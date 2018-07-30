@@ -1,0 +1,12 @@
+{
+  "name": "fetchMotions",
+  "version": "1.0.0",
+  "description": "Fetch motions from Sveriges Riksdag and put into DB",
+  "author": "Markus Silberstein Hont <markus@silberstein.nu>",
+  "license": "MIT",
+  "dependencies": {
+    "aws-sdk": "^2.282.1",
+    "moment": "^2.22.2",
+    "request": "^2.87.0"
+  }
+}

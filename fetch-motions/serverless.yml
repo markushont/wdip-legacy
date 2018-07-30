@@ -1,0 +1,57 @@
+# Welcome to Serverless!
+#
+# This file is the main config file for your service.
+# It's very minimal at this point and uses default values.
+# You can always add more config options for more control.
+# We've included some commented out config examples here.
+# Just uncomment any of them to get that config option.
+#
+# For full config options, check the docs:
+#    docs.serverless.com
+#
+# Happy Coding!
+
+service: fetch-motions
+
+app: motioner
+tenant: markushont
+
+provider:
+  name: aws
+  runtime: nodejs8.11.3
+  timeout: 300
+  profile: serverless
+  stage: dev
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: "arn:aws:dynamodb:eu-central-1:512130172746:table/motion-request-log"
+    - Effect: "Allow"
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: "arn:aws:dynamodb:eu-central-1:512130172746:table/motions"
+
+  environment:
+    MOTION_REQUEST_LOG_TABLE: "motion-request-log"
+    MOTION_TABLE: "motions"
+
+functions:
+  fetchMotions:
+    name: ${self:provider.stage}-fetch-motions
+    handler: handler.fetchMotions
+    events:
+      # Every Sunday at 00:00
+      - schedule:
+          rate: cron(0 0 * * 0)
+          enabled: false
