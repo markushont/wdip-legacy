@@ -86,7 +86,7 @@ async function parseQueryResult(data) {
     // Fetch status and parse
     var isPending = false;
     var statusUrl = urlHelpers.getDocStatusQuery(dok.dok_id);
-    /*
+
     try {
       const statusResp = await getJsonFromUrl(statusUrl);
       const statusObj = statusResp.dokumentstatus;
@@ -105,7 +105,6 @@ async function parseQueryResult(data) {
       console.log("Could not fetch status for url " + statusUrl +
       "\n Reason: " + error);
     }
-    */
 
     toAdd.isPending = isPending;
     batchRequest.RequestItems[process.env.MOTION_TABLE].push({
