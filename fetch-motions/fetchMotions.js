@@ -16,7 +16,7 @@ if (process.env.IS_LOCAL) {
   });
 }
 
-var dynamodb = new AWS.DynamoDB();
+var documentClient = new AWS.DynamoDB.DocumentClient();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -28,14 +28,14 @@ function logRequest(isSuccess, fetchedToStr) {
     moment().valueOf().toString();
   var toPut = {
     Item: {
-      id:   { S: id },
-      date: { N: date }
+      id: id,
+      date: date
     },
     ReturnConsumedCapacity: "TOTAL",
     TableName: process.env.MOTION_REQUEST_LOG_TABLE
   };
 
-  dynamodb.putItem(toPut, function(err, data) {
+  documentClient.put(toPut, function(err, data) {
     if (err) console.log(err);
     else console.log(data);
   });
@@ -81,56 +81,42 @@ async function parseQueryResult(data) {
 
   await Promise.all(data.dokumentlista.dokument.map(async (dok) => {
     // Add basic info
-    var toAdd = {
-      dok_id:     { S: dok.dok_id },
-      date:       { N: moment(dok.datum, "YYYY-MM-DD").valueOf().toString() },
-      dateStr:    { S: dok.datum },
-      doktyp:     { S: dok.doktyp },
-      subtyp:     { S: dok.subtyp },
-      titel:      { S: dok.sokdata.titel },
-      undertitel: { S: dok.sokdata.undertitel },
-      summary:    { S: dok.summary }
-    };
+    var toAdd = docHelpers.parseBasicInfo(dok);
 
     // Fetch status and parse
-    var statusUrl = urlHelpers.getDocStatusQuery(dok.dok_id);
-    const statusResp = await getJsonFromUrl(statusUrl);
-    const statusObj = statusResp.dokumentstatus;
-
-    toAdd.forslag = docHelpers.parseForslag(statusObj.dokforslag);
-    toAdd.intressent = docHelpers.parseIntressent(statusObj.dokintressent);
-    toAdd.uppgift = docHelpers.parseUppgift(statusObj.dokuppgift);
-
     var isPending = false;
-    if (toAdd.status != undefined) {
-      const status = statusObj.dokument.status;
-      toAdd.status = { S: status };
-      isPending = status != "Klar" && status != "ocr";
-    } else if (statusObj.dokforslag != undefined) {
-      // Check status of sub-proposals
-      for (var i = 0; i < statusObj.dokforslag.forslag.length(); ++i) {
-        var item = statusObj.dokforslag.forslag[i];
-        if (item.utskottet === "Avslag" || item.kammaren === "Bifall" ||
-          item.utskottet === "Bifall" || item.kammaren === "Avslag") {
-          continue;
-        }
-        isPending = true;
-        break;
-      }
-    }
-    toAdd.isPending = { B: isPending.toString() };
+    var statusUrl = urlHelpers.getDocStatusQuery(dok.dok_id);
+    /*
+    try {
+      const statusResp = await getJsonFromUrl(statusUrl);
+      const statusObj = statusResp.dokumentstatus;
 
+      toAdd.forslag = docHelpers.parseForslag(statusObj.dokforslag);
+      toAdd.intressent = docHelpers.parseIntressent(statusObj.dokintressent);
+      toAdd.uppgift = docHelpers.parseUppgift(statusObj.dokuppgift);
+      toAdd.status = docHelpers.parseStatus(statusObj.dokument);
+
+      if (toAdd.status === "Klar" || toAdd.status === "ocr") {
+        toAdd.isPending = false;
+      } else {
+        toAdd.isPending = docHelpers.parsePending(statusObj.dokument);
+      }
+    } catch (error) {
+      console.log("Could not fetch status for url " + statusUrl +
+      "\n Reason: " + error);
+    }
+    */
+
+    toAdd.isPending = isPending;
     batchRequest.RequestItems[process.env.MOTION_TABLE].push({
       PutRequest: { Item: toAdd }
     });
-  }))
+  }));
 
-  console.log(batchRequest.RequestItems);
-
-  return dynamodb.batchWriteItem(batchRequest).promise();
+  return documentClient.batchWrite(batchRequest).promise();
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Get result pages while they exist
 async function getResults(urlString) {
@@ -159,7 +145,7 @@ async function getResults(urlString) {
 
 async function _fetchMotions(_fromDate, _toDate) {
   var response = {};
-  var fromDate = _fromDate != null ? getDateString(_fromDate) : getDateString(0);
+  var fromDate = _fromDate != null ? getDateString(_fromDate) : getDateString(process.env.DATE_ZERO);
   var toDate = _toDate != null ? getDateString(_toDate) : getDateString(Date.now());
 
   var motionRequestUrl = urlHelpers.getMotionQuery(fromDate, toDate);
@@ -176,17 +162,17 @@ module.exports = async function fetchMotions(fromDateStrOverride = null, toDateS
   const requestLogQueryParams = {
     TableName: process.env.MOTION_REQUEST_LOG_TABLE,
     KeyConditionExpression: "id = :success",
-    ExpressionAttributeValues: { ":success": {S: "success" }},
+    ExpressionAttributeValues: { ":success": "success" },
     ScanIndexForward: false,
     Limit: 1
   };
 
   // Check last successful fetch and fetch new
-  dynamodb.query(requestLogQueryParams, async function(err, data) {
+  documentClient.query(requestLogQueryParams, async function(err, data) {
     var response = {};
     if (err) {
-      //console.log(err);
-      console.log(process.env.MOTION_REQUEST_LOG_TABLE);
+      console.log("Failed to query log table " +
+        process.env.MOTION_REQUEST_LOG_TABLE + "\n Reason: " + err);
       response = { statusCode: 500, body: "Unable to access query log"};
     }
     else {

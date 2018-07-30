@@ -1,25 +1,46 @@
 'use strict';
 
+const moment = require('moment')
+
+////////////////////////////////////////////////////////////////////////////////
+
+function _parseBasicInfo(dok) {
+  return({
+    dok_id:     dok.dok_id,
+    date:       dok.datum != undefined ? moment(dok.datum, "YYYY-MM-DD").valueOf() : -1,
+    dateStr:    dok.datum,
+    doktyp:     dok.doktyp,
+    subtyp:     dok.subtyp,
+    titel:      dok.sokdata != undefined ? dok.sokdata.titel : null,
+    undertitel: dok.sokdata != undefined ? dok.sokdata.undertitel : null,
+    //summary:    dok.summary
+  });
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 function _parseForslag(dokForslag) {
-  if (dokForslag === undefined) return undefined;
+  if (dokForslag === undefined || dokForslag.forslag === undefined) {
+    return [];
+  }
   const forslag = dokForslag.forslag;
 
-  var ret = { L: [] };
+  var ret = [];
   forslag.forEach((item) => {
-    ret.L.push({
-      nummer:              { N: item.nummer },
-      beteckning:          { N: item.beteckning },
-      lydelse:             { S: item.lydelse },
-      lydelse2:            { S: item.lydelse2 },
-      utskottet:           { S: item.utskottet },
-      kammaren:            { S: item.kammaren },
-      behandlas_i:         { S: item.behandlas_i },
-      behandlas_i_punkt:   { S: item.behandlas_i_punkt },
-      kammarebeslutstyp:   { S: item.kammarebeslutstyp },
-      intressent:          { S: item.intressent.toString() }, // May be Obj?
-      avsnitt:             { S: item.avsnitt },
-      grundforfattning:    { S: item.grundforfattning },
-      andringsforfattning: { S: item.andringsforfattning }
+    ret.push({
+      nummer:              item.nummer,
+      beteckning:          item.beteckning,
+      lydelse:             item.lydelse,
+      lydelse2:            item.lydelse2,
+      utskottet:           item.utskottet,
+      kammaren:            item.kammaren,
+      behandlas_i:         item.behandlas_i,
+      behandlas_i_punkt:   item.behandlas_i_punkt,
+      kammarebeslutstyp:   item.kammarebeslutstyp,
+      intressent:          item.intressent,
+      avsnitt:             item.avsnitt,
+      grundforfattning:    item.grundforfattning,
+      andringsforfattning: item.andringsforfattning
     });
   });
   return ret;
@@ -28,17 +49,46 @@ function _parseForslag(dokForslag) {
 ////////////////////////////////////////////////////////////////////////////////
 
 function _parseIntressent(dokIntressent) {
-  if (dokIntressent === undefined) return undefined;
+  if (dokIntressent === undefined || dokIntressent.intressent === undefined) {
+    return [];
+  }
   const intressent = dokIntressent.intressent;
+  var ret = [];
 
-  var ret = { L: [] };
-  intressent.forEach((item) => {
-    ret.L.push({
-      intressent_id: { S: item.intressent_id },
-      namn:          { S: item.namn },
-      partibet:      { S: item.partibet },
-      ordning:       { N: item.ordning },
-      roll:          { S: item.roll }
+  function parseItem(item) {
+    ret.push({
+      intressent_id: item.intressent_id,
+      namn:          item.namn,
+      partibet:      item.partibet,
+      ordning:       item.ordning,
+      roll:          item.roll
+    });
+  }
+
+  if (intressent.constructor == Array) {
+    intressent.forEach(parseItem);
+  } else {
+    parseItem(intressent);
+  }
+  return ret;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+function _parseUppgift(dokUppgift) {
+  if (dokUppgift === undefined || dokUppgift.uppgift === undefined) {
+    return [];
+  }
+  const uppgift = dokUppgift.uppgift;
+
+  var ret = [];
+  uppgift.forEach((item) => {
+    ret.push({
+      kod:         item.kod,
+      namn:        item.namn,
+      text:        item.text,
+      dok_id:      item.dok_id,
+      systemdatum: item.systemdatum
     });
   });
   return ret;
@@ -46,25 +96,43 @@ function _parseIntressent(dokIntressent) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-function _parseUppgift(dokUppgift) {
-  if (dokUppgift === undefined) return undefined;
-  const uppgift = dokUppgift.uppgift;
-
-  var ret = { L: [] };
-  uppgift.forEach((item) => {
-    ret.L.push({
-      kod:         { S: item.kod },
-      namn:        { S: item.namn },
-      text:        { S: item.text },
-      dok_id:      { S: item.dok_id },
-      systemdatum: { S: item.systemdatum }
-    });
-  });
-  return ret;
+function _parseStatus(dokument) {
+  if (dokument === undefined || dokument.status === undefined) return null;
+  return dokument.status;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+
+function _parsePending(dokforslag) {
+  if (dokforslag.forslag != undefined) {
+    if (dokforslag.forslag.constructor == Array) {
+      for (var i = 0; i < dokforslag.forslag.length(); ++i) {
+        var item = dokforslag.forslag[i];
+        if (item.utskottet === "Avslag" || item.kammaren === "Bifall" ||
+          item.utskottet === "Bifall" || item.kammaren === "Avslag") {
+          continue;
+        }
+        return true;
+      }
+    } else {
+      var item = dokforslag.forslag;
+      if (item.utskottet != "Avslag" && item.kammaren != "Bifall" &&
+        item.utskottet != "Bifall" && item.kammaren != "Avslag") {
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 module.exports = {
-  parseForslag: _parseForslag,
+  parseBasicInfo:  _parseBasicInfo,
+  parseForslag:    _parseForslag,
   parseIntressent: _parseIntressent,
-  parseUppgift: _parseUppgift
+  parseUppgift:    _parseUppgift,
+  parseStatus:     _parseStatus,
+  parsePending:    _parsePending
 }

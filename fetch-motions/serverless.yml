@@ -45,6 +45,7 @@ provider:
   environment:
     MOTION_REQUEST_LOG_TABLE: "motion-request-log"
     MOTION_TABLE: "motions"
+    DATE_ZERO: "1990-01-01"
 
 functions:
   fetchMotions:
