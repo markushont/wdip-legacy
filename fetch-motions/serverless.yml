@@ -16,12 +16,16 @@ service: fetch-motions
 app: motioner
 tenant: markushont
 
+plugins:
+  - serverless-offline
+
 provider:
   name: aws
-  runtime: nodejs8.11.3
+  runtime: nodejs8.10
   timeout: 300
-  profile: serverless
+  profile: wdip-test
   stage: dev
+  region: eu-west-1
   iamRoleStatements:
     - Effect: "Allow"
       Action:
@@ -31,7 +35,7 @@ provider:
         - dynamodb:PutItem
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
-      Resource: "arn:aws:dynamodb:eu-central-1:512130172746:table/motion-request-log"
+      Resource: "arn:aws:dynamodb:eu-west-1:512130172746:table/motion-request-log"
     - Effect: "Allow"
       Action:
         - dynamodb:Query
@@ -40,7 +44,7 @@ provider:
         - dynamodb:PutItem
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
-      Resource: "arn:aws:dynamodb:eu-central-1:512130172746:table/motions"
+      Resource: "arn:aws:dynamodb:eu-west-1:512130172746:table/motions"
 
   environment:
     MOTION_REQUEST_LOG_TABLE: "motion-request-log"
@@ -49,10 +53,12 @@ provider:
 
 functions:
   fetchMotions:
-    name: ${self:provider.stage}-fetch-motions
     handler: handler.fetchMotions
     events:
-      # Every Sunday at 00:00
+      # Every Sunday at 00:00, see https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/ScheduledEvents.html#CronExpressions
       - schedule:
-          rate: cron(0 0 * * 0)
+          rate: cron(0 0 ? * SUN *)
           enabled: false
+      - http:
+          path: fetch-motions
+          method: get
