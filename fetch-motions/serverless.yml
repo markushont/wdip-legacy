@@ -62,3 +62,6 @@ functions:
       - http:
           path: fetch-motions
           method: get
+      - http:
+          path: fetch-motions
+          method: post
