@@ -88,4 +88,11 @@ cd fetch-motions
 serverless offline -P 3001
 ```
 
+or, to run lambda directly in terminal
+
+```bash
+cd fetch-motions
+SLS_DEBUG=* serverless invoke local --function fetchMotions
+```
+
 The functions' REST endpoints will be served on localhost port 3001, for example http://localhost:3001/hello.
