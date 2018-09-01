@@ -1,38 +1,76 @@
 # AWS Motioner Data or WDIP - Who Dunnit In Politics
 
-### Setting ut the development tools
+## Setting up the development tools
 
 The following tools are needed for development:
 
-1. NodeJS 8.1
+1. Install NodeJS 8.1 from https://nodejs.org/en/download.
 
-1. Python package manager PIP (in order to install AWS CLI below)
+1. Homebrew package manager (in order to install AWS CLI below)
 
     On MacOS, run
 
-    ```sudo easy_install pip```
+    ```/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"```
 
 1. AWS CLI
 
-    Use the Python package manager PIP to install by running
+    Use Homebrew to install the AWS CLI
 
-    ```pip install awscli --upgrade --user```
+    ```brew install awscli```
 
-    See https://docs.aws.amazon.com/cli/latest/userguide/installing.html for more information.
+    See https://docs.aws.amazon.com/cli/latest/userguide/installing.html for more information if you would like to use the Python package manager PIP instead.
 
-1. Add the following configuration in ~/.aws/credentials, replacing with the correct values:
+1. Add the following configuration in ~/.aws/credentials, replacing with the correct (and secret!) values:
 
     ```text
-    [profile-test]
+    [default]
+    aws_access_key_id = any_value_will_do
+    aws_secret_access_key = any_value_will_do
+
+    [wdip-test]
     aws_access_key_id = INSERT-ACCESS-KEY-ID-HERE
     aws_secret_access_key = INSERT-SECRET-KEY-HERE
+    ```
+
+2. Add the following configuration in ~/.aws/config:
+
+    ```text
+    [default]
+    region=eu-west-1
+    output=json
     ```
 
 1. Install the serverless framework (needed mainly for deployment)
 
     ```sudo npm install serverless -g```
 
-### Deploying the backend
+1. Install Docker for running DynamoDB at https://www.docker.com/products/docker-desktop. 
+
+1. Set up DynamoDB locally
+
+    The application is using DynamoDB for persistent storage. It is possible to set up a database instance by using the Docker image at https://hub.docker.com/r/amazon/dynamodb-local/.
+
+    Pull the latest Docker image:
+
+    ```docker pull amazon/dynamodb-local```
+
+    Start the service, exposing the default port
+
+    ```docker run -p 8000:8000 amazon/dynamodb-local```
+
+    Optionally, verify that the database is running
+
+    ```aws dynamodb list-tables --endpoint-url http://localhost:8000```
+
+    should give something similar to
+
+    ```json
+    {
+        "TableNames": []
+    }
+    ```
+
+## Deploying the backend
 
 Using the [serverless](https://www.serverless.com) framework, run the following command to deploy a new version to AWS Lambda:
 
