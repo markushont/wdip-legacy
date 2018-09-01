@@ -1,0 +1,17 @@
+{
+  "name": "Handle-DynamoDB-tables",
+  "version": "1.0.0",
+  "description": "Handle DynamoDB tables for Riksdagen app",
+  "author": "Markus Silberstein Hont <markus@silberstein.nu>",
+  "license": "MIT",
+  "dependencies": {
+  },
+  "devDependencies": {
+  },
+  "scripts": {
+    "create": "node createTables.js",
+    "drop": "node dropTables.js",
+    "reset": "node dropTables.js && node createTables.js",
+    "describe": "node describetables.js"
+  }
+}
