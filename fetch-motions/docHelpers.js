@@ -26,7 +26,7 @@ function _parseForslag(dokForslag) {
   const forslag = dokForslag.forslag;
 
   var ret = [];
-  forslag.forEach((item) => {
+  function parseItem(item) {
     ret.push({
       nummer:              item.nummer,
       beteckning:          item.beteckning,
@@ -41,8 +41,14 @@ function _parseForslag(dokForslag) {
       avsnitt:             item.avsnitt,
       grundforfattning:    item.grundforfattning,
       andringsforfattning: item.andringsforfattning
-    });
-  });
+    }); 
+  }
+
+  if (forslag.constructor == Array) {
+    forslag.forEach(parseItem);
+  } else {
+    parseItem(forslag);
+  }
   return ret;
 }
 
@@ -82,7 +88,7 @@ function _parseUppgift(dokUppgift) {
   const uppgift = dokUppgift.uppgift;
 
   var ret = [];
-  uppgift.forEach((item) => {
+  function parseItem(item) {
     ret.push({
       kod:         item.kod,
       namn:        item.namn,
@@ -90,7 +96,13 @@ function _parseUppgift(dokUppgift) {
       dok_id:      item.dok_id,
       systemdatum: item.systemdatum
     });
-  });
+  }
+
+  if (uppgift.constructor == Array) {
+    uppgift.forEach(parseItem);
+  } else {
+    parseItem(uppgift);
+  }
   return ret;
 }
 
