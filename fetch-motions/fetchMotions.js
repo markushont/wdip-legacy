@@ -11,7 +11,7 @@ const docHelpers = require('./docHelpers');
 // Point to local DB instance
 if (process.env.IS_LOCAL) {
   AWS.config.update({
-    region: "eu-central-1",
+    region: "eu-west-1",
     endpoint: "http://localhost:8000"
   });
 }

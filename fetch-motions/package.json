@@ -8,5 +8,8 @@
     "aws-sdk": "^2.282.1",
     "moment": "^2.22.2",
     "request": "^2.87.0"
+  },
+  "devDependencies": {
+    "serverless-offline": "^3.25.10"
   }
 }
