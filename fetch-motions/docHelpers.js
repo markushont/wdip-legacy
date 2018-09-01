@@ -109,7 +109,7 @@ function _parseUppgift(dokUppgift) {
 ////////////////////////////////////////////////////////////////////////////////
 
 function _parseStatus(dokument) {
-  if (dokument === undefined || dokument.status === undefined) return null;
+  if (dokument === undefined || dokument.status === undefined) return "";
   return dokument.status;
 }
 

@@ -24,8 +24,8 @@ var documentClient = new AWS.DynamoDB.DocumentClient();
 function logRequest(isSuccess, fetchedToStr) {
   var id = isSuccess ? "success" : "fail";
   var date = (fetchedToStr != null) ?
-    moment(fetchedToStr, 'YYYY-MM-DD').valueOf().toString() :
-    moment().valueOf().toString();
+    moment(fetchedToStr, 'YYYY-MM-DD').valueOf() :
+    moment().valueOf();
   var toPut = {
     Item: {
       id: id,
@@ -35,10 +35,10 @@ function logRequest(isSuccess, fetchedToStr) {
     TableName: process.env.MOTION_REQUEST_LOG_TABLE
   };
 
-  documentClient.put(toPut, function(err, data) {
+  return documentClient.put(toPut, function(err, data) {
     if (err) console.log(err);
     else console.log(data);
-  });
+  }).promise();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -66,51 +66,58 @@ function getJsonFromUrl(urlString) {
         reject('Invalid JSON in response from url ' + urlString);
       }
     });
-  });
+  }, 2000);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Parse results and put to db
 async function parseQueryResult(data) {
+  const tableName = process.env.MOTION_TABLE;
   var batchRequest = {
     RequestItems: {
-      [process.env.MOTION_TABLE]: []
+      [tableName]: []
     }
   };
 
-  await Promise.all(data.dokumentlista.dokument.map(async (dok) => {
+  var toAddItems = [];
+  console.log("Number of dok: " + data.dokumentlista.dokument.length);
+  for (const dok of data.dokumentlista.dokument) {
     // Add basic info
-    var toAdd = docHelpers.parseBasicInfo(dok);
+    if (dok === undefined || !dok.dok_id || typeof dok.dok_id != 'string') {
+      console.log("Invalid document id " + dok.dok_id + ", skipping.");
+    } else {
+      var toAdd = docHelpers.parseBasicInfo(dok);
 
-    // Fetch status and parse
-    var isPending = false;
-    var statusUrl = urlHelpers.getDocStatusQuery(dok.dok_id);
+      // Fetch status and parse
+      var statusUrl = urlHelpers.getDocStatusQuery(dok.dok_id);
+      try {
+        const statusResp = await getJsonFromUrl(statusUrl);
+        const statusObj = statusResp.dokumentstatus;
 
-    try {
-      const statusResp = await getJsonFromUrl(statusUrl);
-      const statusObj = statusResp.dokumentstatus;
+        toAdd.forslag = docHelpers.parseForslag(statusObj.dokforslag);
+        toAdd.intressent = docHelpers.parseIntressent(statusObj.dokintressent);
+        toAdd.uppgift = docHelpers.parseUppgift(statusObj.dokuppgift);
+        toAdd.status = docHelpers.parseStatus(statusObj.dokument);
 
-      toAdd.forslag = docHelpers.parseForslag(statusObj.dokforslag);
-      toAdd.intressent = docHelpers.parseIntressent(statusObj.dokintressent);
-      toAdd.uppgift = docHelpers.parseUppgift(statusObj.dokuppgift);
-      toAdd.status = docHelpers.parseStatus(statusObj.dokument);
-
-      if (toAdd.status === "Klar" || toAdd.status === "ocr") {
-        toAdd.isPending = false;
-      } else {
-        toAdd.isPending = docHelpers.parsePending(statusObj.dokument);
+        if (toAdd.status === "Klar" || toAdd.status === "ocr") {
+          toAdd.isPending = false;
+        } else {
+          toAdd.isPending = docHelpers.parsePending(statusObj.dokument);
+        }
+      } catch (error) {
+        console.log("Could not fetch status for url " + statusUrl +
+        "\n Reason: " + error);
       }
-    } catch (error) {
-      console.log("Could not fetch status for url " + statusUrl +
-      "\n Reason: " + error);
-    }
 
-    toAdd.isPending = isPending;
-    batchRequest.RequestItems[process.env.MOTION_TABLE].push({
-      PutRequest: { Item: toAdd }
-    });
-  }));
+      toAddItems.push({PutRequest: {Item: toAdd}});
+    }
+  }
+
+  batchRequest.RequestItems[tableName] = toAddItems;
+
+  const nItems = batchRequest.RequestItems[tableName].length;
+  console.log("Writing " + nItems + " items to DB.");
 
   return documentClient.batchWrite(batchRequest).promise();
 }
@@ -128,7 +135,7 @@ async function getResults(urlString) {
       if (nextPage != undefined && nextPage != "" && nextPage != nextUrl) nextUrl = nextPage;
       else nextUrl = null;
 
-      if (jsonResp.dokumentlista.dokument != undefined) {
+      if (jsonResp.dokumentlista.dokument != undefined && jsonResp.dokumentlista.dokument.length > 0) {
         var dbPromise = parseQueryResult(jsonResp);
         dbPromises.push(dbPromise);
       }
@@ -137,7 +144,7 @@ async function getResults(urlString) {
       nextUrl = null;
     }
   }
-  return Promise.all(dbPromises);
+  return dbPromises;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -147,11 +154,16 @@ async function _fetchMotions(_fromDate, _toDate) {
   var fromDate = _fromDate != null ? getDateString(_fromDate) : getDateString(process.env.DATE_ZERO);
   var toDate = _toDate != null ? getDateString(_toDate) : getDateString(Date.now());
 
-  var motionRequestUrl = urlHelpers.getMotionQuery(fromDate, toDate);
-  var propositionRequestUrl = urlHelpers.getPropositionQuery(fromDate, toDate);
-  await Promise.all([getResults(motionRequestUrl), getResults(propositionRequestUrl)]);
-
-  response.status = 200; // TODO: improve
+  try {
+    var motionRequestUrl = urlHelpers.getMotionQuery(fromDate, toDate);
+    var propositionRequestUrl = urlHelpers.getPropositionQuery(fromDate, toDate);
+    var results = [];
+    results.concat(getResults(motionRequestUrl), getResults(propositionRequestUrl));
+    await Promise.all(results);
+    response.status = 200; // TODO: improve
+  } catch (error) {
+    response.status = 500;
+  }
   return response;
 }
 
@@ -167,7 +179,7 @@ module.exports = async function fetchMotions(fromDateStrOverride = null, toDateS
   };
 
   // Check last successful fetch and fetch new
-  documentClient.query(requestLogQueryParams, async function(err, data) {
+  return documentClient.query(requestLogQueryParams, async function(err, data) {
     var response = {};
     if (err) {
       console.log("Failed to query log table " +
@@ -187,7 +199,11 @@ module.exports = async function fetchMotions(fromDateStrOverride = null, toDateS
         return {};
       } else {
         response = await _fetchMotions(fetchFrom, fetchTo);
-        if (response.status === 200) logRequest(true, fetchTo);
+        try {
+          logRequest(response.status == 200, fetchTo);
+        } catch (error) {
+          console.log("Could not log request");
+        }
       }
     }
     return response;
