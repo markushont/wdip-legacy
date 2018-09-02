@@ -5,6 +5,7 @@
 var AWS = require('aws-sdk');
 var moment = require('moment');
 const request = require('request');
+var sizeof = require('object-sizeof');
 const urlHelpers = require('./urlHelpers');
 const docHelpers = require('./docHelpers');
 
@@ -55,7 +56,8 @@ function getDateString(dateInt) {
 function getJsonFromUrl(urlString) {
   return new Promise((resolve, reject) => {
     console.log("Fetching url " + urlString);
-    request(urlString, (error, response, body) => {
+    const encodedUrl = encodeURI(urlString);
+    request(encodedUrl, (error, response, body) => {
       if (error) reject(error);
       if (response.statusCode != 200) {
         reject('Invalid status code <' + response.statusCode + '>');
@@ -81,7 +83,6 @@ async function parseQueryResult(data) {
   };
 
   var toAddItems = [];
-  console.log("Number of dok: " + data.dokumentlista.dokument.length);
   for (const dok of data.dokumentlista.dokument) {
     // Add basic info
     if (dok === undefined || !dok.dok_id || typeof dok.dok_id != 'string') {
@@ -110,7 +111,18 @@ async function parseQueryResult(data) {
         "\n Reason: " + error);
       }
 
-      toAddItems.push({PutRequest: {Item: toAdd}});
+      // DynamoDB only accepts items smaller than 400 kB
+      const toAddSize = sizeof(toAdd);
+      if (toAddSize > 300000) {
+        console.warn("Stripping very large object with id " + toAdd.dok_id + " and size: " + toAddSize.toString());
+        var strippedObj = docHelpers.parseBasicInfo(dok);
+        strippedObj.isPending = toAdd.isPending;
+        strippedObj.status = toAdd.status;
+        toAddItems.push({PutRequest: {Item: strippedObj}});
+        console.log("New size: " + sizeof(strippedObj));
+      } else {
+        toAddItems.push({PutRequest: {Item: toAdd}});
+      }
     }
   }
 
