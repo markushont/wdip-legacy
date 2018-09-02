@@ -70,6 +70,13 @@ The following tools are needed for development:
     }
     ```
 
+1. Initialize the local database
+
+    ```bash
+    cd local
+    npm run create
+    ```
+
 ## Deploying the backend
 
 Using the [serverless](https://www.serverless.com) framework, run the following command to deploy a new version to AWS Lambda:
