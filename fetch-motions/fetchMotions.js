@@ -37,9 +37,9 @@ function logRequest(isSuccess, fetchedToStr) {
   };
 
   return documentClient.put(toPut, function(err, data) {
-    if (err) console.log(err);
-    else console.log(data);
-  }).promise();
+    if (err) console.log("Error logging request. Error: " + err);
+    else console.log("Logged request. Success: " + isSuccess.toString() + ". FetchedTo: " + fetchedToStr);
+  });
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -111,9 +111,9 @@ async function parseQueryResult(data) {
         "\n Reason: " + error);
       }
 
-      // DynamoDB only accepts items smaller than 400 kB
       const toAddSize = sizeof(toAdd);
-      if (toAddSize > 300000) {
+      const maxSize = process.env.DB_ITEM_MAX_SIZE;
+      if (maxSize && toAddSize > maxSize) {
         console.warn("Stripping very large object with id " + toAdd.dok_id + " and size: " + toAddSize.toString());
         var strippedObj = docHelpers.parseBasicInfo(dok);
         strippedObj.isPending = toAdd.isPending;
@@ -129,9 +129,13 @@ async function parseQueryResult(data) {
   batchRequest.RequestItems[tableName] = toAddItems;
 
   const nItems = batchRequest.RequestItems[tableName].length;
-  console.log("Writing " + nItems + " items to DB.");
-
-  return documentClient.batchWrite(batchRequest).promise();
+  if (nItems > 0) {
+    console.log("Writing " + nItems + " items to DB.");
+    return documentClient.batchWrite(batchRequest).promise();
+  } else {
+    console.log("No items to write for page, skipping");
+    return new Promise((resolve, reject) => resolve());
+  }
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -156,32 +160,24 @@ async function getResults(urlString) {
       nextUrl = null;
     }
   }
-  return dbPromises;
+  return Promise.all(dbPromises);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 async function _fetchMotions(_fromDate, _toDate) {
-  var response = {};
   var fromDate = _fromDate != null ? getDateString(_fromDate) : getDateString(process.env.DATE_ZERO);
   var toDate = _toDate != null ? getDateString(_toDate) : getDateString(Date.now());
 
-  try {
-    var motionRequestUrl = urlHelpers.getMotionQuery(fromDate, toDate);
-    var propositionRequestUrl = urlHelpers.getPropositionQuery(fromDate, toDate);
-    var results = [];
-    results.concat(getResults(motionRequestUrl), getResults(propositionRequestUrl));
-    await Promise.all(results);
-    response.status = 200; // TODO: improve
-  } catch (error) {
-    response.status = 500;
-  }
-  return response;
+  var motionRequestUrl = urlHelpers.getMotionQuery(fromDate, toDate);
+  var propositionRequestUrl = urlHelpers.getPropositionQuery(fromDate, toDate);
+  var result = Promise.all([getResults(motionRequestUrl), getResults(propositionRequestUrl)]);
+  return result;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-module.exports = async function fetchMotions(fromDateStrOverride = null, toDateStrOverride = null) {
+module.exports = async function fetchMotions(fromDateStrOverride = null, toDateStrOverride = null, callback) {
   const requestLogQueryParams = {
     TableName: process.env.MOTION_REQUEST_LOG_TABLE,
     KeyConditionExpression: "id = :success",
@@ -191,33 +187,40 @@ module.exports = async function fetchMotions(fromDateStrOverride = null, toDateS
   };
 
   // Check last successful fetch and fetch new
-  return documentClient.query(requestLogQueryParams, async function(err, data) {
-    var response = {};
+  var fetchFrom = await documentClient.query(requestLogQueryParams, async function(err, data) {
     if (err) {
       console.log("Failed to query log table " +
-        process.env.MOTION_REQUEST_LOG_TABLE + "\n Reason: " + err);
-      response = { statusCode: 500, body: "Unable to access query log"};
+      process.env.MOTION_REQUEST_LOG_TABLE + "\n Reason: " + err);
+      return null;
+    } else {
+      return data.Count > 0 ? data.Items[0].date : null;
     }
-    else {
-      var fetchFrom = data.Count > 0 ? data.Items[0].date : null;
-      if (fromDateStrOverride != null)
-        fetchFrom = moment(fromDateStrOverride, 'YYYY-MM-DD');
-      var fetchTo = null;
-      if (toDateStrOverride != null)
-        fetchTo = moment(toDateStrOverride, 'YYYY-MM-DD');
-
-      // Do nothing if interval is zero
-      if (fetchFrom != null && fetchFrom === fetchTo) {
-        return {};
-      } else {
-        response = await _fetchMotions(fetchFrom, fetchTo);
-        try {
-          logRequest(response.status == 200, fetchTo);
-        } catch (error) {
-          console.log("Could not log request");
-        }
-      }
-    }
-    return response;
   });
+
+  if (fromDateStrOverride != null) {
+    fetchFrom = moment(fromDateStrOverride, 'YYYY-MM-DD');
+  }
+
+  var fetchTo = null;
+  if (toDateStrOverride != null) {
+    fetchTo = moment(toDateStrOverride, 'YYYY-MM-DD');
+  }
+
+  var fetchResp = {};
+  // Do nothing if interval is zero
+  if (fetchFrom != null && fetchFrom === fetchTo) {
+    fetchResp = { statusCode: 200, body: "Interval is zero, nothing to fetch"};
+  } else {
+    fetchResp = await _fetchMotions(fetchFrom, fetchTo)
+    .then(resp => {
+      return { statusCode: 200, body: resp, nAdded: nItems };
+    })
+    .catch(err => {
+      return { statusCode: 500, body: err};
+    });
+    logRequest(fetchResp.statusCode == 200, fetchTo);
+  }
+
+  console.log("Callback with response " + fetchResp.statusCode);
+  callback(fetchResp.statusCode, fetchResp);
 };
