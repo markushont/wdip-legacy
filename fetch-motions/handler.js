@@ -3,7 +3,6 @@
 const fetchMotions = require('./fetchMotions');
 
 module.exports.fetchMotions = (event, context, callback) => {
-  console.log("Hello from fetchMotions");
   let payload = event.body != undefined ? JSON.parse(event.body) : undefined;
 
   var from = payload && payload.from != undefined ? payload.from : null;
