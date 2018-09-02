@@ -48,21 +48,15 @@ The following tools are needed for development:
 
 1. Set up DynamoDB locally
 
-    The application is using DynamoDB for persistent storage. It is possible to set up a database instance by using the Docker image at https://hub.docker.com/r/amazon/dynamodb-local/.
+    The application is using DynamoDB for persistent storage. In the repository root, run the following command to start the database and an admin interface:
 
-    Pull the latest Docker image:
+    ```docker-compose up```
 
-    ```docker pull amazon/dynamodb-local```
-
-    Start the service, exposing the default port
-
-    ```docker run -p 8000:8000 amazon/dynamodb-local```
-
-    Optionally, verify that the database is running
+    Optionally, verify that the database is running by going to http://localhost:8001 or by running
 
     ```aws dynamodb list-tables --endpoint-url http://localhost:8000```
 
-    should give something similar to
+    This should give something similar to
 
     ```json
     {
@@ -76,6 +70,8 @@ The following tools are needed for development:
     cd local
     npm run create
     ```
+
+    Optionally verify in the admin GUI or the AWS CLI as above. 
 
 ## Deploying the backend
 

@@ -1,0 +1,20 @@
+version: '3'
+
+services:
+  dynamodb:
+    # Note that there is an official image from Amazon, but I cannot get it to accept startup arguments.
+    image: "dwmkerr/dynamodb"
+    volumes: 
+      - dynamodb:/data
+    ports: 
+      - 8000:8000
+    command: "-sharedDb -dbPath /data"  
+  dynamodb-admin:
+    image: "boogak/dynamodb-admin"
+    ports: 
+      - 8001:8001
+    environment: 
+      DYNAMO_ENDPOINT: "http://dynamodb:8000"
+
+volumes: 
+  dynamodb:
