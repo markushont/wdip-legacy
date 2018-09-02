@@ -111,9 +111,9 @@ async function parseQueryResult(data) {
         "\n Reason: " + error);
       }
 
-      // DynamoDB only accepts items smaller than 400 kB
       const toAddSize = sizeof(toAdd);
-      if (toAddSize > 300000) {
+      const maxSize = process.env.DB_ITEM_MAX_SIZE;
+      if (maxSize && toAddSize > maxSize) {
         console.warn("Stripping very large object with id " + toAdd.dok_id + " and size: " + toAddSize.toString());
         var strippedObj = docHelpers.parseBasicInfo(dok);
         strippedObj.isPending = toAdd.isPending;
