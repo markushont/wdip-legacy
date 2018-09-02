@@ -5,9 +5,9 @@
   "author": "Markus Silberstein Hont <markus@silberstein.nu>",
   "license": "MIT",
   "dependencies": {
+    "aws-sdk": "^2.307.0"
   },
-  "devDependencies": {
-  },
+  "devDependencies": {},
   "scripts": {
     "create": "node createTables.js",
     "drop": "node dropTables.js",
