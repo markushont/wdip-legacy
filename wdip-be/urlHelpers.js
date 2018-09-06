@@ -20,5 +20,5 @@ module.exports.getPropositionQuery = (fromString, toString) => {
 };
 
 module.exports.getDocStatusQuery = (docId) => {
-  return DOC_STATUS_QUERY_DYNAMIC.format(docId);
+  return encodeURI(DOC_STATUS_QUERY_DYNAMIC.format(docId));
 };

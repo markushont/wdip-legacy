@@ -17,16 +17,15 @@ if (process.env.IS_OFFLINE || process.env.IS_LOCAL) {
   });
 }
 
+var dynamoDb = new AWS.DynamoDB();
 var documentClient = new AWS.DynamoDB.DocumentClient();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Add entry to request log
-function logRequest(isSuccess, fetchedToStr) {
+function logRequest(isSuccess, fetchedTo) {
   var id = isSuccess ? "success" : "fail";
-  var date = (fetchedToStr != null) ?
-    moment(fetchedToStr, 'YYYY-MM-DD').valueOf() :
-    moment().valueOf();
+  var date = (fetchedTo != null) ? fetchedTo : moment().valueOf();
   var toPut = {
     Item: {
       id: id,
@@ -38,7 +37,7 @@ function logRequest(isSuccess, fetchedToStr) {
 
   return documentClient.put(toPut, function(err, data) {
     if (err) console.log("Error logging request. Error: " + err);
-    else console.log("Logged request. Success: " + isSuccess.toString() + ". FetchedTo: " + fetchedToStr);
+    else console.log("Logged request. Success: " + isSuccess.toString() + ". FetchedTo: " + fetchedTo);
   });
 }
 
@@ -53,18 +52,20 @@ function getDateString(dateInt) {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+/* Http fetch from URL encoded string */
 function getJsonFromUrl(urlString) {
+  console.log("Fetching URL: " + urlString);
   return new Promise((resolve, reject) => {
-    console.log("Fetching url " + urlString);
-    const encodedUrl = encodeURI(urlString);
-    request(encodedUrl, (error, response, body) => {
+    request(urlString, (error, response, body) => {
       if (error) reject(error);
+      if (!response) reject("Undefined response from URL " + urlString);
       if (response.statusCode != 200) {
         reject('Invalid status code <' + response.statusCode + '>');
       }
       try {
         resolve(JSON.parse(body));
       } catch (err) {
+        console.error('Invalid JSON in response from url ' + urlString);
         reject('Invalid JSON in response from url ' + urlString);
       }
     });
@@ -107,8 +108,9 @@ async function parseQueryResult(data) {
           toAdd.isPending = docHelpers.parsePending(statusObj.dokument);
         }
       } catch (error) {
-        console.log("Could not fetch status for url " + statusUrl +
+        console.error("Could not fetch status for url " + statusUrl +
         "\n Reason: " + error);
+        toAdd.isPending = true;
       }
 
       const toAddSize = sizeof(toAdd);
@@ -149,14 +151,16 @@ async function getResults(urlString) {
       const jsonResp = await getJsonFromUrl(nextUrl);
       var nextPage = jsonResp.dokumentlista['@nasta_sida'];
       if (nextPage != undefined && nextPage != "" && nextPage != nextUrl) nextUrl = nextPage;
-      else nextUrl = null;
+      else {
+        nextUrl = null;
+      }
 
       if (jsonResp.dokumentlista.dokument != undefined && jsonResp.dokumentlista.dokument.length > 0) {
         var dbPromise = parseQueryResult(jsonResp);
         dbPromises.push(dbPromise);
       }
     } catch (error) {
-      console.log("Error when fetching url " + nextUrl + ": " + error);
+      console.error("Error when fetching url " + nextUrl + ": " + error);
       nextUrl = null;
     }
   }
@@ -178,8 +182,9 @@ async function _fetchMotions(_fromDate, _toDate) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 module.exports = async function fetchMotions(fromDateStrOverride = null, toDateStrOverride = null, callback) {
+  const requestLogTableName = process.env.MOTION_REQUEST_LOG_TABLE;
   const requestLogQueryParams = {
-    TableName: process.env.MOTION_REQUEST_LOG_TABLE,
+    TableName: requestLogTableName,
     KeyConditionExpression: "id = :success",
     ExpressionAttributeValues: { ":success": "success" },
     ScanIndexForward: false,
@@ -187,23 +192,35 @@ module.exports = async function fetchMotions(fromDateStrOverride = null, toDateS
   };
 
   // Check last successful fetch and fetch new
-  var fetchFrom = await documentClient.query(requestLogQueryParams, async function(err, data) {
-    if (err) {
-      console.log("Failed to query log table " +
-      process.env.MOTION_REQUEST_LOG_TABLE + "\n Reason: " + err);
-      return null;
-    } else {
-      return data.Count > 0 ? data.Items[0].date : null;
+  var fetchFrom = moment(process.env.DATE_ZERO, 'YYYY-MM-DD').valueOf();
+  try {
+    var requestLogEmpty = await dynamoDb.describeTable({TableName: requestLogTableName}, async (err, data) => {
+      return (err || data.Table.ItemCount === 0);
+    });
+    if (!fetchFrom) {
+      fetchFrom = await documentClient.query(requestLogQueryParams).promise()
+      .then(data => {
+        console.log("FETCHING FROM: " + JSON.stringify(data.Items[0].date));
+        return data.Count > 0 ? data.Items[0].date : null;
+      })
+      .catch(err => {
+        console.error("Failed to query log table " +
+        process.env.MOTION_REQUEST_LOG_TABLE + "\nReason: " + err);
+        return null;
+      });
     }
-  });
+  } catch (error) {
+    console.error("Unable to fetch request log entry. Error:\n" + error + "\nExiting.");
+    return;
+  }
 
   if (fromDateStrOverride != null) {
-    fetchFrom = moment(fromDateStrOverride, 'YYYY-MM-DD');
+    fetchFrom = moment(fromDateStrOverride, 'YYYY-MM-DD').valueOf();
   }
 
   var fetchTo = null;
   if (toDateStrOverride != null) {
-    fetchTo = moment(toDateStrOverride, 'YYYY-MM-DD');
+    fetchTo = moment(toDateStrOverride, 'YYYY-MM-DD').valueOf();
   }
 
   var fetchResp = {};
