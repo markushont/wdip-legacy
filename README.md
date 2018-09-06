@@ -84,7 +84,7 @@ The following tools are needed for development:
 Using the [serverless](https://www.serverless.com) framework, run the following command to deploy a new version to AWS Lambda:
 
 ```bash
-cd fetch-motions
+cd wdip-be
 serverless deploy -v
 ```
 
@@ -95,14 +95,14 @@ serverless deploy -v
 In order to serve the lambda functions on your local machine, run
 
 ```bash
-cd fetch-motions
+cd wdip-be
 serverless offline -P 3001
 ```
 
 or, to run lambda directly in terminal
 
 ```bash
-cd fetch-motions
+cd wdip-be
 SLS_DEBUG=* serverless invoke local --function fetchMotions
 ```
 

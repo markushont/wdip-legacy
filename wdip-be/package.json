@@ -1,5 +1,5 @@
 {
-  "name": "fetchMotions",
+  "name": "wdip-be",
   "version": "1.0.0",
   "description": "Fetch motions from Sveriges Riksdag and put into DB",
   "author": "Markus Silberstein Hont <markus@silberstein.nu>",
