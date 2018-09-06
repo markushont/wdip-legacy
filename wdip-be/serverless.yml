@@ -49,7 +49,7 @@ provider:
   environment:
     MOTION_REQUEST_LOG_TABLE: "motion-request-log"
     MOTION_TABLE: "motions"
-    DATE_ZERO: "1990-01-01"
+    DATE_ZERO: "2000-01-01"
     DB_ITEM_MAX_SIZE: 300000 # Dynamodb max item size 400 kB
 
 functions:
