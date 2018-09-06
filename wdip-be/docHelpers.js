@@ -30,6 +30,7 @@ function _parseForslag(dokForslag) {
     ret.push({
       nummer:              item.nummer,
       beteckning:          item.beteckning,
+      beslutstyp:          item.beslutstyp,
       lydelse:             item.lydelse,
       lydelse2:            item.lydelse2,
       utskottet:           item.utskottet,
@@ -120,16 +121,16 @@ function _parsePending(dokforslag) {
     if (dokforslag.forslag.constructor == Array) {
       for (var i = 0; i < dokforslag.forslag.length(); ++i) {
         var item = dokforslag.forslag[i];
-        if (item.utskottet === "Avslag" || item.kammaren === "Bifall" ||
-          item.utskottet === "Bifall" || item.kammaren === "Avslag") {
+        if (item.utskottet.toLowerCase() === "avslag" || item.kammaren.toLowerCase() === "bifall" ||
+          item.utskottet.toLowerCase() === "bifall" || item.kammaren.toLowerCase() === "avslag") {
           continue;
         }
         return true;
       }
     } else {
       var item = dokforslag.forslag;
-      if (item.utskottet != "Avslag" && item.kammaren != "Bifall" &&
-        item.utskottet != "Bifall" && item.kammaren != "Avslag") {
+      if (item.utskottet.toLowerCase() != "avslag" && item.kammaren.toLowerCase() != "bifall" &&
+        item.utskottet.toLowerCase() != "bifall" && item.kammaren.toLowerCase() != "avslag") {
         return true;
       }
     }
