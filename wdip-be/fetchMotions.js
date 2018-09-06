@@ -22,6 +22,15 @@ var documentClient = new AWS.DynamoDB.DocumentClient();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+// Log errors
+var loggedErrors = [];
+function logError(errorText) {
+  console.error(errorText);
+  loggedErrors.push(errorText);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 // Add entry to request log
 function logRequest(isSuccess, fetchedTo) {
   var id = isSuccess ? "success" : "fail";
@@ -29,7 +38,8 @@ function logRequest(isSuccess, fetchedTo) {
   var toPut = {
     Item: {
       id: id,
-      date: date
+      date: date,
+      errors: loggedErrors
     },
     ReturnConsumedCapacity: "TOTAL",
     TableName: process.env.MOTION_REQUEST_LOG_TABLE
@@ -65,7 +75,7 @@ function getJsonFromUrl(urlString) {
       try {
         resolve(JSON.parse(body));
       } catch (err) {
-        console.error('Invalid JSON in response from url ' + urlString);
+        logError('Invalid JSON in response from url ' + urlString);
         reject('Invalid JSON in response from url ' + urlString);
       }
     });
@@ -108,7 +118,7 @@ async function parseQueryResult(data) {
           toAdd.isPending = docHelpers.parsePending(statusObj.dokument);
         }
       } catch (error) {
-        console.error("Could not fetch status for url " + statusUrl +
+        logError("Could not fetch status for url " + statusUrl +
         "\n Reason: " + error);
         toAdd.isPending = true;
       }
@@ -160,7 +170,7 @@ async function getResults(urlString) {
         dbPromises.push(dbPromise);
       }
     } catch (error) {
-      console.error("Error when fetching url " + nextUrl + ": " + error);
+      logError("Error when fetching url " + nextUrl + ": " + error);
       nextUrl = null;
     }
   }
@@ -204,13 +214,13 @@ module.exports = async function fetchMotions(fromDateStrOverride = null, toDateS
         return data.Count > 0 ? data.Items[0].date : null;
       })
       .catch(err => {
-        console.error("Failed to query log table " +
+        logError("Failed to query log table " +
         process.env.MOTION_REQUEST_LOG_TABLE + "\nReason: " + err);
         return null;
       });
     }
   } catch (error) {
-    console.error("Unable to fetch request log entry. Error:\n" + error + "\nExiting.");
+    logError("Unable to fetch request log entry. Error:\n" + error + "\nExiting.");
     return;
   }
 
