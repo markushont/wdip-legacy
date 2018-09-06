@@ -31,7 +31,7 @@ const responses = {
     }
 };
 
-module.exports.getMotionsByParty = async (event, context, callback) => {
+module.exports.getMotionsByParty = async (event, context) => {
     let result = await getMotionsByParty(new Date(2000, 0, 1), new Date(2010, 0, 1));
-    callback(null, responses.success(result));
+    return responses.success(result);
 };
