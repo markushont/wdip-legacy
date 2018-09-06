@@ -44,6 +44,12 @@ The following tools are needed for development:
 
     ```sudo npm install serverless -g```
 
+1. Install TypeScript
+
+    ```bash
+    npm install -g typescript
+    ```
+
 1. Install Docker for running DynamoDB at https://www.docker.com/products/docker-desktop. 
 
 1. Set up DynamoDB locally
@@ -84,6 +90,8 @@ serverless deploy -v
 
 ## Running the application
 
+### Backend
+
 In order to serve the lambda functions on your local machine, run
 
 ```bash
@@ -99,3 +107,12 @@ SLS_DEBUG=* serverless invoke local --function fetchMotions
 ```
 
 The functions' REST endpoints will be served on localhost port 3001, for example http://localhost:3001/hello.
+
+### Frontend
+
+Start the frontend application by running
+
+```bash
+cd wdip-fe
+npm start
+```
