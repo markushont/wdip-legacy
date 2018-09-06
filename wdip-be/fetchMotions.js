@@ -207,7 +207,7 @@ module.exports = async function fetchMotions(fromDateStrOverride = null, toDateS
     var requestLogEmpty = await dynamoDb.describeTable({TableName: requestLogTableName}, async (err, data) => {
       return (err || data.Table.ItemCount === 0);
     });
-    if (!fetchFrom) {
+    if (!requestLogEmpty) {
       fetchFrom = await documentClient.query(requestLogQueryParams).promise()
       .then(data => {
         console.log("FETCHING FROM: " + JSON.stringify(data.Items[0].date));
