@@ -4,6 +4,10 @@
   "description": "Fetch motions from Sveriges Riksdag and put into DB",
   "author": "Markus Silberstein Hont <markus@silberstein.nu>",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/markushont/aws-motioner-data.git"
+  },
   "dependencies": {
     "aws-sdk": "^2.282.1",
     "moment": "^2.22.2",

@@ -66,3 +66,9 @@ functions:
       - http:
           path: fetch-motions
           method: post
+  getMotionsByParty:
+    handler: apiHandler.getMotionsByParty
+    events:
+      - http:
+          path: motions/byparty
+          method: get
