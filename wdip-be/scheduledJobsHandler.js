@@ -1,6 +1,6 @@
 'use strict';
 
-const fetchMotions = require('./fetchMotions');
+const fetchMotions = require('./scheduledJobs/fetchMotions');
 
 module.exports.fetchMotions = (event, context, callback) => {
   let payload = event.body != undefined ? JSON.parse(event.body) : undefined;
