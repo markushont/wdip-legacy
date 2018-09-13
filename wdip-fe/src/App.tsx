@@ -4,8 +4,11 @@ import './App.css';
 import { GridContainer, Grid, Cell } from 'react-foundation';
 import Header from './Header';
 import MotionsByParty from './MotionsPerParty';
+import { MotionsApi } from './service/wdip-be';
 
 class App extends React.Component<any, any> {
+
+  api: MotionsApi = new MotionsApi();
 
   constructor(props: any) {
     super(props);
@@ -17,8 +20,7 @@ class App extends React.Component<any, any> {
   }
 
   async fetchData() {
-    let data = await fetch("http://localhost:3001/motions/byparty");
-    this.setState({ motionsByParty: await data.json() });
+    this.setState({ motionsByParty: await this.api.getMotionsByParty() });
   }
 
   public render() {
@@ -28,11 +30,11 @@ class App extends React.Component<any, any> {
 
         <GridContainer>
           <Grid >
-         
+
             <Cell>
               <h1>WDIP</h1>
             </Cell>
-         
+
             <Cell>
               <h2>
                 Motioner per parti
@@ -45,7 +47,7 @@ class App extends React.Component<any, any> {
 
             <Cell medium={4}>4 cols</Cell>
             <Cell medium={8}>8 cols</Cell>
-         
+
           </Grid>
         </GridContainer>
 
