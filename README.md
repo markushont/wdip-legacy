@@ -79,6 +79,18 @@ The following tools are needed for development:
 
     Optionally verify in the admin GUI or the AWS CLI as above. 
 
+## Generating API Client
+
+The backend API is defined in an OpenAPI definition file (at wdip-be/api/swagger.yml). This can be used to automatically generate a client component for the frontend application, making it easy to use the backend service by invoking methods and getting typed response objects back. When the API definition changes, you can regenerate the API client by running the following commands:
+
+```bash
+# Remove the previous API client
+rm -rf wdip-fe/src/service/wdip-be
+
+# Generate the new API client
+docker run --rm -v ${PWD}:/local openapitools/openapi-generator-cli generate -i /local/wdip-be/api/swagger.yml -g typescript-fetch -o /local/wdip-fe/src/service/wdip-be
+```
+
 ## Deploying the backend
 
 Using the [serverless](https://www.serverless.com) framework, run the following command to deploy a new version to AWS Lambda:
