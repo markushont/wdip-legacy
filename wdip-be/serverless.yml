@@ -72,3 +72,13 @@ functions:
       - http:
           path: motions/byparty
           method: get
+  getMotion:
+    handler: apiHandler.getMotionById
+    events:
+      - http:
+          path: motions/{id}
+          method: get
+          requests:
+            parameters:
+              paths:
+                id: true
