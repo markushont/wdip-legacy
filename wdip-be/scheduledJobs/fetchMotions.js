@@ -67,16 +67,17 @@ function getJsonFromUrl(urlString) {
   console.log("Fetching URL: " + urlString);
   return new Promise((resolve, reject) => {
     request(urlString, (error, response, body) => {
-      if (error) reject(error);
-      if (!response) reject("Undefined response from URL " + urlString);
-      if (response.statusCode != 200) {
+      if (error) {
+        reject(error);
+      } else if (response.statusCode != 200) {
         reject('Invalid status code <' + response.statusCode + '>');
-      }
-      try {
-        resolve(JSON.parse(body));
-      } catch (err) {
-        logError('Invalid JSON in response from url ' + urlString);
-        reject('Invalid JSON in response from url ' + urlString);
+      } else {
+        try {
+          resolve(JSON.parse(body));
+        } catch (err) {
+          logError('Invalid JSON in response from url ' + urlString);
+          reject('Invalid JSON in response from url ' + urlString);
+        }
       }
     });
   }, 2000);
