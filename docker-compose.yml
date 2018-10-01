@@ -4,6 +4,7 @@ services:
   dynamodb:
     # Note that there is an official image from Amazon, but I cannot get it to accept startup arguments.
     image: "dwmkerr/dynamodb"
+    container_name: wdip_dynamodb
     volumes: 
       - dynamodb:/data
     ports: 
@@ -11,10 +12,34 @@ services:
     command: "-sharedDb -dbPath /data"  
   dynamodb-admin:
     image: "boogak/dynamodb-admin"
+    container_name: wdip_dynamodbadmin
     ports: 
       - 8001:8001
     environment: 
       DYNAMO_ENDPOINT: "http://dynamodb:8000"
+  elastic-search:
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.4.0
+    container_name: wdip_elasticsearch
+    depends_on: 
+      - dynamodb
+    volumes: 
+      - elasticsearch:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+    environment: 
+      discovery.type: single-node
+  kibana:
+    image: docker.elastic.co/kibana/kibana:6.4.1
+    container_name: wdip_kibana
+    depends_on:
+      - elastic-search
+    # volumes:
+      # - ./kibana.yml:/usr/share/kibana/config/kibana.yml
+    ports: 
+      - 5601:5601
+    environment: 
+      ELASTICSEARCH_URL: "http://elastic-search:9200"
 
 volumes: 
   dynamodb:
+  elasticsearch:
