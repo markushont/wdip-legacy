@@ -1,10 +1,13 @@
 'use strict';
 
-const moment = require('moment')
+const moment = require('moment');
+const sizeof = require('object-sizeof');
+const urlHelpers = require('./urlHelpers');
+var errorHelper = require('./errorHelper');
 
 ////////////////////////////////////////////////////////////////////////////////
 
-function _parseBasicInfo(dok) {
+function parseBasicInfo(dok) {
   return({
     dok_id:     dok.dok_id,
     date:       dok.datum != undefined ? moment(dok.datum, "YYYY-MM-DD").valueOf() : -1,
@@ -19,13 +22,13 @@ function _parseBasicInfo(dok) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-function _parseForslag(dokForslag) {
+function parseForslag(dokForslag) {
   if (dokForslag === undefined || dokForslag.forslag === undefined) {
     return [];
   }
   const forslag = dokForslag.forslag;
 
-  var ret = [];
+  let ret = [];
   function parseItem(item) {
     ret.push({
       nummer:              item.nummer,
@@ -55,12 +58,12 @@ function _parseForslag(dokForslag) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-function _parseIntressent(dokIntressent) {
+function parseIntressent(dokIntressent) {
   if (dokIntressent === undefined || dokIntressent.intressent === undefined) {
     return [];
   }
   const intressent = dokIntressent.intressent;
-  var ret = [];
+  let ret = [];
 
   function parseItem(item) {
     ret.push({
@@ -82,13 +85,13 @@ function _parseIntressent(dokIntressent) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-function _parseUppgift(dokUppgift) {
+function parseUppgift(dokUppgift) {
   if (dokUppgift === undefined || dokUppgift.uppgift === undefined) {
     return [];
   }
   const uppgift = dokUppgift.uppgift;
 
-  var ret = [];
+  let ret = [];
   function parseItem(item) {
     ret.push({
       kod:         item.kod,
@@ -109,18 +112,18 @@ function _parseUppgift(dokUppgift) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-function _parseStatus(dokument) {
+function parseStatus(dokument) {
   if (dokument === undefined || dokument.status === undefined) return "";
   return dokument.status;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-function _parsePending(dokforslag) {
+function parsePending(dokforslag) {
   if (dokforslag.forslag != undefined) {
     if (dokforslag.forslag.constructor == Array) {
       for (var i = 0; i < dokforslag.forslag.length(); ++i) {
-        var item = dokforslag.forslag[i];
+        const item = dokforslag.forslag[i];
         if (item.utskottet.toLowerCase() === "avslag" || item.kammaren.toLowerCase() === "bifall" ||
           item.utskottet.toLowerCase() === "bifall" || item.kammaren.toLowerCase() === "avslag") {
           continue;
@@ -128,7 +131,7 @@ function _parsePending(dokforslag) {
         return true;
       }
     } else {
-      var item = dokforslag.forslag;
+      const item = dokforslag.forslag;
       if (item.utskottet.toLowerCase() != "avslag" && item.kammaren.toLowerCase() != "bifall" &&
         item.utskottet.toLowerCase() != "bifall" && item.kammaren.toLowerCase() != "avslag") {
         return true;
@@ -141,11 +144,29 @@ function _parsePending(dokforslag) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+function parseStatusObj(statusObj) {
+  let statusInfo = {};
+
+  statusInfo.forslag = parseForslag(statusObj.dokforslag);
+  statusInfo.intressent = parseIntressent(statusObj.dokintressent);
+  statusInfo.uppgift = parseUppgift(statusObj.dokuppgift);
+  statusInfo.status = parseStatus(statusObj.dokument);
+
+  if (statusInfo.status === "Klar" || statusInfo.status === "ocr") {
+    statusInfo.isPending = false;
+  } else {
+    statusInfo.isPending = parsePending(statusObj.dokument);
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 module.exports = {
-  parseBasicInfo:  _parseBasicInfo,
-  parseForslag:    _parseForslag,
-  parseIntressent: _parseIntressent,
-  parseUppgift:    _parseUppgift,
-  parseStatus:     _parseStatus,
-  parsePending:    _parsePending
+  parseBasicInfo:  parseBasicInfo,
+  parseForslag:    parseForslag,
+  parseIntressent: parseIntressent,
+  parseUppgift:    parseUppgift,
+  parseStatus:     parseStatus,
+  parsePending:    parsePending,
+  parseStatusObj:  parseStatusObj,
 }
