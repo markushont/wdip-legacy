@@ -1,7 +1,7 @@
 'use strict';
 
 const request = require('request');
-var errorHelpers = require('./errorHelper');
+var errorHelper = require('./errorHelper');
 
 const MOTION_QUERY_DYNAMIC = 'http://data.riksdagen.se/dokumentlista/?sok=&doktyp=mot&rm=&from={}&tom={}&ts=&bet=&tempbet=&nr=&org=&iid=&parti=S&parti=M&parti=L&parti=KD&parti=V&parti=SD&parti=C&parti=MP&parti=NYD&parti=-&webbtv=&talare=&exakt=&planering=&sort=datum&sortorder=asc&rapport=&utformat=json&a=s#soktraff';
 
