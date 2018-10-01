@@ -1,6 +1,7 @@
 'use strict';
 
 const getMotionsByParty = require('./api/getMotionsByParty');
+const motions = require('./api/motions.js');
 
 /**
  * Base response HTTP headers
@@ -35,3 +36,10 @@ module.exports.getMotionsByParty = async (event, context) => {
     let result = await getMotionsByParty(new Date(2000, 0, 1), new Date(2010, 0, 1));
     return responses.success(result);
 };
+
+
+module.exports.getMotionById = async (event, context) => {
+    var id = event.pathParameters.id;
+    let result = await motions.byId(id);
+    return responses.success(result);
+};  
