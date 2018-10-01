@@ -13,10 +13,6 @@ class ErrorHelper {
     getLoggedErrors() {
         return this.errors.length ? this.errors : undefined;
     }
-
-    getLoggedErrorsStr() {
-        return this.errors.length ? this.errors.join('\n') : undefined;
-    }
 }
 
 var errorHelper = new ErrorHelper();

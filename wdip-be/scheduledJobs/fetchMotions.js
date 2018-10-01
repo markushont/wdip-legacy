@@ -30,7 +30,7 @@ function logRequest(isSuccess, fetchedTo) {
     Item: {
       id: id,
       date: date,
-      errors: errorHelper.getLoggedErrorsStr()
+      errors: errorHelper.getLoggedErrors()
     },
     ReturnConsumedCapacity: "TOTAL",
     TableName: process.env.MOTION_REQUEST_LOG_TABLE
