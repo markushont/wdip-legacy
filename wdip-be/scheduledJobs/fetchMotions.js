@@ -78,6 +78,8 @@ async function parseQueryResult(data) {
 
     let toAdd = {};
     Object.assign(toAdd, basicInfo, statusInfo);
+    // Sparse indexing - replace isPending with 'x' or undefined to optimize GSI
+    toAdd.isPending = toAdd.isPending ? 'x' : undefined;
     
     const toAddSize = sizeof(toAdd);
     const maxSize = process.env.DB_ITEM_MAX_SIZE;
