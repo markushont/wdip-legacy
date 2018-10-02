@@ -49,6 +49,7 @@ provider:
   environment:
     MOTION_REQUEST_LOG_TABLE: "motion-request-log"
     MOTION_TABLE: "motions"
+    PENDING_INDEX: "pending-motions-index" # global secondary index for pending documents
     DATE_ZERO: "2000-01-01"
     DB_ITEM_MAX_SIZE: 300000 # Dynamodb max item size 400 kB
 
@@ -66,6 +67,15 @@ functions:
       - http:
           path: fetch-motions
           method: post
+  refreshPendingMotions:
+    handler: scheduledJobsHandler.refreshPendingMotions
+    events:
+      # Every day at 02:00
+      - schedule:
+          rate: cron(0 2 * * ? *)
+      - http:
+          path: refresh-pending-motions
+          method: get
   getMotionsByParty:
     handler: apiHandler.getMotionsByParty
     events:
