@@ -30,30 +30,25 @@ async function updateStatus(docId) {
     const statusInfo = docHelpers.parseStatusObj(statusResp.dokumentstatus);
     if (!statusInfo.isPending) {
       for (var key in statusInfo) {
-        if (statusInfo.hasOwnProperty(key)) {
-          putParams.AttributeUpdates[key] = {};
-          putParams.AttributeUpdates[key].Action = "PUT";
-          putParams.AttributeUpdates[key].Value = statusInfo[key];
+        if (statusInfo.hasOwnProperty(key) && statusInfo[key]) {
+          putParams.AttributeUpdates[key] = {
+            Action: "PUT",
+            Value: statusInfo[key]
+          };
         }
       }
 
-      // delete pending flag
+      // explicitly delete pending flag
       putParams.AttributeUpdates.isPending = { Action: "DELETE"};
+      return documentClient.update(putParams).promise();
     } else {
-      return new Promise((resolve, reject) => resolve(true));
+      console.log("Nothing to update for dok " + docId);
+      return null;
     }
-
-    return documentClient.update(putParams).promise()
-    .then(data => {
-      return true;
-    })
-    .catch (err => {
-      return false;
-    });
   } catch (error) {
-    errorHelper.logError("Could not fetch status for url " + statusUrl +
-      "\n Reason: " + error);
-    return new Promise((resolve, reject) => reject());
+    const errorText = "Could not fetch status for url " + statusUrl +
+      "\n Reason: " + error;
+    throw errorText;
   }
 }
 
@@ -80,19 +75,27 @@ module.exports = async function refreshPendingMotions(callback) {
 
   let putPromises = [];
   for (const item of pendingItems) {
-    putPromises.push(updateStatus(item.dok_id));
+    try {
+      putPromises.push(updateStatus(item.dok_id));
+    } catch (error) {
+      errorHelper.logError(error);
+    }
   }
-  await Promise.all(putPromises)
-  .then(data => {
-    let updated = data.filter(item => { return item });
-    callback(200, "Updated " + updated.length + " items.");
-  })
-  .catch(err => {
-    errorHelper.logError(err);
-    callback(500, "The following error occured: " + err);
-  });
 
-  console.error(errorHelper.getLoggedErrors());
+  try {
+    let updatedDocs = await Promise.all(putPromises)
+    .then(data => {
+      return data.map(item => {
+        if (item) return true;
+        else return false;
+      })
+    });
+
+    console.log("Updated " + updatedDocs.length + " documents");
+    callback(200);
+  } catch (error) {
+    callback(500);
+  }
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
