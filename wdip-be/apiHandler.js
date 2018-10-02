@@ -43,3 +43,8 @@ module.exports.getMotionById = async (event, context) => {
     let result = await motions.byId(id);
     return responses.success(result);
 };  
+
+module.exports.getPendingMotions = async (event, context) => {
+    let result = await motions.pending();
+    return responses.success(result);
+}

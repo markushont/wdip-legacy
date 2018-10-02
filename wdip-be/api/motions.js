@@ -36,4 +36,27 @@ async function getMotionById(id) {
         });
 };
 
-module.exports = {byId:getMotionById}
+async function getPendingMotions() {
+    console.log("Getting pending motions from index");
+    const pendingDocsQueryparams = {
+        TableName: motionTableName,
+        IndexName : process.env.PENDING_INDEX,
+        KeyConditionExpression: "isPending = :pending",
+        ExpressionAttributeValues: { ":pending": "x" },
+    };
+
+    return await documentClient.query(pendingDocsQueryparams).promise()
+        .then(data => {
+            let pendingIds = data.Items.map(item => {
+                return {dok_id: item.dok_id};
+            });
+            console.log("Pending motions: " + JSON.stringify(pendingIds));
+            return pendingIds;
+        })
+        .catch(err => {
+            console.error("Failed to query pending motions.\nReason: " + err);
+            return null;
+        });
+};
+
+module.exports = {byId:getMotionById, pending:getPendingMotions}

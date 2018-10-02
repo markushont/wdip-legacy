@@ -76,6 +76,12 @@ functions:
       - http:
           path: refresh-pending-motions
           method: get
+  getPendingMotions:
+    handler: apiHandler.getPendingMotions
+    events:
+      - http:
+          path: motions/pending
+          method: get
   getMotionsByParty:
     handler: apiHandler.getMotionsByParty
     events:
