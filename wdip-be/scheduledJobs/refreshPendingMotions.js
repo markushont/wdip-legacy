@@ -15,12 +15,54 @@ if (process.env.IS_OFFLINE || process.env.IS_LOCAL) {
 
 var documentClient = new AWS.DynamoDB.DocumentClient();
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+async function updateStatus(docId) {
+  let putParams = {
+    TableName: process.env.MOTION_TABLE,
+    Key: { dok_id: docId },
+    AttributeUpdates: {}
+  };
+
+  const statusUrl = urlHelpers.getDocStatusQuery(docId);
+  try {
+    const statusResp = await urlHelpers.getJsonFromUrl(statusUrl);
+    const statusInfo = docHelpers.parseStatusObj(statusResp.dokumentstatus);
+    if (!statusInfo.isPending) {
+      for (var key in statusInfo) {
+        if (statusInfo.hasOwnProperty(key)) {
+          putParams.AttributeUpdates[key] = {};
+          putParams.AttributeUpdates[key].Action = "PUT";
+          putParams.AttributeUpdates[key].Value = statusInfo[key];
+        }
+      }
+
+      // delete pending flag
+      putParams.AttributeUpdates.isPending = { Action: "DELETE"};
+    } else {
+      return new Promise((resolve, reject) => resolve(true));
+    }
+
+    return documentClient.update(putParams).promise()
+    .then(data => {
+      return true;
+    })
+    .catch (err => {
+      return false;
+    });
+  } catch (error) {
+    errorHelper.logError("Could not fetch status for url " + statusUrl +
+      "\n Reason: " + error);
+    return new Promise((resolve, reject) => reject());
+  }
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 module.exports = async function refreshPendingMotions(callback) {
-  const motionTableName = process.env.MOTION_TABLE;
-  const indexName = process.env.PENDING_INDEX;
   const pendingDocsQueryparams = {
-    TableName: motionTableName,
-    IndexName : indexName,
+    TableName: process.env.MOTION_TABLE,
+    IndexName : process.env.PENDING_INDEX,
     KeyConditionExpression: "isPending = :pending",
     ExpressionAttributeValues: { ":pending": "x" },
   };
@@ -36,5 +78,21 @@ module.exports = async function refreshPendingMotions(callback) {
       errorHelper.logError("Error when querying DB for pending docs: " + err);
   }
 
-  console.log("Found " + pendingItems.length + " items.");
+  let putPromises = [];
+  for (const item of pendingItems) {
+    putPromises.push(updateStatus(item.dok_id));
+  }
+  await Promise.all(putPromises)
+  .then(data => {
+    let updated = data.filter(item => { return item });
+    callback(200, "Updated " + updated.length + " items.");
+  })
+  .catch(err => {
+    errorHelper.logError(err);
+    callback(500, "The following error occured: " + err);
+  });
+
+  console.error(errorHelper.getLoggedErrors());
 }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
