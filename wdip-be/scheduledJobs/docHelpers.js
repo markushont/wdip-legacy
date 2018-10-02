@@ -23,7 +23,7 @@ function parseBasicInfo(dok) {
 ////////////////////////////////////////////////////////////////////////////////
 
 function parseForslag(dokForslag) {
-  if (dokForslag === undefined || dokForslag.forslag === undefined) {
+  if (!dokForslag || !dokForslag.forslag) {
     return [];
   }
   const forslag = dokForslag.forslag;
@@ -59,7 +59,7 @@ function parseForslag(dokForslag) {
 ////////////////////////////////////////////////////////////////////////////////
 
 function parseIntressent(dokIntressent) {
-  if (dokIntressent === undefined || dokIntressent.intressent === undefined) {
+  if (!dokIntressent || !dokIntressent.intressent) {
     return [];
   }
   const intressent = dokIntressent.intressent;
@@ -86,7 +86,7 @@ function parseIntressent(dokIntressent) {
 ////////////////////////////////////////////////////////////////////////////////
 
 function parseUppgift(dokUppgift) {
-  if (dokUppgift === undefined || dokUppgift.uppgift === undefined) {
+  if (!dokUppgift || !dokUppgift.uppgift) {
     return [];
   }
   const uppgift = dokUppgift.uppgift;
@@ -113,14 +113,14 @@ function parseUppgift(dokUppgift) {
 ////////////////////////////////////////////////////////////////////////////////
 
 function parseStatus(dokument) {
-  if (dokument === undefined || dokument.status === undefined) return "";
+  if (!dokument || !dokument.status) return "";
   return dokument.status;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 function parsePending(dokforslag) {
-  if (dokforslag.forslag != undefined) {
+  if (dokforslag.forslag) {
     if (dokforslag.forslag.constructor == Array) {
       for (var i = 0; i < dokforslag.forslag.length(); ++i) {
         const item = dokforslag.forslag[i];
