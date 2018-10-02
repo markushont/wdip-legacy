@@ -157,6 +157,8 @@ function parseStatusObj(statusObj) {
   } else {
     statusInfo.isPending = parsePending(statusObj.dokument);
   }
+
+  return statusInfo;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
