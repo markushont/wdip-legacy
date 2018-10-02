@@ -15,7 +15,7 @@ var documentClient = new AWS.DynamoDB.DocumentClient();
 
 const motionTableName = process.env.MOTION_TABLE;
 
-async function getMotionById(id) {
+function getMotionById(id) {
     console.log("Will query for motion " + id)
     const requestMotionParams = {
         TableName: motionTableName,
@@ -24,7 +24,7 @@ async function getMotionById(id) {
         }
     };
 
-    return await documentClient.get(requestMotionParams).promise()
+    return documentClient.get(requestMotionParams).promise()
         .then(data => {
             console.log("Got: " + JSON.stringify(data));
             return data.Item;
@@ -36,7 +36,7 @@ async function getMotionById(id) {
         });
 };
 
-async function getPendingMotions() {
+function getPendingMotions() {
     console.log("Getting pending motions from index");
     const pendingDocsQueryparams = {
         TableName: motionTableName,
@@ -45,7 +45,7 @@ async function getPendingMotions() {
         ExpressionAttributeValues: { ":pending": "x" },
     };
 
-    return await documentClient.query(pendingDocsQueryparams).promise()
+    return documentClient.query(pendingDocsQueryparams).promise()
         .then(data => {
             let pendingIds = data.Items.map(item => {
                 return {dok_id: item.dok_id};
