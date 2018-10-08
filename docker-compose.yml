@@ -4,8 +4,6 @@ services:
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:6.4.2
     container_name: wdip_elasticsearch
-    depends_on: 
-      - dynamodb
     volumes: 
       - elasticsearch:/usr/share/elasticsearch/data
     ports:

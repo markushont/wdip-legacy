@@ -1,17 +1,20 @@
 {
-  "name": "Handle-DynamoDB-tables",
+  "name": "Handle-DB-storage",
   "version": "1.0.0",
-  "description": "Handle DynamoDB tables for Riksdagen app",
+  "description": "Handle database storage for Riksdagen app",
   "author": "Markus Silberstein Hont <markus@silberstein.nu>",
   "license": "MIT",
   "dependencies": {
-    "aws-sdk": "^2.307.0"
+    "@types/elasticsearch": "^5.0.26",
+    "aws-sdk": "^2.307.0",
+    "elasticsearch": "^15.1.1",
+    "winston": "^3.1.0"
   },
   "devDependencies": {},
   "scripts": {
-    "create": "node createTables.js",
-    "drop": "node dropTables.js",
-    "reset": "node dropTables.js && node createTables.js",
-    "describe": "node describetables.js"
+    "create": "node createIndices.js",
+    "delete": "node deleteIndices.js",
+    "reset": "node deleteIndices.js && node createIndices.js",
+    "describe": "node describeIndices.js"
   }
 }
