@@ -48,13 +48,27 @@ dynamodb.listTables({}, (err, data) => {
                 KeySchema: [       
                     { AttributeName: "dok_id", KeyType: "HASH"}  //Partition key
                 ],
-                AttributeDefinitions: [       
-                    { AttributeName: "dok_id", AttributeType: "S" }
+                AttributeDefinitions: [
+                    { AttributeName: "dok_id", AttributeType: "S" },
+                    { AttributeName: "isPending", AttributeType: "S"}
                 ],
                 ProvisionedThroughput: {       
                     ReadCapacityUnits: 10, 
                     WriteCapacityUnits: 10
-                }
+                },
+                GlobalSecondaryIndexes: [
+                    {
+                        IndexName: Constants.PENDING_INDEX,
+                        KeySchema: [
+                            { AttributeName: "isPending", KeyType: "HASH" }
+                        ],
+                        Projection: { ProjectionType: "KEYS_ONLY" },
+                        ProvisionedThroughput: {
+                            ReadCapacityUnits: 10,
+                            WriteCapacityUnits: 10,
+                        },
+                    }
+                ]
             };
         
             dynamodb.createTable(params, function(err, data) {
