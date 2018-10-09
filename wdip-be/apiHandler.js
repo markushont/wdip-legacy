@@ -1,7 +1,7 @@
 'use strict';
 
 const getMotionsByParty = require('./api/getMotionsByParty');
-const motions = require('./api/motions.js');
+const motions = require('./api/motions');
 
 /**
  * Base response HTTP headers

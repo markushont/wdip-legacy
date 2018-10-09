@@ -3,9 +3,8 @@ const constants = {
 };
 
 const indices = {
-    MOTION_TABLE: 'motions',
-    MOTION_REQUEST_LOG_TABLE: 'motion-request-log',
-    PENDING_INDEX: 'pending-motions-index'
+    MOTION_INDEX: 'motions',
+    MOTION_REQUEST_LOG_TABLE: 'motion-request-log'
 }
 
 module.exports = {constants, indices};

@@ -1,0 +1,6 @@
+{
+    "ES_SERVER": "localhost:9200",
+    "ES_USERNAME": null,
+    "ES_PASSWORD": null,
+    "WDIP_MOTION_INDEX": "motions"
+}

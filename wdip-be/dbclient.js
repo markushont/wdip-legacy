@@ -1,8 +1,8 @@
 const elasticsearch = require('elasticsearch');
-const { constants } = require('./constants');
+const { ES_SERVER } = require('./config/config');
 
 let client = new elasticsearch.Client({
-    host: constants.LOCAL_DB_PATH,
+    host: ES_SERVER,
     log: 'info'
 });
 

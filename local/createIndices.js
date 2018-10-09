@@ -1,5 +1,5 @@
 const client = require('./connection.js');
-const { constants, indices } = require('./constants');
+const { indices } = require('./constants');
 const logger = require('./logger');
 
 async function createIndices() {

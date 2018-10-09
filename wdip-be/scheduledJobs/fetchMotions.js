@@ -36,7 +36,7 @@ function logRequest(isSuccess, fetchedTo) {
     TableName: process.env.MOTION_REQUEST_LOG_TABLE
   };
 
-  return documentClient.put(toPut, function(err, data) {
+  return documentClient.put(toPut, function (err, data) {
     if (err) console.log("Error logging request. Error: " + err);
     else console.log("Logged request. Success: " + isSuccess.toString() + ". FetchedTo: " + fetchedTo);
   });
@@ -80,7 +80,7 @@ async function parseQueryResult(data) {
     Object.assign(toAdd, basicInfo, statusInfo);
     // Sparse indexing - replace isPending with 'x' or undefined to optimize GSI
     toAdd.isPending = toAdd.isPending ? 'x' : undefined;
-    
+
     const toAddSize = sizeof(toAdd);
     const maxSize = process.env.DB_ITEM_MAX_SIZE;
     if (maxSize && toAddSize > maxSize) {
@@ -89,9 +89,9 @@ async function parseQueryResult(data) {
       strippedObj.isPending = toAdd.isPending;
       strippedObj.status = toAdd.status;
       console.log("New size: " + sizeof(strippedObj));
-      toAddItems.push({PutRequest: {Item: strippedObj}});
+      toAddItems.push({ PutRequest: { Item: strippedObj } });
     } else {
-      toAddItems.push({PutRequest: {Item: toAdd}});
+      toAddItems.push({ PutRequest: { Item: toAdd } });
     }
   }
 
@@ -114,7 +114,7 @@ async function getResults(urlString) {
   let nextUrl = urlString;
   let dbPromises = [];
   while (nextUrl != null) {
-    try { 
+    try {
       const jsonResp = await urlHelpers.getJsonFromUrl(nextUrl);
       const nextPage = jsonResp.dokumentlista['@nasta_sida'];
       if (nextPage != undefined && nextPage != "" && nextPage != nextUrl) {
@@ -162,20 +162,20 @@ module.exports = async function fetchMotions(fromDateStrOverride = null, toDateS
   // Check last successful fetch and fetch new
   let fetchFrom = moment(process.env.DATE_ZERO, 'YYYY-MM-DD').valueOf();
   try {
-    const requestLogEmpty = await dynamoDb.describeTable({TableName: requestLogTableName}, async (err, data) => {
+    const requestLogEmpty = await dynamoDb.describeTable({ TableName: requestLogTableName }, async (err, data) => {
       return (err || data.Table.ItemCount === 0);
     });
     if (!requestLogEmpty) {
       fetchFrom = await documentClient.query(requestLogQueryParams).promise()
-      .then(data => {
-        console.log("FETCHING FROM: " + JSON.stringify(data.Items[0].date));
-        return data.Count > 0 ? data.Items[0].date : null;
-      })
-      .catch(err => {
-        errorHelper.logError("Failed to query log table " +
-          process.env.MOTION_REQUEST_LOG_TABLE + "\nReason: " + err);
-        return null;
-      });
+        .then(data => {
+          console.log("FETCHING FROM: " + JSON.stringify(data.Items[0].date));
+          return data.Count > 0 ? data.Items[0].date : null;
+        })
+        .catch(err => {
+          errorHelper.logError("Failed to query log table " +
+            process.env.MOTION_REQUEST_LOG_TABLE + "\nReason: " + err);
+          return null;
+        });
     }
   } catch (error) {
     errorHelper.logError("Unable to fetch request log entry. Error:\n" + error + "\nExiting.");
@@ -194,15 +194,15 @@ module.exports = async function fetchMotions(fromDateStrOverride = null, toDateS
   let fetchResp = {};
   // Do nothing if interval is zero
   if (fetchFrom != null && fetchFrom === fetchTo) {
-    fetchResp = { statusCode: 200, body: "Interval is zero, nothing to fetch"};
+    fetchResp = { statusCode: 200, body: "Interval is zero, nothing to fetch" };
   } else {
     fetchResp = await _fetchMotions(fetchFrom, fetchTo)
-    .then(resp => {
-      return { statusCode: 200, body: resp, nAdded: nItems };
-    })
-    .catch(err => {
-      return { statusCode: 500, body: err};
-    });
+      .then(resp => {
+        return { statusCode: 200, body: resp, nAdded: nItems };
+      })
+      .catch(err => {
+        return { statusCode: 500, body: err };
+      });
     logRequest(fetchResp.statusCode == 200, fetchTo);
   }
 
