@@ -1,11 +1,6 @@
-const elasticsearch = require('elasticsearch');
+const client = require('./connection.js');
 const { constants, indices } = require('./constants');
 const logger = require('./logger');
-
-let client = new elasticsearch.Client({
-    host: constants.LOCAL_DB_PATH,
-    log: 'info'
-});
 
 async function deleteIndices() {
     Object.keys(indices).forEach(index => deleteIndex(indices[index]));
