@@ -34,7 +34,7 @@ async function getPendingMotions() {
 
     try {
         const response = await client.search(params);
-        let pendingIds = response.map(({ id }) => id);
+        let pendingIds = response.map(({ _id }) => _id);
         logger.debug('Pending motions: ', pendingIds);
         return pendingIds;
     }
