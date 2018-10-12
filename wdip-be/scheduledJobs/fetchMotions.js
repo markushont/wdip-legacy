@@ -17,26 +17,26 @@ if (process.env.IS_OFFLINE || process.env.IS_LOCAL) {
   });
 }
 
-var dynamoDb = new AWS.DynamoDB();
-var documentClient = new AWS.DynamoDB.DocumentClient();
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
+const dbClient = require('../dbclient');
+const { WDIP_MOTION_INDEX } = require('../config/config');
+const logger = require('../logger');
 
 // Add entry to request log
 function logRequest(isSuccess, fetchedTo) {
   let id = isSuccess ? "success" : "fail";
   let date = (fetchedTo != null) ? fetchedTo : moment().valueOf();
   let toPut = {
-    Item: {
+    index: process.env.MOTION_REQUEST_LOG_TABLE,
+    type: '_doc',
+    body: {
       id: id,
       date: date,
       errors: errorHelper.getLoggedErrors()
-    },
-    ReturnConsumedCapacity: "TOTAL",
-    TableName: process.env.MOTION_REQUEST_LOG_TABLE
+    }
+    //ReturnConsumedCapacity: "TOTAL",
   };
 
-  return documentClient.put(toPut, function (err, data) {
+  return dbClient.index(toPut, function (err, data) {
     if (err) console.log("Error logging request. Error: " + err);
     else console.log("Logged request. Success: " + isSuccess.toString() + ". FetchedTo: " + fetchedTo);
   });
@@ -72,7 +72,7 @@ async function parseQueryResult(data) {
       statusInfo = docHelpers.parseStatusObj(statusResp.dokumentstatus);
     } catch (error) {
       errorHelper.logError("Could not fetch status for url " + statusUrl +
-        "\n Reason: " + error);
+      "\n Reason: " + error);
       statusInfo.isPending = true;
     }
 
@@ -83,24 +83,37 @@ async function parseQueryResult(data) {
 
     const toAddSize = sizeof(toAdd);
     const maxSize = process.env.DB_ITEM_MAX_SIZE;
+    toAddItems.push({
+      index: {
+        _index: process.env.MOTION_TABLE,
+        _type: '_doc'
+      },
+    });
     if (maxSize && toAddSize > maxSize) {
       console.warn("Stripping very large object with id " + toAdd.dok_id + " and size: " + toAddSize.toString());
       let strippedObj = docHelpers.parseBasicInfo(dok);
       strippedObj.isPending = toAdd.isPending;
       strippedObj.status = toAdd.status;
       console.log("New size: " + sizeof(strippedObj));
-      toAddItems.push({ PutRequest: { Item: strippedObj } });
+      toAddItems.push(strippedObj);
     } else {
-      toAddItems.push({ PutRequest: { Item: toAdd } });
+      toAddItems.push(toAdd);
     }
   }
 
-  batchRequest.RequestItems[tableName] = toAddItems;
+  const nItems = toAddItems.length/2;
 
-  const nItems = batchRequest.RequestItems[tableName].length;
   if (nItems > 0) {
     console.log("Writing " + nItems + " items to DB.");
-    return documentClient.batchWrite(batchRequest).promise();
+
+    return dbClient.bulk({
+      body: toAddItems
+    }).promise();
+
+    //  errorHelper.logError("Error when adding documents to index: "+ ": " + err);
+  //  });
+    //.promise();
+
   } else {
     console.log("No items to write for page, skipping");
     return new Promise((resolve, reject) => resolve());
@@ -138,6 +151,8 @@ async function getResults(urlString) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 async function _fetchMotions(_fromDate, _toDate) {
+
+
   const fromDate = _fromDate != null ? getDateString(_fromDate) : getDateString(process.env.DATE_ZERO);
   const toDate = _toDate != null ? getDateString(_toDate) : getDateString(Date.now());
 
@@ -150,32 +165,30 @@ async function _fetchMotions(_fromDate, _toDate) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 module.exports = async function fetchMotions(fromDateStrOverride = null, toDateStrOverride = null, callback) {
-  const requestLogTableName = process.env.MOTION_REQUEST_LOG_TABLE;
+fromDateStrOverride="2017-01-01";
+toDateStrOverride="2017-01-12";
+
+  const requestLogTableName = "motion-request-log"
   const requestLogQueryParams = {
-    TableName: requestLogTableName,
-    KeyConditionExpression: "id = :success",
-    ExpressionAttributeValues: { ":success": "success" },
-    ScanIndexForward: false,
-    Limit: 1
+    index: requestLogTableName,
+    q: "id:success",
+    size: "1",
+    sort: "date:desc"
   };
 
   // Check last successful fetch and fetch new
   let fetchFrom = moment(process.env.DATE_ZERO, 'YYYY-MM-DD').valueOf();
   try {
-    const requestLogEmpty = await dynamoDb.describeTable({ TableName: requestLogTableName }, async (err, data) => {
-      return (err || data.Table.ItemCount === 0);
-    });
-    if (!requestLogEmpty) {
-      fetchFrom = await documentClient.query(requestLogQueryParams).promise()
-        .then(data => {
-          console.log("FETCHING FROM: " + JSON.stringify(data.Items[0].date));
-          return data.Count > 0 ? data.Items[0].date : null;
-        })
-        .catch(err => {
-          errorHelper.logError("Failed to query log table " +
-            process.env.MOTION_REQUEST_LOG_TABLE + "\nReason: " + err);
-          return null;
-        });
+    const { count } = await dbClient.count({index: requestLogTableName});
+    const empty = count === 0;
+    if (!empty) {
+      await dbClient.search(requestLogQueryParams)
+      .then(function(resp){
+        console.log("FETCHING FROM: ",JSON.stringify(resp.hits.hits[0]._source.date));
+      }, function(err) {
+        errorHelper.logError("Failed to query log table " +
+        process.env.MOTION_REQUEST_LOG_TABLE + "\nReason: " + err);
+      });
     }
   } catch (error) {
     errorHelper.logError("Unable to fetch request log entry. Error:\n" + error + "\nExiting.");
@@ -197,12 +210,12 @@ module.exports = async function fetchMotions(fromDateStrOverride = null, toDateS
     fetchResp = { statusCode: 200, body: "Interval is zero, nothing to fetch" };
   } else {
     fetchResp = await _fetchMotions(fetchFrom, fetchTo)
-      .then(resp => {
-        return { statusCode: 200, body: resp, nAdded: nItems };
-      })
-      .catch(err => {
-        return { statusCode: 500, body: err };
-      });
+    .then(resp => {
+      return { statusCode: 200, body: resp, nAdded: nItems };
+    })
+    .catch(err => {
+      return { statusCode: 500, body: err };
+    });
     logRequest(fetchResp.statusCode == 200, fetchTo);
   }
 
