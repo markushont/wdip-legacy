@@ -48,6 +48,7 @@ function getDateString(dateInt) {
   if (dateInt === null || dateInt === undefined) return null;
 
   let date = moment(dateInt);
+  //  console.log(date.format('YYYY-MM-DD'));
   return date.format('YYYY-MM-DD');
 }
 
@@ -105,13 +106,23 @@ async function parseQueryResult(data) {
 
   if (nItems > 0) {
     console.log("Writing " + nItems + " items to DB.");
-
-    return dbClient.bulk({
-      body: toAddItems
-    }).promise();
+    // return dbClient.bulk({
+    //   body: toAddItems
+    // }).then(success => {
+    //   console.log("bulk success:", success);
+    // }).catch(err =>{
+    //   console.log("error: ", reason);
+    // });
+    try{
+      return dbClient.bulk({
+        body: toAddItems
+      });
+    }catch(error){
+      errorHelper.logError("Error when adding documents to index: "+ ": " + err);
+    }
 
     //  errorHelper.logError("Error when adding documents to index: "+ ": " + err);
-  //  });
+    //  });
     //.promise();
 
   } else {
@@ -145,19 +156,21 @@ async function getResults(urlString) {
       nextUrl = null;
     }
   }
-  return Promise.all(dbPromises);
+  var getResultPromise = Promise.all(dbPromises);
+  return getResultPromise;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 async function _fetchMotions(_fromDate, _toDate) {
-
-
   const fromDate = _fromDate != null ? getDateString(_fromDate) : getDateString(process.env.DATE_ZERO);
   const toDate = _toDate != null ? getDateString(_toDate) : getDateString(Date.now());
 
   const motionRequestUrl = urlHelpers.getMotionQuery(fromDate, toDate);
   const propositionRequestUrl = urlHelpers.getPropositionQuery(fromDate, toDate);
+  // Promise.all([getResults(motionRequestUrl), getResults(propositionRequestUrl)]).then(function(values) {
+  //   return;
+  // });
   const result = Promise.all([getResults(motionRequestUrl), getResults(propositionRequestUrl)]);
   return result;
 }
@@ -165,8 +178,8 @@ async function _fetchMotions(_fromDate, _toDate) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 module.exports = async function fetchMotions(fromDateStrOverride = null, toDateStrOverride = null, callback) {
-fromDateStrOverride="2017-01-01";
-toDateStrOverride="2017-01-12";
+  fromDateStrOverride="2017-01-01";
+  toDateStrOverride="2017-01-12";
 
   const requestLogTableName = "motion-request-log"
   const requestLogQueryParams = {
@@ -211,7 +224,8 @@ toDateStrOverride="2017-01-12";
   } else {
     fetchResp = await _fetchMotions(fetchFrom, fetchTo)
     .then(resp => {
-      return { statusCode: 200, body: resp, nAdded: nItems };
+      return { statusCode: 200, body: resp };
+    //  return { statusCode: 200, body: resp, nAdded: nItems };
     })
     .catch(err => {
       return { statusCode: 500, body: err };
