@@ -33,7 +33,6 @@ function logRequest(isSuccess, fetchedTo) {
       date: date,
       errors: errorHelper.getLoggedErrors()
     }
-    //ReturnConsumedCapacity: "TOTAL",
   };
 
   return dbClient.index(toPut, function (err, data) {
@@ -48,7 +47,6 @@ function getDateString(dateInt) {
   if (dateInt === null || dateInt === undefined) return null;
 
   let date = moment(dateInt);
-  //  console.log(date.format('YYYY-MM-DD'));
   return date.format('YYYY-MM-DD');
 }
 
@@ -106,13 +104,6 @@ async function parseQueryResult(data) {
 
   if (nItems > 0) {
     console.log("Writing " + nItems + " items to DB.");
-    // return dbClient.bulk({
-    //   body: toAddItems
-    // }).then(success => {
-    //   console.log("bulk success:", success);
-    // }).catch(err =>{
-    //   console.log("error: ", reason);
-    // });
     try{
       return dbClient.bulk({
         body: toAddItems
@@ -120,10 +111,6 @@ async function parseQueryResult(data) {
     }catch(error){
       errorHelper.logError("Error when adding documents to index: "+ ": " + err);
     }
-
-    //  errorHelper.logError("Error when adding documents to index: "+ ": " + err);
-    //  });
-    //.promise();
 
   } else {
     console.log("No items to write for page, skipping");
@@ -225,7 +212,6 @@ module.exports = async function fetchMotions(fromDateStrOverride = null, toDateS
     fetchResp = await _fetchMotions(fetchFrom, fetchTo)
     .then(resp => {
       return { statusCode: 200, body: resp };
-    //  return { statusCode: 200, body: resp, nAdded: nItems };
     })
     .catch(err => {
       return { statusCode: 500, body: err };
