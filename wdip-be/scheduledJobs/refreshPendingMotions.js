@@ -13,15 +13,18 @@ if (process.env.IS_OFFLINE || process.env.IS_LOCAL) {
     });
   }
 
-var documentClient = new AWS.DynamoDB.DocumentClient();
+  const dbClient = require('../dbclient');
+  const { WDIP_MOTION_INDEX } = require('../config/config');
+  const logger = require('../logger');
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 async function updateStatus(docId) {
   let putParams = {
-    TableName: process.env.MOTION_TABLE,
-    Key: { dok_id: docId },
-    AttributeUpdates: {}
+    index: process.env.MOTION_TABLE,
+    type: "_doc",
+    id: docId,
+    body: {doc:{}}
   };
 
   const statusUrl = urlHelpers.getDocStatusQuery(docId);
@@ -31,16 +34,11 @@ async function updateStatus(docId) {
     if (!statusInfo.isPending) {
       for (var key in statusInfo) {
         if (statusInfo.hasOwnProperty(key) && statusInfo[key]) {
-          putParams.AttributeUpdates[key] = {
-            Action: "PUT",
-            Value: statusInfo[key]
-          };
+          putParams.body.doc[key] =  statusInfo[key];
+
         }
       }
-
-      // explicitly delete pending flag
-      putParams.AttributeUpdates.isPending = { Action: "DELETE"};
-      return documentClient.update(putParams).promise();
+      return dbClient.update(putParams);
     } else {
       console.log("Nothing to update for dok " + docId);
       return null;
@@ -55,45 +53,47 @@ async function updateStatus(docId) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 module.exports = async function refreshPendingMotions(callback) {
+
+  //alla pending
   const pendingDocsQueryparams = {
-    TableName: process.env.MOTION_TABLE,
-    IndexName : process.env.PENDING_INDEX,
-    KeyConditionExpression: "isPending = :pending",
-    ExpressionAttributeValues: { ":pending": "x" },
+    index: process.env.MOTION_TABLE,
+    q: 'isPending:true',
+    size:'30'
   };
 
   let pendingItems = [];
   try {
-    pendingItems = await documentClient.query(pendingDocsQueryparams).promise()
+    pendingItems = await dbClient.search(pendingDocsQueryparams)
     .then(data => {
-      console.log("NUMBER OF ITEMS FOUND: " + data.Count);
-      return data.Count > 0 ? data.Items : [];
+      console.log("NUMBER OF ITEMS FOUND: " + data.hits.total);
+      return data.hits.total > 0 ? data.hits : [];
     });
   } catch (err) {
       errorHelper.logError("Error when querying DB for pending docs: " + err);
   }
 
   let putPromises = [];
-  for (const item of pendingItems) {
+  for (var i=0; i<pendingItems.total; i++) {
     try {
-      putPromises.push(updateStatus(item.dok_id));
+      putPromises.push(updateStatus(pendingItems.hits[i]._source.dok_id));
     } catch (error) {
       errorHelper.logError(error);
     }
   }
 
+  var updatedDocs=0;
   try {
-    let updatedDocs = await Promise.all(putPromises)
+    await Promise.all(putPromises)
     .then(data => {
       return data.map(item => {
-        if (item) return true;
-        else return false;
+        item.result=="updated" ? i++ : false;
       })
     });
 
-    console.log("Updated " + updatedDocs.length + " documents");
+    console.log("Updated " + updatedDocs + " documents");
     callback(200);
   } catch (error) {
+    console.log("err:",error);
     callback(500);
   }
 }

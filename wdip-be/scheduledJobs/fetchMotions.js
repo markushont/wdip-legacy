@@ -78,14 +78,14 @@ async function parseQueryResult(data) {
     let toAdd = {};
     Object.assign(toAdd, basicInfo, statusInfo);
     // Sparse indexing - replace isPending with 'x' or undefined to optimize GSI
-    toAdd.isPending = toAdd.isPending ? 'x' : undefined;
-
+  //  toAdd.isPending = toAdd.isPending ? 'x' : undefined;
     const toAddSize = sizeof(toAdd);
     const maxSize = process.env.DB_ITEM_MAX_SIZE;
     toAddItems.push({
       index: {
         _index: process.env.MOTION_TABLE,
-        _type: '_doc'
+        _type: '_doc',
+        _id: basicInfo.dok_id
       },
     });
     if (maxSize && toAddSize > maxSize) {
@@ -165,8 +165,6 @@ async function _fetchMotions(_fromDate, _toDate) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 module.exports = async function fetchMotions(fromDateStrOverride = null, toDateStrOverride = null, callback) {
-  fromDateStrOverride="2017-01-01";
-  toDateStrOverride="2017-01-12";
 
   const requestLogTableName = "motion-request-log"
   const requestLogQueryParams = {

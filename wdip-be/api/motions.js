@@ -29,7 +29,7 @@ async function getPendingMotions() {
 
     const params = {
         index: WDIP_MOTION_INDEX,
-        q: 'isPending:x'
+        q: 'isPending:true'
     };
 
     try {
