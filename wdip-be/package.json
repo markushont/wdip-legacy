@@ -9,11 +9,14 @@
     "url": "https://github.com/markushont/aws-motioner-data.git"
   },
   "dependencies": {
+    "@types/elasticsearch": "^5.0.26",
     "aws-sdk": "^2.282.1",
+    "cryptiles": "^4.1.2",
+    "elasticsearch": "^15.1.1",
     "moment": "^2.22.2",
     "object-sizeof": "^1.2.0",
     "request": "^2.87.0",
-    "cryptiles": "^4.1.2"
+    "winston": "^3.1.0"
   },
   "devDependencies": {
     "serverless": "^1.30.3",
