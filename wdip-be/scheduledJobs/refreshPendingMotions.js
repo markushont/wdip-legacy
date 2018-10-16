@@ -21,7 +21,7 @@ if (process.env.IS_OFFLINE || process.env.IS_LOCAL) {
 
 async function updateStatus(docId) {
   let putParams = {
-    index: process.env.MOTION_TABLE,
+    index: WDIP_MOTION_INDEX,
     type: "_doc",
     id: docId,
     body: {doc:{}}
@@ -55,7 +55,7 @@ async function updateStatus(docId) {
 module.exports = async function refreshPendingMotions(callback) {
 var putPromises = [];
   dbClient.search({
-    index: process.env.MOTION_TABLE,
+    index: WDIP_MOTION_INDEX,
     scroll: '10s',
     q: 'isPending:true'
   }, async function getMoreUntilDone(error, response) {
