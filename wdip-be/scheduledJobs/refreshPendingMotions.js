@@ -35,9 +35,9 @@ async function updateStatus(docId) {
       for (var key in statusInfo) {
         if (statusInfo.hasOwnProperty(key) && statusInfo[key]) {
           putParams.body.doc[key] =  statusInfo[key];
-
         }
       }
+      putParams.body.doc["isPending"] = false;
       return dbClient.update(putParams);
     } else {
       console.log("Nothing to update for dok " + docId);
@@ -53,49 +53,39 @@ async function updateStatus(docId) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 module.exports = async function refreshPendingMotions(callback) {
-
-  //alla pending
-  const pendingDocsQueryparams = {
+var putPromises = [];
+  dbClient.search({
     index: process.env.MOTION_TABLE,
-    q: 'isPending:true',
-    size:'30'
-  };
-
-  let pendingItems = [];
-  try {
-    pendingItems = await dbClient.search(pendingDocsQueryparams)
-    .then(data => {
-      console.log("NUMBER OF ITEMS FOUND: " + data.hits.total);
-      return data.hits.total > 0 ? data.hits : [];
+    scroll: '10s',
+    q: 'isPending:true'
+  }, async function getMoreUntilDone(error, response) {
+    response.hits.hits.forEach(function (hit) {
+      putPromises.push(updateStatus(hit._source.dok_id));
     });
-  } catch (err) {
-      errorHelper.logError("Error when querying DB for pending docs: " + err);
-  }
 
-  let putPromises = [];
-  for (var i=0; i<pendingItems.total; i++) {
-    try {
-      putPromises.push(updateStatus(pendingItems.hits[i]._source.dok_id));
-    } catch (error) {
-      errorHelper.logError(error);
+    if (response.hits.total !== putPromises.length) {
+      dbClient.scroll({
+        scrollId: response._scroll_id,
+        scroll: '10s'
+      }, getMoreUntilDone);
+    } else {
+      try {
+        let updatedDocs = await Promise.all(putPromises)
+        .then(data => {
+          return data.map(item => {
+            if(item.result == "updated") return true;
+            else return false;
+          })
+        });
+
+        console.log("Updated " + updatedDocs.length + " documents");
+        callback(200);
+      } catch (error) {
+        console.log("err:",error);
+        callback(500);
+      }
     }
-  }
-
-  var updatedDocs=0;
-  try {
-    await Promise.all(putPromises)
-    .then(data => {
-      return data.map(item => {
-        item.result=="updated" ? i++ : false;
-      })
-    });
-
-    console.log("Updated " + updatedDocs + " documents");
-    callback(200);
-  } catch (error) {
-    console.log("err:",error);
-    callback(500);
-  }
+  });
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
