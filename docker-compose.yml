@@ -3,7 +3,7 @@ version: '3'
 services:
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:6.4.2
-    container_name: wdip_elasticsearch
+    container_name: wdip-elasticsearch
     volumes: 
       - elasticsearch:/usr/share/elasticsearch/data
     ports:
@@ -12,7 +12,7 @@ services:
       discovery.type: single-node
   kibana:
     image: docker.elastic.co/kibana/kibana:6.4.2
-    container_name: wdip_kibana
+    container_name: wdip-kibana
     depends_on:
       - elasticsearch
     # volumes:
@@ -21,6 +21,33 @@ services:
       - 5601:5601
     environment: 
       ELASTICSEARCH_URL: "http://elasticsearch:9200"
+  wdip-be:
+    image: amaysim/serverless:1.30.3
+    container_name: wdip-be
+    depends_on:
+      - elasticsearch
+    ports: 
+      - 3001:3001
+      - 9229:9229
+    environment: 
+      - SLS_DEBUG=*
+    volumes: 
+      - ./wdip-be:/app
+    working_dir: /app
+    command: node --inspect=0.0.0.0:9229 ./node_modules/.bin/serverless offline --host 0.0.0.0 --port 3001
+  wdip-fe:
+    image: node:10
+    container_name: wdip-fe
+    depends_on: 
+      - wdip-be
+    ports: 
+      - 3000:3000
+    volumes: 
+      - ./wdip-fe:/app
+    working_dir: /app
+    command: npm start
+
+
 
 volumes: 
   elasticsearch:

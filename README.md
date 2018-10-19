@@ -4,6 +4,25 @@
 
 The following tools are needed for development:
 
+1. Install Docker for running all system components at https://www.docker.com/products/docker-desktop. 
+
+1. In the root directory of the repository, run
+
+    ```docker-compose up```
+
+This brings up the system containing these components:
+
+* WDIP frontend at http://localhost:3000
+* WDIP backend at http://localhost:3001
+* Elasticsearch at http://locahost:9200
+* Kibana at http://localhost:5601
+
+The WDIP frontend and backend components reload automatically on file changes without restarting docker containers or applications. The WDIP backend exposes a debug possibility on port 9229, making it possible to set breakpoints and interactively debug the application. If you use Visueal Studio Code, use the debugger configuration _Attach to WDIP-BE_.
+
+## Optional development tools
+
+The following tools might be handy for development and deployment:
+
 1. Install NodeJS 8.1 from https://nodejs.org/en/download.
 
 1. Homebrew package manager (in order to install AWS CLI below)
@@ -46,38 +65,7 @@ The following tools are needed for development:
 
 1. Install TypeScript
 
-    ```bash
-    npm install -g typescript
-    ```
-
-1. Install Docker for running DynamoDB at https://www.docker.com/products/docker-desktop. 
-
-1. Set up DynamoDB locally
-
-    The application is using DynamoDB for persistent storage. In the repository root, run the following command to start the database and an admin interface:
-
-    ```docker-compose up```
-
-    Optionally, verify that the database is running by going to http://localhost:8001 or by running
-
-    ```aws dynamodb list-tables --endpoint-url http://localhost:8000```
-
-    This should give something similar to
-
-    ```json
-    {
-        "TableNames": []
-    }
-    ```
-
-1. Initialize the local database
-
-    ```bash
-    cd local
-    npm run create
-    ```
-
-    Optionally verify in the admin GUI or the AWS CLI as above. 
+    ```sudo npm install -g typescript```
 
 ## Generating API Client
 
@@ -98,33 +86,4 @@ Using the [serverless](https://www.serverless.com) framework, run the following 
 ```bash
 cd wdip-be
 serverless deploy -v
-```
-
-## Running the application
-
-### Backend
-
-In order to serve the lambda functions on your local machine, run
-
-```bash
-cd wdip-be
-serverless offline -P 3001
-```
-
-or, to run lambda directly in terminal
-
-```bash
-cd wdip-be
-SLS_DEBUG=* serverless invoke local --function fetchMotions
-```
-
-The functions' REST endpoints will be served on localhost port 3001, for example http://localhost:3001/hello.
-
-### Frontend
-
-Start the frontend application by running
-
-```bash
-cd wdip-fe
-npm start
 ```
