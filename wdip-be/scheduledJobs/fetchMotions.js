@@ -8,6 +8,9 @@ const sizeof = require('object-sizeof');
 const urlHelpers = require('./urlHelpers');
 const docHelpers = require('./docHelpers');
 var errorHelper = require('./errorHelper');
+const logger = require('../logger');
+const dbClient = require('../dbclient');
+const { WDIP_MOTION_INDEX, WDIP_MOTION_REQUEST_LOG_INDEX } = require('../config/config');
 
 // Point to local DB instance
 if (process.env.IS_OFFLINE || process.env.IS_LOCAL) {
@@ -17,18 +20,12 @@ if (process.env.IS_OFFLINE || process.env.IS_LOCAL) {
   });
 }
 
-const dbClient = require('../dbclient');
-const { WDIP_MOTION_INDEX } = require('../config/config');
-const { WDIP_MOTION_REQUEST_LOG_TABLE } = require('../config/config');
-
-const logger = require('../logger');
-
 // Add entry to request log
-function logRequest(isSuccess, fetchedTo) {
+async function logRequest(isSuccess, fetchedTo) {
   let id = isSuccess ? "success" : "fail";
   let date = (fetchedTo != null) ? fetchedTo : moment().valueOf();
   let toPut = {
-    index: WDIP_MOTION_INDEX,
+    index: WDIP_MOTION_REQUEST_LOG_INDEX,
     type: '_doc',
     body: {
       id: id,
@@ -37,10 +34,13 @@ function logRequest(isSuccess, fetchedTo) {
     }
   };
 
-  return dbClient.index(toPut, function (err, data) {
-    if (err) console.log("Error logging request. Error: " + err);
-    else console.log("Logged request. Success: " + isSuccess.toString() + ". FetchedTo: " + fetchedTo);
-  });
+  try {
+    await dbClient.index(toPut);
+    logger.info(`Logged request. Success: ${isSuccess}. FetchedTo: ${fetchedTo}.`);
+  }
+  catch (err) {
+    logger.error('Error logging request.', err);
+  }
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -73,7 +73,7 @@ async function parseQueryResult(data) {
       statusInfo = docHelpers.parseStatusObj(statusResp.dokumentstatus);
     } catch (error) {
       errorHelper.logError("Could not fetch status for url " + statusUrl +
-      "\n Reason: " + error);
+        "\n Reason: " + error);
       statusInfo.isPending = true;
     }
 
@@ -101,16 +101,16 @@ async function parseQueryResult(data) {
   }
 
   //Each document consists of two entries, action description and the data itself.
-  const nItems = toAddItems.length/2;
+  const nItems = toAddItems.length / 2;
 
   if (nItems > 0) {
     console.log("Writing " + nItems + " items to DB.");
-    try{
+    try {
       return dbClient.bulk({
         body: toAddItems
       });
-    }catch(error){
-      errorHelper.logError("Error when adding documents to index: "+ ": " + err);
+    } catch (error) {
+      errorHelper.logError("Error when adding documents to index: " + ": " + err);
     }
 
   } else {
@@ -164,9 +164,8 @@ async function _fetchMotions(_fromDate, _toDate) {
 
 module.exports = async function fetchMotions(fromDateStrOverride = null, toDateStrOverride = null, callback) {
 
-  const requestLogTableName = "motion-request-log"
   const requestLogQueryParams = {
-    index: requestLogTableName,
+    index: WDIP_MOTION_REQUEST_LOG_INDEX,
     q: "id:success",
     size: "1",
     sort: "date:desc"
@@ -175,16 +174,16 @@ module.exports = async function fetchMotions(fromDateStrOverride = null, toDateS
   // Check last successful fetch and fetch new
   let fetchFrom = moment(process.env.DATE_ZERO, 'YYYY-MM-DD').valueOf();
   try {
-    const { count } = await dbClient.count({index: requestLogTableName});
+    const { count } = await dbClient.count({ index: WDIP_MOTION_REQUEST_LOG_INDEX });
     const empty = count === 0;
     if (!empty) {
       await dbClient.search(requestLogQueryParams)
-      .then(function(resp){
-        console.log("FETCHING FROM: ",JSON.stringify(resp.hits.hits[0]._source.date));
-      }, function(err) {
-        errorHelper.logError("Failed to query log table " +
-        process.env.MOTION_REQUEST_LOG_TABLE + "\nReason: " + err);
-      });
+        .then(function (resp) {
+          console.log("FETCHING FROM: ", JSON.stringify(resp.hits.hits[0]._source.date));
+        }, function (err) {
+          errorHelper.logError("Failed to query log table " +
+            process.env.MOTION_REQUEST_LOG_TABLE + "\nReason: " + err);
+        });
     }
   } catch (error) {
     errorHelper.logError("Unable to fetch request log entry. Error:\n" + error + "\nExiting.");
@@ -206,13 +205,13 @@ module.exports = async function fetchMotions(fromDateStrOverride = null, toDateS
     fetchResp = { statusCode: 200, body: "Interval is zero, nothing to fetch" };
   } else {
     fetchResp = await _fetchMotions(fetchFrom, fetchTo)
-    .then(resp => {
-      return { statusCode: 200, body: resp };
-    })
-    .catch(err => {
-      return { statusCode: 500, body: err };
-    });
-    logRequest(fetchResp.statusCode == 200, fetchTo);
+      .then(resp => {
+        return { statusCode: 200, body: resp };
+      })
+      .catch(err => {
+        return { statusCode: 500, body: err };
+      });
+    await logRequest(fetchResp.statusCode == 200, fetchTo);
   }
 
   console.log("Callback with response " + fetchResp.statusCode);
