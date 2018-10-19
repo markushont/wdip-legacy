@@ -1,14 +1,63 @@
 'use strict';
 
-module.exports = async function getMotionsByParty(fromDateStrOverride = null, toDateStrOverride = null) {
-    let data = {
-        fromDate: fromDateStrOverride, toDate: toDateStrOverride, results: [
-            { party: "M", submitted: 1, approved: 6, declined: 10 },
-            { party: "L", submitted: 2, approved: 7, declined: 20 },
-            { party: "C", submitted: 3, approved: 8, declined: 30 },
-            { party: "V", submitted: 4, approved: 9, declined: 40 },
-            { party: "S", submitted: 5, approved: 0, declined: 50 }
-        ]
-    };
-    return data;
+const dbClient = require('../dbclient');
+const { WDIP_MOTION_INDEX, WDIP_DEFAULT_PARTIES } = require('../config/config');
+
+const logger = require('../logger');
+
+async function getMotions(fromDateStrOverride = null, toDateStrOverride = null, outcome, parties) {
+  var toAddDocs = [];
+  parties.forEach(function (party) {
+    toAddDocs.push({
+      index: WDIP_MOTION_INDEX,
+      type: '_doc',
+      size: '0'
+    });
+    toAddDocs.push(
+      {
+        query: {
+          bool: {
+            must: [
+              {
+                term: { "intressent.partibet": party }
+              },
+              {
+                term: { "forslag.kammaren": outcome }
+              },
+              {
+                range: {
+                  "dateStr": {
+                    "gte": fromDateStrOverride,
+                    "lte": toDateStrOverride
+                  }
+                }
+              }
+            ]
+          }
+        }
+      });
+  });
+  try {
+    return dbClient.msearch({
+      body: toAddDocs
+    });
+  } catch (error) {
+    logger.error("Error fetching documents in getMotions: ", error);
+  }
+}
+
+module.exports = async function getMotionsByParty(fromDateStrOverride = new Date(2000, 0, 1), toDateStrOverride = new Date(2018, 0, 1), parties = WDIP_DEFAULT_PARTIES) {
+  const posResponse = getMotions(fromDateStrOverride, toDateStrOverride, "bifall", parties);
+  const negResponse = getMotions(fromDateStrOverride, toDateStrOverride, "avslag", parties);
+  const responseQueue= await Promise.all([posResponse, negResponse]);
+  var i = 0;
+  var partyData = [];
+  parties.forEach(function (party) {
+    const approved = responseQueue[0].responses[i].hits.total;
+    const declined = responseQueue[1].responses[i].hits.total;
+    partyData.push({ party: party, submitted: approved + declined, approved: approved, declined: declined });
+    i++;
+  });
+  return { fromDate: fromDateStrOverride, toDate: toDateStrOverride, results: partyData };
+
 };

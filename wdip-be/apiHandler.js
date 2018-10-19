@@ -9,7 +9,7 @@ const motions = require('./api/motions');
 const responseHeaders = {
     'Content-Type': 'application/json',
     'Access-Control-Allow-Origin': '*',        // Required for CORS support to work
-    'Access-Control-Allow-Credentials': true   // Required for cookies, authorization headers with HTTPS 
+    'Access-Control-Allow-Credentials': true   // Required for cookies, authorization headers with HTTPS
 };
 
 /**
@@ -33,7 +33,7 @@ const responses = {
 };
 
 module.exports.getMotionsByParty = async (event, context) => {
-    let result = await getMotionsByParty(new Date(2000, 0, 1), new Date(2010, 0, 1));
+    let result = await getMotionsByParty();
     return responses.success(result);
 };
 
@@ -42,7 +42,7 @@ module.exports.getMotionById = async (event, context) => {
     var id = event.pathParameters.id;
     let result = await motions.byId(id);
     return responses.success(result);
-};  
+};
 
 module.exports.getPendingMotions = async (event, context) => {
     let result = await motions.pending();
