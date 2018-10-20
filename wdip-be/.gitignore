@@ -5,6 +5,9 @@ jspm_packages
 # Serverless directories
 .serverless
 
+# Output build directory
+dist
+
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json

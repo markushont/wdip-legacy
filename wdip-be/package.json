@@ -6,16 +6,23 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/markushont/aws-motioner-data.git"
+    "url": "https://github.com/hejare/aws-motioner-data.git"
+  },
+  "scripts": {
+    "build": "npm run build-ts",
+    "build-ts": "tsc",
+    "debug": "npm run build && node --inspect=0.0.0.0:9229 ./node_modules/.bin/serverless offline --location ./dist --host 0.0.0.0 --port 3001"
   },
   "dependencies": {
     "@types/elasticsearch": "^5.0.26",
+    "@types/node": "^10.12.0",
     "aws-sdk": "^2.282.1",
     "cryptiles": "^4.1.2",
     "elasticsearch": "^15.1.1",
     "moment": "^2.22.2",
     "object-sizeof": "^1.2.0",
     "request": "^2.87.0",
+    "typescript": "^3.1.3",
     "winston": "^3.1.0"
   },
   "devDependencies": {
