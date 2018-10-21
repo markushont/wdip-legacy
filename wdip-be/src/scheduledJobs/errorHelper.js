@@ -1,12 +1,14 @@
 "use strict";
 
+const logger = require("../logger");
+
 class ErrorHelper {
     constructor() {
         this.errors = [];
     }
 
     logError(errorText) {
-        console.error(errorText);
+        logger.error(errorText);
         this.errors.push(errorText);
     }
 

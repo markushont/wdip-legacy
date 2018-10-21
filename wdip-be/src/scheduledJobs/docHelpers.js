@@ -1,21 +1,18 @@
-'use strict';
+"use strict";
 
-const moment = require('moment');
-const sizeof = require('object-sizeof');
-const urlHelpers = require('./urlHelpers');
-var errorHelper = require('./errorHelper');
+const moment = require("moment");
 
 ////////////////////////////////////////////////////////////////////////////////
 
 function parseBasicInfo(dok) {
-  return({
-    dok_id:     dok.dok_id,
-    date:       dok.datum != undefined ? moment(dok.datum, "YYYY-MM-DD").valueOf() : -1,
-    dateStr:    dok.datum,
-    doktyp:     dok.doktyp,
-    subtyp:     dok.subtyp,
-    titel:      dok.sokdata != undefined ? dok.sokdata.titel : null,
-    undertitel: dok.sokdata != undefined ? dok.sokdata.undertitel : null,
+  return ({
+    dok_id: dok.dok_id,
+    date: dok.datum !== undefined ? moment(dok.datum, "YYYY-MM-DD").valueOf() : -1,
+    dateStr: dok.datum,
+    doktyp: dok.doktyp,
+    subtyp: dok.subtyp,
+    titel: dok.sokdata !== undefined ? dok.sokdata.titel : null,
+    undertitel: dok.sokdata !== undefined ? dok.sokdata.undertitel : null
     //summary:    dok.summary
   });
 }
@@ -31,24 +28,24 @@ function parseForslag(dokForslag) {
   let ret = [];
   function parseItem(item) {
     ret.push({
-      nummer:              item.nummer,
-      beteckning:          item.beteckning,
-      beslutstyp:          item.beslutstyp,
-      lydelse:             item.lydelse,
-      lydelse2:            item.lydelse2,
-      utskottet:           item.utskottet,
-      kammaren:            item.kammaren,
-      behandlas_i:         item.behandlas_i,
-      behandlas_i_punkt:   item.behandlas_i_punkt,
-      kammarebeslutstyp:   item.kammarebeslutstyp,
-      intressent:          item.intressent,
-      avsnitt:             item.avsnitt,
-      grundforfattning:    item.grundforfattning,
+      nummer: item.nummer,
+      beteckning: item.beteckning,
+      beslutstyp: item.beslutstyp,
+      lydelse: item.lydelse,
+      lydelse2: item.lydelse2,
+      utskottet: item.utskottet,
+      kammaren: item.kammaren,
+      behandlas_i: item.behandlas_i,
+      behandlas_i_punkt: item.behandlas_i_punkt,
+      kammarebeslutstyp: item.kammarebeslutstyp,
+      intressent: item.intressent,
+      avsnitt: item.avsnitt,
+      grundforfattning: item.grundforfattning,
       andringsforfattning: item.andringsforfattning
-    }); 
+    });
   }
 
-  if (forslag.constructor == Array) {
+  if (forslag.constructor === Array) {
     forslag.forEach(parseItem);
   } else {
     parseItem(forslag);
@@ -68,14 +65,14 @@ function parseIntressent(dokIntressent) {
   function parseItem(item) {
     ret.push({
       intressent_id: item.intressent_id,
-      namn:          item.namn,
-      partibet:      item.partibet,
-      ordning:       item.ordning,
-      roll:          item.roll
+      namn: item.namn,
+      partibet: item.partibet,
+      ordning: item.ordning,
+      roll: item.roll
     });
   }
 
-  if (intressent.constructor == Array) {
+  if (intressent.constructor === Array) {
     intressent.forEach(parseItem);
   } else {
     parseItem(intressent);
@@ -94,15 +91,15 @@ function parseUppgift(dokUppgift) {
   let ret = [];
   function parseItem(item) {
     ret.push({
-      kod:         item.kod,
-      namn:        item.namn,
-      text:        item.text,
-      dok_id:      item.dok_id,
+      kod: item.kod,
+      namn: item.namn,
+      text: item.text,
+      dok_id: item.dok_id,
       systemdatum: item.systemdatum
     });
   }
 
-  if (uppgift.constructor == Array) {
+  if (uppgift.constructor === Array) {
     uppgift.forEach(parseItem);
   } else {
     parseItem(uppgift);
@@ -113,7 +110,7 @@ function parseUppgift(dokUppgift) {
 ////////////////////////////////////////////////////////////////////////////////
 
 function parseStatus(dokument) {
-  if (!dokument || !dokument.status) return "";
+  if (!dokument || !dokument.status) { return ""; }
   return dokument.status;
 }
 
@@ -121,7 +118,7 @@ function parseStatus(dokument) {
 
 function parsePending(dokforslag) {
   if (dokforslag.forslag) {
-    if (dokforslag.forslag.constructor == Array) {
+    if (dokforslag.forslag.constructor === Array) {
       for (var i = 0; i < dokforslag.forslag.length(); ++i) {
         const item = dokforslag.forslag[i];
         if (item.utskottet.toLowerCase() === "avslag" || item.kammaren.toLowerCase() === "bifall" ||
@@ -132,8 +129,8 @@ function parsePending(dokforslag) {
       }
     } else {
       const item = dokforslag.forslag;
-      if (item.utskottet.toLowerCase() != "avslag" && item.kammaren.toLowerCase() != "bifall" &&
-        item.utskottet.toLowerCase() != "bifall" && item.kammaren.toLowerCase() != "avslag") {
+      if (item.utskottet.toLowerCase() !== "avslag" && item.kammaren.toLowerCase() !== "bifall" &&
+        item.utskottet.toLowerCase() !== "bifall" && item.kammaren.toLowerCase() !== "avslag") {
         return true;
       }
     }
@@ -164,11 +161,11 @@ function parseStatusObj(statusObj) {
 ////////////////////////////////////////////////////////////////////////////////
 
 module.exports = {
-  parseBasicInfo:  parseBasicInfo,
-  parseForslag:    parseForslag,
+  parseBasicInfo: parseBasicInfo,
+  parseForslag: parseForslag,
   parseIntressent: parseIntressent,
-  parseUppgift:    parseUppgift,
-  parseStatus:     parseStatus,
-  parsePending:    parsePending,
-  parseStatusObj:  parseStatusObj,
-}
+  parseUppgift: parseUppgift,
+  parseStatus: parseStatus,
+  parsePending: parsePending,
+  parseStatusObj: parseStatusObj
+};

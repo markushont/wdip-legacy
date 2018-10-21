@@ -1,16 +1,16 @@
 // Fetch motions from Riksdagen API and insert into DB
 
-'use strict';
+"use strict";
 
-var AWS = require('aws-sdk');
-var moment = require('moment');
-const sizeof = require('object-sizeof');
-const urlHelpers = require('./urlHelpers');
-const docHelpers = require('./docHelpers');
-var errorHelper = require('./errorHelper');
-const logger = require('../logger');
-const dbClient = require('../dbclient');
-const { WDIP_MOTION_INDEX, WDIP_MOTION_REQUEST_LOG_INDEX } = require('../config/config');
+var AWS = require("aws-sdk");
+var moment = require("moment");
+const sizeof = require("object-sizeof");
+const urlHelpers = require("./urlHelpers");
+const docHelpers = require("./docHelpers");
+var errorHelper = require("./errorHelper");
+const logger = require("../logger");
+const dbClient = require("../dbclient");
+const { WDIP_MOTION_INDEX, WDIP_MOTION_REQUEST_LOG_INDEX } = require("../config/config");
 
 // Point to local DB instance
 if (process.env.IS_OFFLINE || process.env.IS_LOCAL) {
@@ -26,7 +26,7 @@ async function logRequest(isSuccess, fetchedTo) {
   let date = (fetchedTo != null) ? fetchedTo : moment().valueOf();
   let toPut = {
     index: WDIP_MOTION_REQUEST_LOG_INDEX,
-    type: '_doc',
+    type: "_doc",
     body: {
       id: id,
       date: date,
@@ -37,19 +37,18 @@ async function logRequest(isSuccess, fetchedTo) {
   try {
     await dbClient.index(toPut);
     logger.info(`Logged request. Success: ${isSuccess}. FetchedTo: ${fetchedTo}.`);
-  }
-  catch (err) {
-    logger.error('Error logging request.', err);
+  } catch (err) {
+    logger.error("Error logging request.", err);
   }
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 function getDateString(dateInt) {
-  if (dateInt === null || dateInt === undefined) return null;
+  if (dateInt === null || dateInt === undefined) { return null; }
 
   let date = moment(dateInt);
-  return date.format('YYYY-MM-DD');
+  return date.format("YYYY-MM-DD");
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -84,16 +83,16 @@ async function parseQueryResult(data) {
     toAddItems.push({
       index: {
         _index: WDIP_MOTION_INDEX,
-        _type: '_doc',
+        _type: "_doc",
         _id: basicInfo.dok_id
-      },
+      }
     });
     if (maxSize && toAddSize > maxSize) {
-      console.warn("Stripping very large object with id " + toAdd.dok_id + " and size: " + toAddSize.toString());
+      logger.warn(`Stripping very large object with id ${toAdd.dok_id} and size ${toAddSize}.`);
       let strippedObj = docHelpers.parseBasicInfo(dok);
       strippedObj.isPending = toAdd.isPending;
       strippedObj.status = toAdd.status;
-      console.log("New size: " + sizeof(strippedObj));
+      logger.debug(`New size: ${sizeof(strippedObj)}`);
       toAddItems.push(strippedObj);
     } else {
       toAddItems.push(toAdd);
@@ -104,7 +103,7 @@ async function parseQueryResult(data) {
   const nItems = toAddItems.length / 2;
 
   if (nItems > 0) {
-    console.log("Writing " + nItems + " items to DB.");
+    logger.debug(`Writing ${nItems} items to DB."`);
     try {
       return dbClient.bulk({
         body: toAddItems
@@ -114,7 +113,7 @@ async function parseQueryResult(data) {
     }
 
   } else {
-    console.log("No items to write for page, skipping");
+    logger.debug("No items to write for page, skipping");
     return new Promise((resolve, reject) => resolve());
   }
 }
@@ -128,14 +127,14 @@ async function getResults(urlString) {
   while (nextUrl != null) {
     try {
       const jsonResp = await urlHelpers.getJsonFromUrl(nextUrl);
-      const nextPage = jsonResp.dokumentlista['@nasta_sida'];
-      if (nextPage != undefined && nextPage != "" && nextPage != nextUrl) {
+      const nextPage = jsonResp.dokumentlista["@nasta_sida"];
+      if (nextPage !== undefined && nextPage !== "" && nextPage !== nextUrl) {
         nextUrl = nextPage;
       } else {
         nextUrl = null;
       }
 
-      if (jsonResp.dokumentlista.dokument != undefined && jsonResp.dokumentlista.dokument.length > 0) {
+      if (jsonResp.dokumentlista.dokument !== undefined && jsonResp.dokumentlista.dokument.length > 0) {
         const dbPromise = parseQueryResult(jsonResp);
         dbPromises.push(dbPromise);
       }
@@ -150,12 +149,12 @@ async function getResults(urlString) {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-async function _fetchMotions(_fromDate, _toDate) {
-  const fromDate = _fromDate != null ? getDateString(_fromDate) : getDateString(process.env.DATE_ZERO);
-  const toDate = _toDate != null ? getDateString(_toDate) : getDateString(Date.now());
+async function _fetchMotions(fromDate, toDate) {
+  const selectedFromDate = fromDate != null ? getDateString(fromDate) : getDateString(process.env.DATE_ZERO);
+  const selectedToDate = toDate != null ? getDateString(toDate) : getDateString(Date.now());
 
-  const motionRequestUrl = urlHelpers.getMotionQuery(fromDate, toDate);
-  const propositionRequestUrl = urlHelpers.getPropositionQuery(fromDate, toDate);
+  const motionRequestUrl = urlHelpers.getMotionQuery(selectedFromDate, selectedToDate);
+  const propositionRequestUrl = urlHelpers.getPropositionQuery(selectedFromDate, selectedToDate);
   const result = Promise.all([getResults(motionRequestUrl), getResults(propositionRequestUrl)]);
   return result;
 }
@@ -172,15 +171,15 @@ module.exports = async function fetchMotions(fromDateStrOverride = null, toDateS
   };
 
   // Check last successful fetch and fetch new
-  let fetchFrom = moment(process.env.DATE_ZERO, 'YYYY-MM-DD').valueOf();
+  let fetchFrom = moment(process.env.DATE_ZERO, "YYYY-MM-DD").valueOf();
   try {
     const { count } = await dbClient.count({ index: WDIP_MOTION_REQUEST_LOG_INDEX });
     const empty = count === 0;
     if (!empty) {
       await dbClient.search(requestLogQueryParams)
-        .then(function (resp) {
-          console.log("FETCHING FROM: ", JSON.stringify(resp.hits.hits[0]._source.date));
-        }, function (err) {
+        .then((resp) => {
+          logger.debug(`FETCHING FROM: ${JSON.stringify(resp.hits.hits[0]._source.date)}`);
+        }, (err) => {
           errorHelper.logError("Failed to query log table " +
             process.env.MOTION_REQUEST_LOG_TABLE + "\nReason: " + err);
         });
@@ -191,12 +190,12 @@ module.exports = async function fetchMotions(fromDateStrOverride = null, toDateS
   }
 
   if (fromDateStrOverride != null) {
-    fetchFrom = moment(fromDateStrOverride, 'YYYY-MM-DD').valueOf();
+    fetchFrom = moment(fromDateStrOverride, "YYYY-MM-DD").valueOf();
   }
 
   let fetchTo = null;
   if (toDateStrOverride != null) {
-    fetchTo = moment(toDateStrOverride, 'YYYY-MM-DD').valueOf();
+    fetchTo = moment(toDateStrOverride, "YYYY-MM-DD").valueOf();
   }
 
   let fetchResp = {};
@@ -211,9 +210,9 @@ module.exports = async function fetchMotions(fromDateStrOverride = null, toDateS
       .catch(err => {
         return { statusCode: 500, body: err };
       });
-    await logRequest(fetchResp.statusCode == 200, fetchTo);
+    await logRequest(fetchResp.statusCode === 200, fetchTo);
   }
 
-  console.log("Callback with response " + fetchResp.statusCode);
+  logger.debug(`Callback with response ${fetchResp.statusCode}.`);
   callback(fetchResp.statusCode, fetchResp);
 };
