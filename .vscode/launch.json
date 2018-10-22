@@ -7,12 +7,22 @@
         {
             "type": "node",
             "request": "attach",
-            "name": "Attach to WDIP-BE",
+            "name": "Attach to WDIP-BE in Docker",
             "port": 9229,
             "address": "localhost",
             "localRoot": "${workspaceFolder}/wdip-be",
             "remoteRoot": "/app",
-            "protocol": "inspector"
+            "protocol": "inspector",
+            "outFiles": [
+                "${workspaceFolder}/wdip-be/dist/**/*.js"
+            ],
+            "sourceMaps": true,
+            "smartStep": true,
+            "skipFiles": [
+                "<node_internals>/**/*.js",
+                "${workspaceFolder}/wdip-be/node_modules/**/*.js",
+                "/app/node_modules/**/*.js"
+            ]
         },
         {
             "type": "node",
@@ -20,7 +30,7 @@
             "name": "Debug fetch-motions",
             "program": "${workspaceRoot}/fetch-motions/node_modules/.bin/sls",
             "localRoot": "${workspaceRoot}/fetch-motions",
-            "args":[
+            "args": [
                 "invoke",
                 "local",
                 "-f",
