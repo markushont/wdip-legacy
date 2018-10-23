@@ -1,7 +1,6 @@
 // Check status for motions with isPending=true
 
 var AWS = require("aws-sdk");
-var errorHelper = require("./errorHelper");
 const docHelpers = require("./docHelpers");
 const urlHelpers = require("./urlHelpers");
 const logger = require("../logger");
@@ -16,7 +15,6 @@ if (process.env.IS_OFFLINE || process.env.IS_LOCAL) {
 
 const dbClient = require("../dbclient");
 const { WDIP_MOTION_INDEX } = require("../config/config");
-const logger = require("../logger");
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
