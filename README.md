@@ -76,7 +76,7 @@ The backend API is defined in an OpenAPI definition file (at wdip-be/api/swagger
 rm -rf wdip-fe/src/service/wdip-be
 
 # Generate the new API client
-docker run --rm -v ${PWD}:/local openapitools/openapi-generator-cli generate -i /local/wdip-be/api/swagger.yml -g typescript-fetch -o /local/wdip-fe/src/service/wdip-be
+docker run --rm -v ${PWD}:/local openapitools/openapi-generator-cli generate -i /local/wdip-be/src/api/swagger.yml -g typescript-fetch -o /local/wdip-fe/src/service/wdip-be
 ```
 
 ## Deploying the backend
