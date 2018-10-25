@@ -3,11 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "foundation-sites": "^6.5.0-rc.2",
+    "@types/chart.js": "^2.7.40",
+    "chart.js": "^2.7.3",
+    "foundation-sites": "^6.5.0-rc.4",
     "jquery": "^3.3.1",
     "portable-fetch": "^3.0.0",
-    "react": "^16.4.2",
-    "react-dom": "^16.4.2",
+    "react": "^16.6.0",
+    "react-chartjs-2": "^2.7.4",
+    "react-dom": "^16.6.0",
     "react-foundation": "^0.9.6",
     "react-scripts-ts": "2.17.0"
   },
@@ -18,11 +21,11 @@
     "eject": "react-scripts-ts eject"
   },
   "devDependencies": {
-    "@types/jest": "^23.3.1",
-    "@types/node": "^10.9.4",
-    "@types/react": "^16.4.13",
-    "@types/react-dom": "^16.0.7",
+    "@types/jest": "^23.3.7",
+    "@types/node": "^10.12.0",
+    "@types/react": "^16.4.18",
+    "@types/react-dom": "^16.0.9",
     "@types/react-foundation": "^0.9.3",
-    "typescript": "^3.0.3"
+    "typescript": "^3.1.3"
   }
 }

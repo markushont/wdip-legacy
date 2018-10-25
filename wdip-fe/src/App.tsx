@@ -5,6 +5,8 @@ import { GridContainer, Grid, Cell } from 'react-foundation';
 import Header from './Header';
 import MotionsByParty from './MotionsPerParty';
 import { MotionsApi } from './service/wdip-be';
+import Chart from './Chart';
+
 
 class App extends React.Component<any, any> {
 
@@ -27,12 +29,15 @@ class App extends React.Component<any, any> {
     return (
       <div>
         <Header />
-
+        
+  
+      <Chart />
+        
         <GridContainer>
           <Grid >
 
             <Cell>
-              <h1>WDIP</h1>
+              <h1>WDIPs</h1>
             </Cell>
 
             <Cell>
