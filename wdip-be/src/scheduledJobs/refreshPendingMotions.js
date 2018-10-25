@@ -16,7 +16,6 @@ if (process.env.IS_OFFLINE || process.env.IS_LOCAL) {
 
 const dbClient = require("../dbclient");
 const { WDIP_MOTION_INDEX } = require("../config/config");
-const logger = require("../logger");
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
