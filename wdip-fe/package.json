@@ -3,16 +3,15 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@types/chart.js": "^2.7.40",
-    "chart.js": "^2.7.3",
+    "@types/recharts": "^1.1.0",
     "foundation-sites": "^6.5.0-rc.4",
     "jquery": "^3.3.1",
     "portable-fetch": "^3.0.0",
     "react": "^16.6.0",
-    "react-chartjs-2": "^2.7.4",
     "react-dom": "^16.6.0",
     "react-foundation": "^0.9.6",
-    "react-scripts-ts": "2.17.0"
+    "react-scripts-ts": "2.17.0",
+    "recharts": "^1.3.5"
   },
   "scripts": {
     "start": "react-scripts-ts start",

@@ -3,9 +3,9 @@ import './App.css';
 
 import { GridContainer, Grid, Cell } from 'react-foundation';
 import Header from './Header';
-import MotionsByParty from './MotionsPerParty';
 import { MotionsApi } from './service/wdip-be';
 import Chart from './Chart';
+
 
 
 class App extends React.Component<any, any> {
@@ -14,7 +14,7 @@ class App extends React.Component<any, any> {
 
   constructor(props: any) {
     super(props);
-    this.state = { motionsByParty: {} };
+    this.state = { chart: {}, motionsByParty: {}};
   }
 
   componentDidMount() {
@@ -22,29 +22,26 @@ class App extends React.Component<any, any> {
   }
 
   async fetchData() {
-    this.setState({ motionsByParty: await this.api.getMotionsByParty() });
+    this.setState({ chart: await this.api.getMotionsByParty, motionsByParty: await this.api.getMotionsByParty()  });
   }
 
   public render() {
     return (
       <div>
         <Header />
-        
-  
-      <Chart />
-        
+
         <GridContainer>
           <Grid >
 
             <Cell>
-              <h1>WDIPs</h1>
+              <h1>WDIP - NOAH</h1>
             </Cell>
 
             <Cell>
               <h2>
                 Motioner per parti
               </h2>
-              <MotionsByParty
+              <Chart
                 fromDate={this.state.motionsByParty.fromDate}
                 toDate={this.state.motionsByParty.toDate}
                 results={this.state.motionsByParty.results} />
@@ -61,5 +58,4 @@ class App extends React.Component<any, any> {
     );
   }
 }
-
 export default App;

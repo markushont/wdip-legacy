@@ -1,38 +1,36 @@
 import * as React from 'react';
-import {Bar} from 'react-chartjs-2';
+import { BarChart, Tooltip, Legend, Bar, CartesianGrid, YAxis, XAxis } from 'recharts';
 
-class Chart extends React.Component<any, any>{
-    constructor(props: any){
+class Chart extends React.Component<any, any> {
+
+    constructor(props: any) {
         super(props);
-        this.state = {
-            chartData:{
-                labels:['S','M','MP'],
-                datasets:[{
-                    label:'test1',
-                    data:[
-                        3,
-                        4,
-                        2
-                    ],
-                    backgroundColor:[
-                        'rgba(244,99,142,0.6)',
-                        'rgba(158,99,20,0.6)',
-                        'rgba(244,19,142,0.6)'
-                    ]
-                }
-                ]
-            }
-        }
     }
-    render(){
+
+    public render() {
+        let tableRows;
+        if (this.props.results)
+                  tableRows = this.props.results.map((result: any) => ({
+                                                                        parti: result.party,
+                                                                        bifall: result.approved,
+                                                                        avslag: result.declined             
+                                                                        }));
+        console.log("return: ", tableRows);
+
         return (
             <div className="chart">
-                <Bar 
-                    data = {this.state.chartData}
-                    options={{                    }}
-            />
+            <p>{this.props.fromDate} - {this.props.toDate}</p>
+                <BarChart width={730} height={250} data={tableRows}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="parti" />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    <Bar dataKey="bifall" stackId="a" fill="#8884d8" />
+                    <Bar dataKey="avslag" stackId="a" fill="#82ca9d" />
+                </BarChart>
             </div>
-        )
+        );
     }
 }
 
