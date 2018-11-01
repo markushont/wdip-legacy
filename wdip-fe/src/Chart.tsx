@@ -15,7 +15,6 @@ class Chart extends React.Component<any, any> {
                                                                         bifall: result.approved,
                                                                         avslag: result.declined             
                                                                         }));
-        console.log("return: ", tableRows);
 
         return (
             <div className="chart">

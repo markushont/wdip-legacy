@@ -1,7 +1,7 @@
 "use strict";
 
 const dbClient = require("../dbclient");
-const { WDIP_MOTION_INDEX, WDIP_DEFAULT_PARTIES } = require("../config/config");
+const { WDIP_MOTION_INDEX, WDIP_DEFAULT_PARTIES} = require("../config/config");
 
 const logger = require("../logger");
 
@@ -47,9 +47,11 @@ async function getMotions(fromDateStrOverride = null, toDateStrOverride = null, 
 }
 
 async function getMotionsByParty(
-  fromDateStrOverride = new Date(2000, 0, 1),
-  toDateStrOverride = new Date(2018, 0, 1),
-  parties = WDIP_DEFAULT_PARTIES) {
+  fromDateStrOverride,
+  toDateStrOverride) {
+
+  var parties = WDIP_DEFAULT_PARTIES;
+
   const posResponse = getMotions(fromDateStrOverride, toDateStrOverride, "bifall", parties);
   const negResponse = getMotions(fromDateStrOverride, toDateStrOverride, "avslag", parties);
   const responseQueue = await Promise.all([posResponse, negResponse]);
