@@ -2,6 +2,7 @@
 
 const getMotionsByParty = require("./api/getMotionsByParty");
 const motions = require("./api/motions");
+const logger = require("./logger");
 
 /**
  * Base response HTTP headers
@@ -33,7 +34,9 @@ const responses = {
 };
 
 module.exports.getMotionsByParty = async (event, context) => {
-    let result = await getMotionsByParty();
+    var fromDate = event.queryStringParameters.fromDate;
+    var toDate = event.queryStringParameters.toDate;
+    let result = await getMotionsByParty(fromDate, toDate);
     return responses.success(result);
 };
 
