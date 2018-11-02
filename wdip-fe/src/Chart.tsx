@@ -9,16 +9,16 @@ class Chart extends React.Component<any, any> {
 
     public render() {
         let tableRows;
-        if (this.props.results)
-                  tableRows = this.props.results.map((result: any) => ({
-                                                                        parti: result.party,
-                                                                        bifall: result.approved,
-                                                                        avslag: result.declined             
-                                                                        }));
+        if (this.props.results) {
+            tableRows = this.props.results.map((result: any) => ({
+                parti: result.party,
+                bifall: result.approved,
+                avslag: result.declined
+            }));
+        }
 
         return (
             <div className="chart">
-            <p>{this.props.fromDate} - {this.props.toDate}</p>
                 <BarChart width={730} height={250} data={tableRows}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="parti" />

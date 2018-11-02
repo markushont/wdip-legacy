@@ -5,6 +5,8 @@ import { GridContainer, Grid, Cell } from 'react-foundation';
 import Header from './Header';
 import { MotionsApi } from './service/wdip-be';
 import Chart from './Chart';
+const DEFAULT_FROM_DATE = '2000-01-01';
+const DEFAULT_TO_DATE = (new Date()).toISOString().substring(0, 10);
 
 
 
@@ -14,9 +16,8 @@ class App extends React.Component<any, any> {
 
   constructor(props: any) {
     super(props);
-    this.setFromDate = this.setFromDate.bind(this);
-    this.setToDate = this.setToDate.bind(this);
-    this.state = { chart: {}, motionsByParty: {}, fromDate: '2000-09-19', toDate: '2012-10-11'};
+    this.setDate = this.setDate.bind(this);
+    this.state = { chart: {}, motionsByParty: {}, fromDate: DEFAULT_FROM_DATE, toDate: DEFAULT_TO_DATE };
   }
 
   componentDidMount() {
@@ -24,26 +25,23 @@ class App extends React.Component<any, any> {
   }
 
   async fetchData() {
-    this.setState({ chart: await this.api.getMotionsByParty(this.state.fromDate, this.state.toDate)});
+    this.setState({ chart: await this.api.getMotionsByParty(this.state.fromDate, this.state.toDate) });
   }
 
-  setFromDate(e: React.ChangeEvent<HTMLInputElement>) {
-    this.setState({fromDate: e.target.value});
-  }
-
-  setToDate(e: React.ChangeEvent<HTMLInputElement>){
-    this.setState({toDate: e.target.value});
+  setDate(fromChanged: Boolean, e: React.ChangeEvent<HTMLInputElement>) {
+    if (fromChanged) {
+      this.setState({ fromDate: e.target.value }, this.fetchData);
+    } else {
+      this.setState({ toDate: e.target.value }, this.fetchData);
+    }
   }
 
   public render() {
-    const fromDate = this.state.fromDate;
-    const toDate = this.state.toDate;
     return (
       <div>
         <Header />
         <GridContainer>
           <Grid >
-
             <Cell>
               <h1>WDIP</h1>
             </Cell>
@@ -51,32 +49,29 @@ class App extends React.Component<any, any> {
               <h2>
                 Motioner per parti
               </h2>
-              </Cell>
-              <Cell medium={5}>
-           <label> Från <input onChange ={ this.setFromDate } value={fromDate} type="date"></input>
-           </label>
-           </Cell>
-           <Cell medium={5}>
-           <label> Till <input onChange={this.setToDate } value= {toDate} type="date"></input>
-           </label> 
-           </Cell>
-           <Cell>
-                <Chart
-                  fromDate={this.state.chart.fromDate}
-                  toDate={this.state.chart.toDate}
-                  results={this.state.chart.results} />
             </Cell>
-
-              <Cell medium={4}>{this.state.fromDate}</Cell>
-              <Cell medium={8}>{this.state.toDate}</Cell>
+            <Cell medium={5}>
+              <label> Från <input onChange={(e) => this.setDate(true, e)} value={this.state.fromDate} type="date"></input>
+              </label>
+            </Cell>
+            <Cell medium={5}>
+              <label> Till <input onChange={(e) => this.setDate(false, e)} value={this.state.toDate} type="date"></input>
+              </label>
+            </Cell>
+            <Cell>
+              <Chart
+                fromDate={this.state.fromDate}
+                toDate={this.state.toDate}
+                results={this.state.chart.results} />
+            </Cell>
 
           </Grid>
         </GridContainer>
 
 
       </div >
-        );
-      }
-    }
-    export default App;
+    );
+  }
+}
+export default App;
 
