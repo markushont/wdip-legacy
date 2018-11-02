@@ -4,7 +4,7 @@ import './App.css';
 import { GridContainer, Grid, Cell } from 'react-foundation';
 import Header from './Header';
 import { MotionsApi } from './service/wdip-be';
-import Chart from './Chart';
+import Chart from './Modules/BarChart';
 const DEFAULT_FROM_DATE = '2000-01-01';
 const DEFAULT_TO_DATE = (new Date()).toISOString().substring(0, 10);
 
