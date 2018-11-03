@@ -3,9 +3,13 @@ import './App.css';
 
 import { GridContainer, Grid, Cell } from 'react-foundation';
 import Header from './Header';
-import MotionsByParty from './MotionsPerParty';
 import { MotionsApi } from './service/wdip-be';
 import WordCloud from './modules/WordCloud';
+import Chart from './modules/BarChart';
+const DEFAULT_FROM_DATE = new Date(2000, 1, 1); //'2000-01-01';
+const DEFAULT_TO_DATE = (new Date());//.toISOString().substring(0, 10);
+
+
 
 class App extends React.Component<any, any> {
 
@@ -14,6 +18,9 @@ class App extends React.Component<any, any> {
   constructor(props: any) {
     super(props);
     this.state = {
+      chart: {},
+      fromDate: DEFAULT_FROM_DATE,
+      toDate: DEFAULT_TO_DATE,
       motionsByParty: {},
       wordCloudData: [
         { text: 'Friedlich', value: this.randValue() },
@@ -33,6 +40,8 @@ class App extends React.Component<any, any> {
         { text: 'Neutral', value: this.randValue() },
       ]
     };
+
+    this.setDate = this.setDate.bind(this);
   }
 
   randValue(): number {
@@ -44,29 +53,45 @@ class App extends React.Component<any, any> {
   }
 
   async fetchData() {
-    this.setState({ motionsByParty: await this.api.getMotionsByParty() });
+    this.setState({ chart: await this.api.getMotionsByParty(this.state.fromDate, this.state.toDate) });
+  }
+
+  setDate(fromChanged: Boolean, e: React.ChangeEvent<HTMLInputElement>) {
+    if (fromChanged) {
+      this.setState({ fromDate: e.target.value }, this.fetchData);
+    } else {
+      this.setState({ toDate: e.target.value }, this.fetchData);
+    }
   }
 
   public render() {
     return (
       <div>
         <Header />
-
         <GridContainer>
           <Grid >
-
             <Cell>
               <h1>WDIP</h1>
             </Cell>
-
             <Cell>
               <h2>
                 Motioner per parti
               </h2>
-              <MotionsByParty
-                fromDate={this.state.motionsByParty.fromDate}
-                toDate={this.state.motionsByParty.toDate}
-                results={this.state.motionsByParty.results} />
+            </Cell>
+
+            <Cell medium={5}>
+              <label> Från <input onChange={(e) => this.setDate(true, e)} value={this.state.fromDate} type="date"></input>
+              </label>
+            </Cell>
+            <Cell medium={5}>
+              <label> Till <input onChange={(e) => this.setDate(false, e)} value={this.state.toDate} type="date"></input>
+              </label>
+            </Cell>
+            <Cell>
+              <Chart
+                fromDate={this.state.fromDate}
+                toDate={this.state.toDate}
+                results={this.state.chart.results} />
             </Cell>
 
             <Cell medium={4}>4 cols</Cell>
@@ -80,5 +105,5 @@ class App extends React.Component<any, any> {
     );
   }
 }
-
 export default App;
+

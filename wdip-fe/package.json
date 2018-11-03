@@ -1,32 +1,34 @@
 {
-  "name": "wdip-fe",
-  "version": "0.1.0",
-  "private": true,
-  "dependencies": {
-    "foundation-sites": "^6.5.0-rc.2",
-    "jquery": "^3.3.1",
-    "portable-fetch": "^3.0.0",
-    "react": "^16.4.2",
-    "react-d3-cloud": "^0.7.0",
-    "react-dom": "^16.4.2",
-    "react-foundation": "^0.9.6",
-    "react-scripts-ts": "2.17.0"
-  },
-  "scripts": {
-    "start": "react-scripts-ts start",
-    "build": "react-scripts-ts build",
-    "testOriginal": "react-scripts-ts test --env=jsdom",
-    "test": "./node_modules/.bin/jest --watch",
-    "eject": "react-scripts-ts eject"
-  },
-  "devDependencies": {
-    "@types/jest": "^23.3.9",
-    "@types/node": "^10.9.4",
-    "@types/react": "^16.4.13",
-    "@types/react-dom": "^16.0.7",
-    "@types/react-foundation": "^0.9.3",
-    "jest": "^23.6.0",
-    "ts-jest": "^23.10.4",
-    "typescript": "^3.0.3"
-  }
+    "name": "wdip-fe",
+    "version": "0.1.0",
+    "private": true,
+    "dependencies": {
+        "@types/recharts": "^1.1.0",
+        "foundation-sites": "^6.5.0-rc.4",
+        "jquery": "^3.3.1",
+        "portable-fetch": "^3.0.0",
+        "react": "^16.6.0",
+        "react-d3-cloud": "^0.7.0",
+        "react-dom": "^16.6.0",
+        "react-foundation": "^0.9.6",
+        "react-scripts-ts": "2.17.0",
+        "recharts": "^1.3.5"
+    },
+    "scripts": {
+        "start": "react-scripts-ts start",
+        "build": "react-scripts-ts build",
+        "testOriginal": "react-scripts-ts test --env=jsdom",
+        "test": "./node_modules/.bin/jest --watch",
+        "eject": "react-scripts-ts eject"
+    },
+    "devDependencies": {
+        "@types/jest": "^23.3.9",
+        "jest": "^23.6.0",
+        "ts-jest": "^23.10.4",
+        "@types/node": "^10.12.0",
+        "@types/react": "^16.4.18",
+        "@types/react-dom": "^16.0.9",
+        "@types/react-foundation": "^0.9.3",
+        "typescript": "^3.1.3"
+    }
 }
