@@ -6,10 +6,8 @@ import Header from './Header';
 import { MotionsApi } from './service/wdip-be';
 import WordCloud from './modules/WordCloud';
 import Chart from './modules/BarChart';
-const DEFAULT_FROM_DATE = new Date(2000, 1, 1); //'2000-01-01';
-const DEFAULT_TO_DATE = (new Date());//.toISOString().substring(0, 10);
-
-
+const DEFAULT_FROM_DATE = new Date(2000, 1, 1);
+const DEFAULT_TO_DATE = new Date();
 
 class App extends React.Component<any, any> {
 
