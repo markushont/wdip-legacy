@@ -4,11 +4,10 @@ import './App.css';
 import { GridContainer, Grid, Cell } from 'react-foundation';
 import Header from './Header';
 import { MotionsApi } from './service/wdip-be';
-import Chart from './Modules/BarChart';
-const DEFAULT_FROM_DATE = '2000-01-01';
-const DEFAULT_TO_DATE = (new Date()).toISOString().substring(0, 10);
-
-
+import WordCloud from './modules/WordCloud';
+import Chart from './modules/BarChart';
+const DEFAULT_FROM_DATE = new Date(2000, 1, 1);
+const DEFAULT_TO_DATE = new Date();
 
 class App extends React.Component<any, any> {
 
@@ -16,8 +15,35 @@ class App extends React.Component<any, any> {
 
   constructor(props: any) {
     super(props);
+    this.state = {
+      chart: {},
+      fromDate: DEFAULT_FROM_DATE,
+      toDate: DEFAULT_TO_DATE,
+      motionsByParty: {},
+      wordCloudData: [
+        { text: 'Friedlich', value: this.randValue() },
+        { text: 'Hanks', value: this.randValue() },
+        { text: 'Tunnan', value: this.randValue() },
+        { text: 'Le Bacon', value: this.randValue() },
+        { text: 'Mr O', value: this.randValue() },
+        { text: 'Big M', value: this.randValue() },
+        { text: 'Luddas', value: this.randValue() },
+        { text: 'Sejdis', value: this.randValue() },
+        { text: 'Burn Hard', value: this.randValue() },
+        { text: 'Leo', value: this.randValue() },
+        { text: 'Seb-man', value: this.randValue() },
+        { text: 'Seti', value: this.randValue() },
+        { text: 'Positiv', value: this.randValue() },
+        { text: 'Negativ', value: this.randValue() },
+        { text: 'Neutral', value: this.randValue() },
+      ]
+    };
+
     this.setDate = this.setDate.bind(this);
-    this.state = { chart: {}, motionsByParty: {}, fromDate: DEFAULT_FROM_DATE, toDate: DEFAULT_TO_DATE };
+  }
+
+  randValue(): number {
+    return Math.round(Math.random() * 1000);
   }
 
   componentDidMount() {
@@ -50,6 +76,7 @@ class App extends React.Component<any, any> {
                 Motioner per parti
               </h2>
             </Cell>
+
             <Cell medium={5}>
               <label> Från <input onChange={(e) => this.setDate(true, e)} value={this.state.fromDate} type="date"></input>
               </label>
@@ -64,6 +91,9 @@ class App extends React.Component<any, any> {
                 toDate={this.state.toDate}
                 results={this.state.chart.results} />
             </Cell>
+
+            <Cell medium={4}>4 cols</Cell>
+            <Cell medium={8}><WordCloud data={this.state.wordCloudData}></WordCloud></Cell>
 
           </Grid>
         </GridContainer>
