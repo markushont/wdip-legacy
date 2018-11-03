@@ -24,14 +24,12 @@ paths:
           required: false
           schema:
             type: string
-            format: date
         - name: toDate
           in: query
           description: To which date (inclusive) data should be returned.
           required: false
           schema:
             type: string
-            format: date
       responses:
         '200':
           description: A list of all motions by party
