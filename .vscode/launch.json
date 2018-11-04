@@ -36,6 +36,13 @@
                 "-f",
                 "fetchMotions"
             ]
+        },
+        {
+            "name": "Debug WDIP-FE",
+            "type": "chrome",
+            "request": "launch",
+            "url": "http://localhost:3000",
+            "webRoot": "${workspaceFolder}/wdip-fe"
         }
     ]
 }

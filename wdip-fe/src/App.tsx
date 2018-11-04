@@ -3,7 +3,7 @@ import './App.css';
 
 import { GridContainer, Grid, Cell } from 'react-foundation';
 import Header from './Header';
-import { MotionsApi } from './service/wdip-be';
+import { MotionsApi, ChartsApi } from './service/wdip-be';
 import WordCloud from './modules/WordCloud';
 import Chart from './modules/BarChart';
 const DEFAULT_FROM_DATE = new Date(2000, 1, 1);
@@ -11,39 +11,19 @@ const DEFAULT_TO_DATE = new Date();
 
 class App extends React.Component<any, any> {
 
-  api: MotionsApi = new MotionsApi();
+  motionsApi: MotionsApi = new MotionsApi();
+  chartsApi: ChartsApi = new ChartsApi();
 
   constructor(props: any) {
     super(props);
     this.state = {
-      chart: {},
       fromDate: DEFAULT_FROM_DATE,
       toDate: DEFAULT_TO_DATE,
       motionsByParty: {},
-      wordCloudData: [
-        { text: 'Friedlich', value: this.randValue() },
-        { text: 'Hanks', value: this.randValue() },
-        { text: 'Tunnan', value: this.randValue() },
-        { text: 'Le Bacon', value: this.randValue() },
-        { text: 'Mr O', value: this.randValue() },
-        { text: 'Big M', value: this.randValue() },
-        { text: 'Luddas', value: this.randValue() },
-        { text: 'Sejdis', value: this.randValue() },
-        { text: 'Burn Hard', value: this.randValue() },
-        { text: 'Leo', value: this.randValue() },
-        { text: 'Seb-man', value: this.randValue() },
-        { text: 'Seti', value: this.randValue() },
-        { text: 'Positiv', value: this.randValue() },
-        { text: 'Negativ', value: this.randValue() },
-        { text: 'Neutral', value: this.randValue() },
-      ]
+      wordCloudData: []
     };
 
     this.setDate = this.setDate.bind(this);
-  }
-
-  randValue(): number {
-    return Math.round(Math.random() * 1000);
   }
 
   componentDidMount() {
@@ -51,7 +31,24 @@ class App extends React.Component<any, any> {
   }
 
   async fetchData() {
-    this.setState({ chart: await this.api.getMotionsByParty(this.state.fromDate, this.state.toDate) });
+    this.getMotionsByParty();
+    this.getWordCloudData();
+  }
+
+  async getMotionsByParty() {
+    try {
+      this.setState({ motionsByParty: await this.motionsApi.getMotionsByParty(this.state.fromDate, this.state.toDate) });
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async getWordCloudData() {
+    try {
+      this.setState({ wordCloudData: await this.chartsApi.getWordCloud() });
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   setDate(fromChanged: Boolean, e: React.ChangeEvent<HTMLInputElement>) {
@@ -89,7 +86,7 @@ class App extends React.Component<any, any> {
               <Chart
                 fromDate={this.state.fromDate}
                 toDate={this.state.toDate}
-                results={this.state.chart.results} />
+                results={this.state.motionsByParty.results} />
             </Cell>
 
             <Cell medium={4}>4 cols</Cell>
@@ -104,4 +101,3 @@ class App extends React.Component<any, any> {
   }
 }
 export default App;
-

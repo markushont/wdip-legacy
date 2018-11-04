@@ -156,6 +156,135 @@ export interface MotionsByPartyResults {
     declined?: number;
 }
 
+/**
+ * 
+ * @export
+ * @interface Word
+ */
+export interface Word {
+    /**
+     * 
+     * @type {string}
+     * @memberof Word
+     */
+    text: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof Word
+     */
+    value: number;
+}
+
+/**
+ * 
+ * @export
+ * @interface Words
+ */
+export interface Words extends Array<Word> {
+}
+
+
+/**
+ * ChartsApi - fetch parameter creator
+ * @export
+ */
+export const ChartsApiFetchParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * 
+         * @summary Gets word cloud data, ie keywords and their frequency
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getWordCloud(options: any = {}): FetchArgs {
+            const localVarPath = `/charts/wordcloud`;
+            const localVarUrlObj = url.parse(localVarPath, true);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+            const localVarRequestOptions = Object.assign({ method: 'GET' }, baseOptions, options);
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            localVarUrlObj.query = Object.assign({}, localVarUrlObj.query, localVarQueryParameter, options.query);
+            // fix override query string Detail: https://stackoverflow.com/a/7517673/1077943
+            delete localVarUrlObj.search;
+            localVarRequestOptions.headers = Object.assign({}, localVarHeaderParameter, options.headers);
+
+            return {
+                url: url.format(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * ChartsApi - functional programming interface
+ * @export
+ */
+export const ChartsApiFp = function(configuration?: Configuration) {
+    return {
+        /**
+         * 
+         * @summary Gets word cloud data, ie keywords and their frequency
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getWordCloud(options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Words> {
+            const localVarFetchArgs = ChartsApiFetchParamCreator(configuration).getWordCloud(options);
+            return (fetch: FetchAPI = portableFetch, basePath: string = BASE_PATH) => {
+                return fetch(basePath + localVarFetchArgs.url, localVarFetchArgs.options).then((response) => {
+                    if (response.status >= 200 && response.status < 300) {
+                        return response.json();
+                    } else {
+                        throw response;
+                    }
+                });
+            };
+        },
+    }
+};
+
+/**
+ * ChartsApi - factory interface
+ * @export
+ */
+export const ChartsApiFactory = function (configuration?: Configuration, fetch?: FetchAPI, basePath?: string) {
+    return {
+        /**
+         * 
+         * @summary Gets word cloud data, ie keywords and their frequency
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getWordCloud(options?: any) {
+            return ChartsApiFp(configuration).getWordCloud(options)(fetch, basePath);
+        },
+    };
+};
+
+/**
+ * ChartsApi - object-oriented interface
+ * @export
+ * @class ChartsApi
+ * @extends {BaseAPI}
+ */
+export class ChartsApi extends BaseAPI {
+    /**
+     * 
+     * @summary Gets word cloud data, ie keywords and their frequency
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ChartsApi
+     */
+    public getWordCloud(options?: any) {
+        return ChartsApiFp(this.configuration).getWordCloud(options)(this.fetch, this.basePath);
+    }
+
+}
 
 /**
  * MotionsApi - fetch parameter creator
