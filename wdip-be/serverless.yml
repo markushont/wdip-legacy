@@ -98,3 +98,9 @@ functions:
             parameters:
               paths:
                 id: true
+  getWordCloud:
+    handler: apiHandler.getWordCloud
+    events:
+      - http:
+          path: charts/wordcloud
+          method: get

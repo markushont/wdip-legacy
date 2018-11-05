@@ -19,19 +19,17 @@ class WordCloud extends React.Component<any, any> {
         return 0;
     };
 
-    constructor(props: any) {
-        super(props);
-
-        // Create a new normalizer with the min and max values from the data set.
-        const min = props.data.reduce((minSoFar: number, curVal: any) => Math.min(minSoFar, curVal.value), props.data[0].value);
-        const max = props.data.reduce((minSoFar: number, curVal: any) => Math.max(minSoFar, curVal.value), props.data[0].value);
-        this.normalizer = new Normalizer(min, max);
-
-        // Update the font size mapper to use the new normalizer.
-        this.fontSizeMapper = (word: any) => this.normalizer.normalize(word.value);
-    }
-
     public render() {
+        if (this.props && this.props.data && Array.isArray(this.props.data) && this.props.data[0]) {
+            // Create a new normalizer with the min and max values from the data set.
+            const startValue = this.props.data[0].value;
+            const min = this.props.data.reduce((minSoFar: number, curVal: any) => Math.min(minSoFar, curVal.value), startValue);
+            const max = this.props.data.reduce((minSoFar: number, curVal: any) => Math.max(minSoFar, curVal.value), startValue);
+            this.normalizer = new Normalizer(min, max);
+
+            // Update the font size mapper to use the new normalizer.
+            this.fontSizeMapper = (word: any) => this.normalizer.normalize(word.value);
+        }
         return (
             <D3WordCloud
                 data={this.props.data}

@@ -8,6 +8,7 @@ info:
   contact:
     name: Markus Silberstein Hont
     email: markus@silberstein.nu
+    url: http://www.hejare.se
 servers:
   - url: http://localhost:3001
 paths:
@@ -45,6 +46,19 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorModel"
+  /charts/wordcloud:
+    get:
+      summary: Gets word cloud data, ie keywords and their frequency
+      operationId: getWordCloud
+      tags:
+        - charts
+      responses:
+        '200':
+          description: A list of words and their number of appearances
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Words"
 components:
   schemas:
     MotionsByParty:
@@ -72,6 +86,19 @@ components:
                 type: integer
               declined:
                 type: integer
+    Word:
+      required:
+        - text
+        - value
+      properties:
+        text:
+          type: string
+        value:
+          type: integer
+    Words:
+      type: array
+      items:
+        $ref: "#/components/schemas/Word"
     ErrorModel:
       required:
         - code

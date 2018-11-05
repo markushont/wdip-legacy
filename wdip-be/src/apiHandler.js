@@ -2,6 +2,7 @@
 
 const getMotionsByParty = require("./api/getMotionsByParty");
 const motions = require("./api/motions");
+import getWordCloud from "./api/getWordCloud";
 const logger = require("./logger");
 
 /**
@@ -48,5 +49,10 @@ module.exports.getMotionById = async (event, context) => {
 
 module.exports.getPendingMotions = async (event, context) => {
     let result = await motions.pending();
+    return responses.success(result);
+};
+
+module.exports.getWordCloud = async (event, context) => {
+    let result = await getWordCloud();
     return responses.success(result);
 };
