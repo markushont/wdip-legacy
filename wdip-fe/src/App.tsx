@@ -17,8 +17,8 @@ class App extends React.Component<any, any> {
   constructor(props: any) {
     super(props);
     this.state = {
-      fromDate: DEFAULT_FROM_DATE,
-      toDate: DEFAULT_TO_DATE,
+      fromDateStr: DEFAULT_FROM_DATE.toISOString().split('T')[0],
+      toDateStr: DEFAULT_TO_DATE.toISOString().split('T')[0],
       motionsByParty: {},
       wordCloudData: []
     };
@@ -37,7 +37,7 @@ class App extends React.Component<any, any> {
 
   async getMotionsByParty() {
     try {
-      this.setState({ motionsByParty: await this.motionsApi.getMotionsByParty(this.state.fromDate, this.state.toDate) });
+      this.setState({ motionsByParty: await this.motionsApi.getMotionsByParty(this.state.fromDateStr, this.state.toDateStr) });
     } catch (error) {
       console.error(error);
     }
@@ -45,18 +45,14 @@ class App extends React.Component<any, any> {
 
   async getWordCloudData() {
     try {
-      this.setState({ wordCloudData: await this.chartsApi.getWordCloud() });
+      this.setState({ wordCloudData: await this.chartsApi.getWordCloud(this.state.fromDateStr, this.state.toDateStr) });
     } catch (error) {
       console.error(error);
     }
   }
 
-  setDate(fromChanged: Boolean, e: React.ChangeEvent<HTMLInputElement>) {
-    if (fromChanged) {
-      this.setState({ fromDate: e.target.value }, this.fetchData);
-    } else {
-      this.setState({ toDate: e.target.value }, this.fetchData);
-    }
+  setDate(e: React.ChangeEvent<HTMLInputElement>) {
+    this.setState({ [e.target.name]: e.target.value }, this.fetchData);
   }
 
   public render() {
@@ -75,21 +71,23 @@ class App extends React.Component<any, any> {
             </Cell>
 
             <Cell medium={5}>
-              <label> Från <input onChange={(e) => this.setDate(true, e)} value={this.state.fromDate} type="date"></input>
+              <label> Från <input name="fromDate" onChange={(e) => this.setDate(e)} value={this.state.fromDateStr} type="date"></input>
               </label>
             </Cell>
             <Cell medium={5}>
-              <label> Till <input onChange={(e) => this.setDate(false, e)} value={this.state.toDate} type="date"></input>
+              <label> Till <input name="fromDate" onChange={(e) => this.setDate(e)} value={this.state.toDateStr} type="date"></input>
               </label>
             </Cell>
             <Cell>
+
               <Chart
-                fromDate={this.state.fromDate}
-                toDate={this.state.toDate}
+                fromDate={this.state.fromDateStr}
+                toDate={this.state.toDateStr}
                 results={this.state.motionsByParty.results} />
             </Cell>
 
-            <Cell medium={4}>4 cols</Cell>
+            <Cell medium={4}>              
+            </Cell>
             <Cell medium={8}><WordCloud data={this.state.wordCloudData}></WordCloud></Cell>
 
           </Grid>
