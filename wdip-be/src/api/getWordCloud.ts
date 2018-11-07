@@ -29,11 +29,8 @@ export default async function getWordCloud(fromDateStr, toDateStr) {
 
   try {
     const response = await dbClient.search(params);
-    logger.debug(response);
     const buckets = response.aggregations.keywords.buckets;
-    logger.debug(buckets);
     const words = buckets.map((word: any) =>  ({text: word.key, value: word.score}));
-    logger.debug(words);
     return words;
   } catch (error) {
     logger.error("Error sending request in getWordCloud: ", error);
