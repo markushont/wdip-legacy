@@ -7,8 +7,11 @@ import Header from './Header';
 import { MotionsApi, ChartsApi } from './service/wdip-be';
 import WordCloud from './modules/WordCloud';
 import Chart from './modules/BarChart';
+
+
 const DEFAULT_FROM_DATE = new Date(2000, 1, 1);
 const DEFAULT_TO_DATE = new Date();
+
 
 class App extends React.Component<any, any> {
 
@@ -79,6 +82,7 @@ class App extends React.Component<any, any> {
             <Cell medium={5}>
               Från
               <DatePicker
+                name="from"
                 onChange={this.onChangeFromDate}
                 value={fromDate}
               />
@@ -86,19 +90,19 @@ class App extends React.Component<any, any> {
             <Cell medium={5}>
               Till
               <DatePicker
+                name="to"
                 onChange={this.onChangeToDate}
                 value={toDate}
               />
             </Cell>
             <Cell>
-
               <Chart
                 fromDate={this.state.fromdate}
                 toDate={this.state.todate}
                 results={this.state.motionsByParty.results} />
             </Cell>
 
-            <Cell medium={4}>              
+            <Cell medium={4}>
             </Cell>
             <Cell medium={8}><WordCloud data={this.state.wordCloudData}></WordCloud></Cell>
 
