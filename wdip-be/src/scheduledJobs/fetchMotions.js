@@ -10,7 +10,14 @@ const docHelpers = require("./docHelpers");
 var errorHelper = require("./errorHelper");
 const logger = require("../logger");
 const dbClient = require("../dbclient");
-const { WDIP_MOTION_INDEX, WDIP_MOTION_REQUEST_LOG_INDEX } = require("../config/config");
+const {
+  WDIP_MOTION_INDEX,
+  WDIP_MOTION_REQUEST_LOG_INDEX,
+  MAX_PAGINATED_PAGES,
+  DATE_ZERO,
+  FETCH_MOTIONS,
+  FETCH_PROPOSITIONS
+} = require("../config/config");
 
 // Point to local DB instance
 if (process.env.IS_OFFLINE || process.env.IS_LOCAL) {
@@ -21,25 +28,22 @@ if (process.env.IS_OFFLINE || process.env.IS_LOCAL) {
 }
 
 // Add entry to request log
-async function logRequest(isSuccess, fetchedTo) {
-  let id = isSuccess ? "success" : "fail";
+async function logRequest(isSuccess, fetchedTo, nAdded) {
+  logger.debug(`Logging request. isSuccess: ${isSuccess}, fetchedTo: ${fetchedTo}, nAdded: ${nAdded}`);
   let date = (fetchedTo != null) ? fetchedTo : moment().valueOf();
   let toPut = {
     index: WDIP_MOTION_REQUEST_LOG_INDEX,
     type: "_doc",
     body: {
-      id: id,
+      success: isSuccess,
       date: date,
-      errors: errorHelper.getLoggedErrors()
+      errors: errorHelper.getLoggedErrors(),
+      incompleteDocs: errorHelper.getIncompleteDocs(),
+      nAdded: nAdded
     }
   };
 
-  try {
-    await dbClient.index(toPut);
-    logger.info(`Logged request. Success: ${isSuccess}. FetchedTo: ${fetchedTo}.`);
-  } catch (err) {
-    logger.error("Error logging request.", err);
-  }
+  return dbClient.index(toPut);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -55,14 +59,8 @@ function getDateString(dateInt) {
 
 // Parse results and put to db
 async function parseQueryResult(data) {
-  const tableName = process.env.MOTION_TABLE;
-  let batchRequest = {
-    RequestItems: {
-      [tableName]: []
-    }
-  };
-
   let toAddItems = [];
+
   for (const dok of data.dokumentlista.dokument) {
     let basicInfo = docHelpers.parseBasicInfo(dok);
     let statusInfo = {};
@@ -73,13 +71,12 @@ async function parseQueryResult(data) {
     } catch (error) {
       errorHelper.logError("Could not fetch status for url " + statusUrl +
         "\n Reason: " + error);
+      errorHelper.logIncomplete(dok.dok_id);
       statusInfo.isPending = true;
     }
 
     let toAdd = {};
     Object.assign(toAdd, basicInfo, statusInfo);
-    const toAddSize = sizeof(toAdd);
-    const maxSize = process.env.DB_ITEM_MAX_SIZE;
     toAddItems.push({
       index: {
         _index: WDIP_MOTION_INDEX,
@@ -87,132 +84,182 @@ async function parseQueryResult(data) {
         _id: basicInfo.dok_id
       }
     });
-    if (maxSize && toAddSize > maxSize) {
-      logger.warn(`Stripping very large object with id ${toAdd.dok_id} and size ${toAddSize}.`);
-      let strippedObj = docHelpers.parseBasicInfo(dok);
-      strippedObj.isPending = toAdd.isPending;
-      strippedObj.status = toAdd.status;
-      logger.debug(`New size: ${sizeof(strippedObj)}`);
-      toAddItems.push(strippedObj);
-    } else {
-      toAddItems.push(toAdd);
-    }
+    toAddItems.push(toAdd);
   }
 
   //Each document consists of two entries, action description and the data itself.
   const nItems = toAddItems.length / 2;
 
   if (nItems > 0) {
-    logger.debug(`Writing ${nItems} items to DB."`);
+    logger.debug(`Writing ${nItems} items to DB.`);
     try {
-      return dbClient.bulk({
-        body: toAddItems
-      });
-    } catch (error) {
-      errorHelper.logError("Error when adding documents to index: " + ": " + err);
+      const { items } = await dbClient.bulk({body: toAddItems });
+      let nAdded = 0;
+      for (const item of items) {
+        if (item.index.status === 200 || item.index.status === 201) {
+          ++nAdded;
+        } else {
+          errorHelper.logIncomplete(item.index._id);
+        }
+      }
+      return nAdded;
+    } catch (err) {
+      for (let i = 1; i < toAddItems.length; i += 2) {
+        errorHelper.logIncomplete(item.dok_id);
+      }
     }
-
   } else {
     logger.debug("No items to write for page, skipping");
-    return new Promise((resolve, reject) => resolve());
+    return new Promise((resolve, reject) => resolve(0));
   }
-}
-
-//////////////////////////////////////////////////////////////////////////////////////////////////
-
-// Get result pages while they exist
-async function getResults(urlString) {
-  let nextUrl = urlString;
-  let dbPromises = [];
-  while (nextUrl != null) {
-    try {
-      const jsonResp = await urlHelpers.getJsonFromUrl(nextUrl);
-      const nextPage = jsonResp.dokumentlista["@nasta_sida"];
-      if (nextPage !== undefined && nextPage !== "" && nextPage !== nextUrl) {
-        nextUrl = nextPage;
-      } else {
-        nextUrl = null;
-      }
-
-      if (jsonResp.dokumentlista.dokument !== undefined && jsonResp.dokumentlista.dokument.length > 0) {
-        const dbPromise = parseQueryResult(jsonResp);
-        dbPromises.push(dbPromise);
-      }
-    } catch (error) {
-      errorHelper.logError("Error when fetching url " + nextUrl + ": " + error);
-      nextUrl = null;
-    }
-  }
-  var getResultPromise = Promise.all(dbPromises);
-  return getResultPromise;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-async function _fetchMotions(fromDate, toDate) {
-  const selectedFromDate = fromDate != null ? getDateString(fromDate) : getDateString(process.env.DATE_ZERO);
-  const selectedToDate = toDate != null ? getDateString(toDate) : getDateString(Date.now());
+async function fetchDocuments(fromDate, toDate, getDocQueryFunc) {
+  let docQuery = getDocQueryFunc(getDateString(fromDate), getDateString(toDate));
 
-  const motionRequestUrl = urlHelpers.getMotionQuery(selectedFromDate, selectedToDate);
-  const propositionRequestUrl = urlHelpers.getPropositionQuery(selectedFromDate, selectedToDate);
-  const result = Promise.all([getResults(motionRequestUrl), getResults(propositionRequestUrl)]);
-  return result;
+  // fetch documents page by page
+  let nAdded = 0;
+  let shouldFetch = true;
+  let fetchedTo = fromDate;
+  while (shouldFetch) {
+    try {
+      const jsonResp = await urlHelpers.getJsonFromUrl(docQuery);
+      const docs = jsonResp.dokumentlista;
+      const nDocs = jsonResp.dokumentlista.dokument.length;
+      const hasMoreResults = docs["@sida"] === MAX_PAGINATED_PAGES.toString();
+      const lastPage = docs["@sida"] === docs["@sidor"];
+      const nextUrl = docs["@nasta_sida"];
+      fetchedTo = docs.dokument[nDocs - 1].datum;
+
+      // parse results and put to db
+      try {
+        const toAdd = await parseQueryResult(jsonResp);
+        nAdded += toAdd;
+      } catch (parseErr) {
+        logger.error("Error when parsing query result");
+        for (const doc of docs.dokument) {
+          errorHelper.logIncomplete(doc.dok_id);
+        }
+      }
+
+      // check for next url to fetch or break out of loop
+      if (lastPage && !hasMoreResults) {
+        shouldFetch = false;
+      } else if (nextUrl && nextUrl === docQuery) {
+        shouldFetch = false;
+      } else if (hasMoreResults) {
+        docQuery = getDocQueryFunc(getDateString(fetchedTo), getDateString(toDate));
+      } else {
+        docQuery = docs["@nasta_sida"];
+      }
+    } catch (err) {
+      if (err.code === "ETIMEDOUT") { // try again
+        logger.debug(`Request with url ${docQuery} timed out, trying again`);
+        continue;
+      } else { // something else is wrong, give up
+        errorHelper.logError(`Error when fetching results: ${err}`);
+        shouldFetch = false;
+      }
+    }
+  }
+
+  return { nAdded, fetchedTo };
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+async function getFetchInterval(fromDateStrOverride = null, toDateStrOverride = null) {
+  const requestLogQueryParams = {
+    index: WDIP_MOTION_REQUEST_LOG_INDEX,
+    q: "success:true",
+    size: "1",
+    sort: "date:desc"
+  };
+
+  const dateZero = moment(DATE_ZERO, "YYYY-MM-DD").valueOf();
+  logger.debug(`dateZero: ${dateZero}`);
+
+  // Deduce fetchFrom
+  let from = dateZero;
+  if (fromDateStrOverride) {
+    from = fromDateStrOverride;
+  } else {
+    // Check last successful fetch from db
+    try {
+      const { count } = await dbClient.count( {index: WDIP_MOTION_REQUEST_LOG_INDEX });
+      if (count) {
+        try {
+          const { hits: {hits} } = await dbClient.search(requestLogQueryParams);
+          if (hits.length) {
+            from = hits[0]._source.date;
+          }
+        } catch (error) {
+          errorHelper.logError(`Unable to fetch request log entry. Error:\n ${error} \nDefaulting to ${DATE_ZERO}.`);
+        }
+      }
+    } catch (error) {
+      errorHelper.logError(`Failed to 'count' WDIP_MOTION_REQUEST_LOG_INDEX. Error: ${err}`);
+    }
+  }
+
+  // Deduce fetchTo
+  const to = toDateStrOverride || Date.now().valueOf();
+
+  logger.debug(`FETCHING FROM: ${from}\nFETCHING TO: ${to}`);
+  return { from, to };
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 module.exports = async function fetchMotions(fromDateStrOverride = null, toDateStrOverride = null, callback) {
-
-  const requestLogQueryParams = {
-    index: WDIP_MOTION_REQUEST_LOG_INDEX,
-    q: "id:success",
-    size: "1",
-    sort: "date:desc"
-  };
-
-  // Check last successful fetch and fetch new
-  let fetchFrom = moment(process.env.DATE_ZERO, "YYYY-MM-DD").valueOf();
+  // Get fetch interval
+  let fetchFrom;
+  let fetchTo;
   try {
-    const { count } = await dbClient.count({ index: WDIP_MOTION_REQUEST_LOG_INDEX });
-    const empty = count === 0;
-    if (!empty) {
-      await dbClient.search(requestLogQueryParams)
-        .then((resp) => {
-          logger.debug(`FETCHING FROM: ${JSON.stringify(resp.hits.hits[0]._source.date)}`);
-        }, (err) => {
-          errorHelper.logError("Failed to query log table " +
-            process.env.MOTION_REQUEST_LOG_TABLE + "\nReason: " + err);
-        });
-    }
-  } catch (error) {
-    errorHelper.logError("Unable to fetch request log entry. Error:\n" + error + "\nExiting.");
+    const { from, to } = await getFetchInterval(fromDateStrOverride, toDateStrOverride);
+    fetchFrom = from;
+    fetchTo = to;
+  } catch (err) {
+    logger.error(`Something went wrong when deducing date interval. Error: ${err}`);
+    callback(500, `Something went wrong when deducing date interval. Error: ${err}`);
     return;
   }
 
-  if (fromDateStrOverride != null) {
-    fetchFrom = moment(fromDateStrOverride, "YYYY-MM-DD").valueOf();
-  }
-
-  let fetchTo = null;
-  if (toDateStrOverride != null) {
-    fetchTo = moment(toDateStrOverride, "YYYY-MM-DD").valueOf();
-  }
-
-  let fetchResp = {};
   // Do nothing if interval is zero
-  if (fetchFrom != null && fetchFrom === fetchTo) {
-    fetchResp = { statusCode: 200, body: "Interval is zero, nothing to fetch" };
-  } else {
-    fetchResp = await _fetchMotions(fetchFrom, fetchTo)
-      .then(resp => {
-        return { statusCode: 200, body: resp };
-      })
-      .catch(err => {
-        return { statusCode: 500, body: err };
-      });
-    await logRequest(fetchResp.statusCode === 200, fetchTo);
+  if (fetchFrom === fetchTo) {
+    logger.debug("Interval is zero, nothing to fetch");
+    callback(200, { statusCode: 200, body: "Interval is zero, nothing to fetch" });
+    return;
   }
 
-  logger.debug(`Callback with response ${fetchResp.statusCode}.`);
-  callback(fetchResp.statusCode, fetchResp);
+  let nTotAdded = 0;
+  let totFetchedTo = 0;
+
+  // Fetch motions
+  if (FETCH_MOTIONS) {
+    const { nAdded, fetchedTo } =
+      await fetchDocuments(fetchFrom, fetchTo, urlHelpers.getMotionQuery);
+    nTotAdded += nAdded;
+    totFetchedTo = fetchedTo;
+  }
+
+  // Fetch propositions
+  if (FETCH_PROPOSITIONS) {
+    const { nAdded, fetchedTo } =
+      await fetchDocuments(fetchFrom, fetchTo, urlHelpers.getPropositionQuery);
+    nTotAdded += nAdded;
+    totFetchedTo = (totFetchedTo < fetchedTo) ? totFetchedTo : fetchedTo;
+  }
+
+  // log result and exit
+  logger.debug(`Successfully added ${nTotAdded} documents.`);
+  try {
+    const { logResp } = await logRequest(true, totFetchedTo, nTotAdded);
+    callback(200, `Successfully added ${nTotAdded} documents.`);
+  } catch (err) {
+    logger.error(`Error adding entry to request log: ${err}`);
+    callback(500, "Error adding entry to request log");
+  }
 };

@@ -1,6 +1,6 @@
 "use strict";
 
-const request = require("request");
+var request = require("request");
 var errorHelper = require("./errorHelper");
 const logger = require("../logger");
 
@@ -15,7 +15,7 @@ const PROPOSITION_QUERY_DYNAMIC =
 
 const DOC_STATUS_QUERY_DYNAMIC = "http://data.riksdagen.se/dokumentstatus/{}.json";
 
-String.prototype.format = () => {
+String.prototype.format = function() {
   let i = 0;
   let args = arguments;
   return this.replace(/{}/g, () => {
@@ -53,7 +53,7 @@ function getJsonFromUrl(urlString) {
         }
       }
     });
-  }, 2000);
+  });
 }
 
 module.exports = {
