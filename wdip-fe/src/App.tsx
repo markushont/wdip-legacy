@@ -8,7 +8,6 @@ import { MotionsApi, ChartsApi } from './service/wdip-be';
 import WordCloud from './modules/WordCloud';
 import Chart from './modules/BarChart';
 
-
 const DEFAULT_FROM_DATE = new Date(2000, 1, 1);
 const DEFAULT_TO_DATE = new Date();
 
@@ -82,7 +81,6 @@ class App extends React.Component<any, any> {
             <Cell medium={5}>
               Från
               <DatePicker
-                name="from"
                 onChange={this.onChangeFromDate}
                 value={fromDate}
               />
@@ -90,7 +88,6 @@ class App extends React.Component<any, any> {
             <Cell medium={5}>
               Till
               <DatePicker
-                name="to"
                 onChange={this.onChangeToDate}
                 value={toDate}
               />
