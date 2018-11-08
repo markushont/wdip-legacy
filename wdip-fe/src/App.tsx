@@ -2,6 +2,7 @@ import * as React from 'react';
 import './App.css';
 
 import { GridContainer, Grid, Cell } from 'react-foundation';
+import DatePicker from 'react-date-picker';
 import Header from './Header';
 import { MotionsApi, ChartsApi } from './service/wdip-be';
 import WordCloud from './modules/WordCloud';
@@ -17,13 +18,11 @@ class App extends React.Component<any, any> {
   constructor(props: any) {
     super(props);
     this.state = {
-      fromDateStr: DEFAULT_FROM_DATE.toISOString().split('T')[0],
-      toDateStr: DEFAULT_TO_DATE.toISOString().split('T')[0],
+      fromDate: DEFAULT_FROM_DATE,
+      toDate: DEFAULT_TO_DATE,
       motionsByParty: {},
       wordCloudData: []
     };
-
-    this.setDate = this.setDate.bind(this);
   }
 
   componentDidMount() {
@@ -37,7 +36,7 @@ class App extends React.Component<any, any> {
 
   async getMotionsByParty() {
     try {
-      this.setState({ motionsByParty: await this.motionsApi.getMotionsByParty(this.state.fromDateStr, this.state.toDateStr) });
+      this.setState({ motionsByParty: await this.motionsApi.getMotionsByParty(this.state.fromDate, this.state.toDate) });
     } catch (error) {
       console.error(error);
     }
@@ -45,17 +44,24 @@ class App extends React.Component<any, any> {
 
   async getWordCloudData() {
     try {
-      this.setState({ wordCloudData: await this.chartsApi.getWordCloud(this.state.fromDateStr, this.state.toDateStr) });
+      this.setState({ wordCloudData: await this.chartsApi.getWordCloud(this.state.fromDate, this.state.toDate) });
     } catch (error) {
       console.error(error);
     }
   }
 
-  setDate(e: React.ChangeEvent<HTMLInputElement>) {
-    this.setState({ [e.target.name]: e.target.value }, this.fetchData);
+  public onChangeFromDate = (value: Date) => {
+    this.setState({ fromDate: value }, this.fetchData);
+  }
+
+  public onChangeToDate = (value: Date) => {
+    this.setState({ toDate: value }, this.fetchData);
   }
 
   public render() {
+
+    const { fromDate, toDate } = this.state;
+
     return (
       <div>
         <Header />
@@ -71,18 +77,24 @@ class App extends React.Component<any, any> {
             </Cell>
 
             <Cell medium={5}>
-              <label> Från <input name="fromDate" onChange={(e) => this.setDate(e)} value={this.state.fromDateStr} type="date"></input>
-              </label>
+              Från
+              <DatePicker
+                onChange={this.onChangeFromDate}
+                value={fromDate}
+              />
             </Cell>
             <Cell medium={5}>
-              <label> Till <input name="fromDate" onChange={(e) => this.setDate(e)} value={this.state.toDateStr} type="date"></input>
-              </label>
+              Till
+              <DatePicker
+                onChange={this.onChangeToDate}
+                value={toDate}
+              />
             </Cell>
             <Cell>
 
               <Chart
-                fromDate={this.state.fromDateStr}
-                toDate={this.state.toDateStr}
+                fromDate={this.state.fromdate}
+                toDate={this.state.todate}
                 results={this.state.motionsByParty.results} />
             </Cell>
 
