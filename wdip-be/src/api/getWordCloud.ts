@@ -1,26 +1,38 @@
+import { WDIP_MOTION_INDEX } from "../config/config";
+import dbClient from "../dbclient";
 import logger from "../logger";
 
-export default async function getWordClound() {
-  logger.debug("Calculating word cloud data.");
-  return [
-    { text: "Friedlich", value: randValue() },
-    { text: "Hanks", value: randValue() },
-    { text: "Tunnan", value: randValue() },
-    { text: "Le Bacon", value: randValue() },
-    { text: "Mr O", value: randValue() },
-    { text: "Big M", value: randValue() },
-    { text: "Luddas", value: randValue() },
-    { text: "Sejdis", value: randValue() },
-    { text: "Burn Hard", value: randValue() },
-    { text: "Leo", value: randValue() },
-    { text: "Seb-man", value: randValue() },
-    { text: "Seti", value: randValue() },
-    { text: "Positiv", value: randValue() },
-    { text: "Negativ", value: randValue() },
-    { text: "Neutral", value: randValue() }
-  ];
-}
+export default async function getWordCloud(fromDateStr, toDateStr) {
 
-function randValue(): number {
-  return Math.round(Math.random() * 1000);
+  const params = {
+    index: WDIP_MOTION_INDEX,
+    body: {
+      query: {
+        range: {
+          dateStr: {
+            gte: fromDateStr,
+            lte: toDateStr
+          }
+        }
+      },
+      aggregations: {
+        keywords: {
+          significant_text:
+          {
+            field: "titel",
+            min_doc_count: 2
+          }
+        }
+      }
+    }
+  };
+
+  try {
+    const response = await dbClient.search(params);
+    const buckets = response.aggregations.keywords.buckets;
+    const words = buckets.map((word: any) =>  ({text: word.key, value: word.score}));
+    return words;
+  } catch (error) {
+    logger.error("Error sending request in getWordCloud: ", error);
+  }
 }

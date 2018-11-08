@@ -7,8 +7,10 @@ import Header from './Header';
 import { MotionsApi, ChartsApi } from './service/wdip-be';
 import WordCloud from './modules/WordCloud';
 import Chart from './modules/BarChart';
+
 const DEFAULT_FROM_DATE = new Date(2000, 1, 1);
 const DEFAULT_TO_DATE = new Date();
+
 
 class App extends React.Component<any, any> {
 
@@ -44,7 +46,7 @@ class App extends React.Component<any, any> {
 
   async getWordCloudData() {
     try {
-      this.setState({ wordCloudData: await this.chartsApi.getWordCloud() });
+      this.setState({ wordCloudData: await this.chartsApi.getWordCloud(this.state.fromDate, this.state.toDate) });
     } catch (error) {
       console.error(error);
     }
@@ -92,12 +94,13 @@ class App extends React.Component<any, any> {
             </Cell>
             <Cell>
               <Chart
-                fromDate={this.state.fromDate}
-                toDate={this.state.toDate}
+                fromDate={this.state.fromdate}
+                toDate={this.state.todate}
                 results={this.state.motionsByParty.results} />
             </Cell>
 
-            <Cell medium={4}>4 cols</Cell>
+            <Cell medium={4}>
+            </Cell>
             <Cell medium={8}><WordCloud data={this.state.wordCloudData}></WordCloud></Cell>
 
           </Grid>

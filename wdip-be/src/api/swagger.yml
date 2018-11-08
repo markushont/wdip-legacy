@@ -52,6 +52,21 @@ paths:
       operationId: getWordCloud
       tags:
         - charts
+      parameters:
+        - name: fromDate
+          in: query
+          description: From which date (inclusive) data should be returned.
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: toDate
+          in: query
+          description: To which date (inclusive) data should be returned.
+          required: false
+          schema:
+            type: string
+            format: date
       responses:
         '200':
           description: A list of words and their number of appearances

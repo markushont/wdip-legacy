@@ -53,6 +53,8 @@ module.exports.getPendingMotions = async (event, context) => {
 };
 
 module.exports.getWordCloud = async (event, context) => {
-    let result = await getWordCloud();
+    var fromDate = event.queryStringParameters.fromDate;
+    var toDate = event.queryStringParameters.toDate;
+    let result = await getWordCloud(fromDate, toDate);
     return responses.success(result);
 };

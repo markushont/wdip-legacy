@@ -50,8 +50,6 @@ async function getMotionsByParty(
   fromDateStrOverride,
   toDateStrOverride) {
 
-  logger.debug(fromDateStrOverride + " " + toDateStrOverride);
-
   var parties = WDIP_DEFAULT_PARTIES;
 
   const posResponse = getMotions(fromDateStrOverride, toDateStrOverride, "bifall", parties);
