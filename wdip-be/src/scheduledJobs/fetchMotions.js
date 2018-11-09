@@ -105,7 +105,7 @@ async function parseQueryResult(data) {
       return nAdded;
     } catch (err) {
       for (let i = 1; i < toAddItems.length; i += 2) {
-        errorHelper.logIncomplete(item.dok_id);
+        errorHelper.logIncomplete(toAddItems[i].dok_id);
       }
     }
   } else {
