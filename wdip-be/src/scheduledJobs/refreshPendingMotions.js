@@ -1,7 +1,6 @@
 // Check status for motions with isPending=true
 
 var AWS = require("aws-sdk");
-var errorHelper = require("./errorHelper");
 const docHelpers = require("./docHelpers");
 const urlHelpers = require("./urlHelpers");
 const logger = require("../logger");

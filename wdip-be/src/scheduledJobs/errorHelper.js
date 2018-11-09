@@ -5,6 +5,7 @@ const logger = require("../logger");
 class ErrorHelper {
     constructor() {
         this.errors = [];
+        this.incompleteDocs = [];
     }
 
     logError(errorText) {
@@ -12,8 +13,17 @@ class ErrorHelper {
         this.errors.push(errorText);
     }
 
+    logIncomplete(docId) {
+        logger.error(`Incomplete document with id ${docId}`);
+        this.incompleteDocs.push(docId);
+    }
+
     getLoggedErrors() {
-        return this.errors.length ? this.errors : undefined;
+        return this.errors;
+    }
+
+    getIncompleteDocs() {
+        return this.incompleteDocs;
     }
 }
 
