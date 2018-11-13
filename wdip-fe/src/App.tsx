@@ -7,6 +7,7 @@ import Header from './Header';
 import { MotionsApi, ChartsApi } from './service/wdip-be';
 import WordCloud from './modules/WordCloud';
 import Chart from './modules/BarChart';
+import BubbleChart from './modules/BubbleChart';
 
 const DEFAULT_FROM_DATE = new Date(2000, 1, 1);
 const DEFAULT_TO_DATE = new Date();
@@ -92,6 +93,7 @@ class App extends React.Component<any, any> {
                 value={toDate}
               />
             </Cell>
+            <Cell medium={8}><BubbleChart results={this.state.motionsByParty.results}></BubbleChart></Cell>
             <Cell>
               <Chart
                 fromDate={this.state.fromdate}
