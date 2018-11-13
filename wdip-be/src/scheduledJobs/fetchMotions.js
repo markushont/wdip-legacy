@@ -62,12 +62,17 @@ async function parseQueryResult(data) {
   let toAddItems = [];
 
   for (const dok of data.dokumentlista.dokument) {
-    let basicInfo = docHelpers.parseBasicInfo(dok);
-    let statusInfo = {};
+    let toAdd = docHelpers.parseBasicInfo(dok);
     const statusUrl = urlHelpers.getDocStatusQuery(dok.dok_id);
+    const summaryUrl = urlHelpers.getDocSummaryQuery(dok.dok_id);
     try {
-      const statusResp = await urlHelpers.getJsonFromUrl(statusUrl);
-      statusInfo = docHelpers.parseStatusObj(statusResp.dokumentstatus);
+      const [ statusResp, summaryResp ] = await Promise.all([
+        urlHelpers.getJsonFromUrl(statusUrl),
+        urlHelpers.getPlainTextFromUrl(summaryUrl)
+      ]);
+      toAdd.text = summaryResp;
+      const statusInfo = docHelpers.parseStatusObj(statusResp.dokumentstatus);
+      Object.assign(toAdd, statusInfo);
     } catch (error) {
       errorHelper.logError("Could not fetch status for url " + statusUrl +
         "\n Reason: " + error);
@@ -75,13 +80,11 @@ async function parseQueryResult(data) {
       statusInfo.isPending = true;
     }
 
-    let toAdd = {};
-    Object.assign(toAdd, basicInfo, statusInfo);
     toAddItems.push({
       index: {
         _index: WDIP_MOTION_INDEX,
         _type: "_doc",
-        _id: basicInfo.dok_id
+        _id: toAdd.dok_id
       }
     });
     toAddItems.push(toAdd);
