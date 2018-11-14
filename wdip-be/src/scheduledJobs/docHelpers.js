@@ -12,8 +12,8 @@ function parseBasicInfo(dok) {
     doktyp: dok.doktyp,
     subtyp: dok.subtyp,
     titel: dok.sokdata !== undefined ? dok.sokdata.titel : null,
-    undertitel: dok.sokdata !== undefined ? dok.sokdata.undertitel : null
-    //summary:    dok.summary
+    undertitel: dok.sokdata !== undefined ? dok.sokdata.undertitel : null,
+    summary: dok.summary
   });
 }
 
@@ -25,9 +25,10 @@ function parseForslag(dokForslag) {
   }
   const forslag = dokForslag.forslag;
 
-  let ret = [];
+  let ret = { proposals: [], nAccepted: 0, nRejected: 0 };
+
   function parseItem(item) {
-    ret.push({
+    ret.proposals.push({
       nummer: item.nummer,
       beteckning: item.beteckning,
       beslutstyp: item.beslutstyp,
@@ -50,6 +51,18 @@ function parseForslag(dokForslag) {
   } else {
     parseItem(forslag);
   }
+
+  for (const proposal of ret.proposals) {
+    const utskottet = proposal.utskottet ? proposal.utskottet.toLowerCase() : "";
+    const kammaren = proposal.kammaren ? proposal.kammaren.toLowerCase() : "";
+
+    if (utskottet.includes("bifall") || kammaren.includes("bifall")) {
+      ret.nAccepted += 1;
+    } else if (utskottet.includes("avslag") || kammaren.includes("avslag")) {
+      ret.nRejected += 1;
+    }
+  }
+
   return ret;
 }
 
@@ -109,13 +122,6 @@ function parseUppgift(dokUppgift) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-function parseStatus(dokument) {
-  if (!dokument || !dokument.status) { return ""; }
-  return dokument.status;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
 function parsePending(dokforslag) {
   if (dokforslag.forslag) {
     if (dokforslag.forslag.constructor === Array) {
@@ -147,12 +153,20 @@ function parseStatusObj(statusObj) {
   statusInfo.forslag = parseForslag(statusObj.dokforslag);
   statusInfo.intressent = parseIntressent(statusObj.dokintressent);
   statusInfo.uppgift = parseUppgift(statusObj.dokuppgift);
-  statusInfo.status = parseStatus(statusObj.dokument);
 
-  if (statusInfo.status === "Klar" || statusInfo.status === "ocr") {
+  if (statusInfo.status === "Klar") {
     statusInfo.isPending = false;
   } else {
     statusInfo.isPending = parsePending(statusObj.dokument);
+  }
+
+  const nProposals = statusInfo.forslag.proposals.length;
+  if (statusInfo.forslag.nAccepted === nProposals) {
+    statusInfo.status = "accepted";
+  } else if (statusInfo.forslag.nRejected === nProposals) {
+    statusInfo.status = "rejected";
+  } else {
+    statusInfo.status = "partially_accepted";
   }
 
   return statusInfo;
@@ -165,7 +179,6 @@ module.exports = {
   parseForslag: parseForslag,
   parseIntressent: parseIntressent,
   parseUppgift: parseUppgift,
-  parseStatus: parseStatus,
   parsePending: parsePending,
   parseStatusObj: parseStatusObj
 };

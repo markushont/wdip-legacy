@@ -15,6 +15,8 @@ const PROPOSITION_QUERY_DYNAMIC =
 
 const DOC_STATUS_QUERY_DYNAMIC = "http://data.riksdagen.se/dokumentstatus/{}.json";
 
+const DOC_SUMMARY_QUERY_DYNAMIC = "http://data.riksdagen.se/dokument/{}.text";
+
 String.prototype.format = function() {
   let i = 0;
   let args = arguments;
@@ -35,8 +37,12 @@ function getDocStatusQuery(docId) {
   return encodeURI(DOC_STATUS_QUERY_DYNAMIC.format(docId));
 }
 
+function getDocSummaryQuery(docId) {
+  return encodeURI(DOC_SUMMARY_QUERY_DYNAMIC.format(docId));
+}
+
 /* Http fetch from URL encoded string */
-function getJsonFromUrl(urlString) {
+function fetchUrl(urlString, parseFunc) {
   logger.debug(`Fetching URL: ${urlString}`);
   return new Promise((resolve, reject) => {
     request(urlString, (error, response, body) => {
@@ -46,19 +52,37 @@ function getJsonFromUrl(urlString) {
         reject("Invalid status code <" + response.statusCode + ">");
       } else {
         try {
-          resolve(JSON.parse(body));
+          resolve(parseFunc(body));
         } catch (err) {
-          errorHelper.logError("Invalid JSON in response from url " + urlString);
-          reject("Invalid JSON in response from url " + urlString);
+          errorHelper.logError(err);
+          reject(err);
         }
       }
     });
   });
 }
 
+function getJsonFromUrl(urlString) {
+  let parseFunc = (resp) => {
+    try {
+      return JSON.parse(resp);
+    } catch (err) {
+      throw new Error("Invalid JSON in response from url " + urlString);
+    }
+  };
+  return fetchUrl(urlString, parseFunc);
+}
+
+function getPlainTextFromUrl(urlString) {
+  let parseFunc = (resp) => { return resp; };
+  return fetchUrl(urlString, parseFunc);
+}
+
 module.exports = {
   getMotionQuery: getMotionQuery,
   getPropositionQuery: getPropositionQuery,
   getDocStatusQuery: getDocStatusQuery,
-  getJsonFromUrl: getJsonFromUrl
+  getDocSummaryQuery: getDocSummaryQuery,
+  getJsonFromUrl: getJsonFromUrl,
+  getPlainTextFromUrl, getPlainTextFromUrl
 };
