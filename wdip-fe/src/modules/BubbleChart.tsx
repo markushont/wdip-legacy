@@ -96,26 +96,31 @@ class BubbleChart extends React.Component<any, any> {
 
             this.normalizer = new Normalizer(minSubmitted, maxSubmitted);
 
-            const partyData = this.props.partyData;
 
             bubbles.datasets = this.props.results.map((result: any) => ({
                 label: result.party,
                 data: [{
-                    r: this.normalizer.normalize(result.submitted) < 10 ? 10 : this.normalizer.normalize(result.submitted),
-                    approved: result.approved,
-                    declined: result.declined
+                    r: (this.normalizer.normalize(result.submitted) < 10 ? 10 : this.normalizer.normalize(result.submitted)) || "0",
+                    approved: result.approved || "0",
+                    declined: result.declined || "0" 
                 }],
                 pointStyle: 'circle',
                 borderWidth: 3,
                 hoverRadius: 20
             }));
 
-            for (let bubble of bubbles.datasets) {
-                bubble.data[0].x = partyData[bubble.label].x;
-                bubble.data[0].y = partyData[bubble.label].y;
-                bubble.backgroundColor = partyData[bubble.label].color;
-                bubble.data[0].fullName = partyData[bubble.label].name;
+            
+            const partyData = this.props.partyData;
+            if(partyData){
+                for (let bubble of bubbles.datasets) {
+                    bubble.data[0].x = partyData[bubble.label].x;
+                    bubble.data[0].y = partyData[bubble.label].y;
+                    bubble.backgroundColor = partyData[bubble.label].color;
+                    bubble.data[0].fullName = partyData[bubble.label].name;
+                }
             }
+
+
         }
 
         return (
