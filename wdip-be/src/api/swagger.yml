@@ -74,6 +74,19 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Words"
+  /partydata/allparties:
+    get:
+      summary: Gets data for all the parties, i.e. GAL-TAN position and party color
+      operationId: getAllParties
+      tags:
+        - party
+      responses:
+        '200':
+          description: A list of the parties, their X- and Y-positions and party color. 
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
 components:
   schemas:
     MotionsByParty:

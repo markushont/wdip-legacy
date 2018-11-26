@@ -1,15 +1,7 @@
 import * as React from 'react';
-import { ScatterChart, Scatter, XAxis, YAxis, ZAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 import { Normalizer } from 'src/service/Normalizer';
-
-
-const GALTAN = { s: { x: 4, y: 4 },  m: { x: 9, y: 5 },
- l: {x: 6, y: 7 },  kd: {x: 7, y: 6 },
- v: {x: 0, y: 5 }, sd: {x: 5, y: 4 }, c: {x: 6, y: 8 }, mp: {x: 3, y: 9 }};
-
-// const data01 = [{ parti: "mp", x: -20.3, y: 200, z: 200 }, {parti: "sd", x: 120, y: 100, z: 260 },
-// { parti: "c", x: 170, y: 300, z: 400 }, { parti: "s", x: 140, y: 250, z: 280 },
-// { parti: "v", x: 150, y: 400, z: 500 }, { parti: "m", x: 110, y: 280, z: 200 }];
+import { Bubble } from 'react-chartjs-2';
+import 'chartjs-plugin-annotation';
 
 class BubbleChart extends React.Component<any, any> {
     private normalizer: Normalizer;
@@ -19,46 +11,121 @@ class BubbleChart extends React.Component<any, any> {
     }
 
 
+
     public render() {
-        let bubbles;
+        let bubbles = {
+            datasets: Array<any>()
+
+        }
+
+        let options = {
+            legend:{
+                display:false
+            },
+            tooltips: {
+                callbacks: {
+                    label: function (tooltipItem: any, data: any) {
+                        var approved = data.datasets[tooltipItem.datasetIndex].data[0].approved;
+                        var declined = data.datasets[tooltipItem.datasetIndex].data[0].declined;
+
+                        return ["Bifall: " + approved, "Avslag: " + declined];
+                    },
+                    title: function (tooltipItem: any, data: any) {
+                        return data.datasets[tooltipItem[0].datasetIndex].data[0].fullName;
+                    }
+                }
+            },
+            scales: {
+                yAxes: [{
+                    id: 'y-axis-0',
+                    ticks: {
+                        min: 0,
+                        max: 10,
+                        stepSize: 1
+                    }
+                }],
+                xAxes: [{
+                    id: 'x-axis-0',
+                    ticks: {
+                        min: 0,
+                        max: 10,
+                        stepSize: 1
+                    }
+                }]
+            },
+            annotation: {
+                annotations: [
+                    {
+                        drawTime: 'afterDatasetsDraw',
+                        type: 'line',
+                        mode: 'horizontal',
+                        scaleID: 'y-axis-0',
+                        value: 5,
+                        borderColor: 'gray',
+                        borderWidth: 1,
+                        label: {
+                            enabled: false,
+                        }
+                    },
+                    {
+                        drawTime: 'afterDatasetsDraw',
+                        borderColor: 'gray',
+                        borderWidth: 1,
+                        mode: 'vertical',
+                        type: 'line',
+                        value: 5,
+                        scaleID: 'x-axis-0',
+                    }
+                ]
+            },
+            maintainAspectRatio: false,
+            animation: {
+                duration: 2000
+            }
+        }
+
         if (this.props.results) {
 
             const minSubmitted = this.props.results.reduce(function (prev: any, current: any) {
                 return (prev.submitted < current.submitted) ? prev : current
-             }).submitted;
+            }).submitted;
 
             const maxSubmitted = this.props.results.reduce(function (prev: any, current: any) {
                 return (prev.submitted > current.submitted) ? prev : current
-             }).submitted;
+            }).submitted;
 
             this.normalizer = new Normalizer(minSubmitted, maxSubmitted);
 
-            bubbles = this.props.results.map((result: any) => ({
-                parti: result.party,
-                normaliseradSumma: this.normalizer.normalize(result.submitted),
-                summa: result.submitted, 
-                bifall: result.approved,
-                avslag: result.declined,
+            const partyData = this.props.partyData;
+
+            bubbles.datasets = this.props.results.map((result: any) => ({
+                label: result.party,
+                data: [{
+                    r: this.normalizer.normalize(result.submitted) < 10 ? 10 : this.normalizer.normalize(result.submitted),
+                    approved: result.approved,
+                    declined: result.declined
+                }],
+                pointStyle: 'circle',
+                borderWidth: 3,
+                hoverRadius: 20
             }));
 
-            for(let bubble of bubbles){
-                bubble.position = GALTAN[bubble.parti];
+            for (let bubble of bubbles.datasets) {
+                bubble.data[0].x = partyData[bubble.label].x;
+                bubble.data[0].y = partyData[bubble.label].y;
+                bubble.backgroundColor = partyData[bubble.label].color;
+                bubble.data[0].fullName = partyData[bubble.label].name;
             }
-
-            console.log(bubbles);
         }
 
         return (
-            <div className="chart">
-                <ScatterChart width={500} height={500} margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
-                    <XAxis type="number" dataKey={'position.x'} name='stature' unit='cm' />
-                    <YAxis type="number" dataKey={'position.y'} name='weight' unit='kg' />
-                    <ZAxis dataKey={'normaliseradSumma'} range={[0, 10000]} name='score' unit='km' />
-                    <CartesianGrid />
-                    <Tooltip cursor={{ strokeDasharray: '3 3' }} />
-                    <Legend />
-                    <Scatter name='Parti' data={bubbles} fill='#8884d8' shape="circle" />
-                </ScatterChart>
+            <div>
+                <Bubble
+                    type='bubble'
+                    data={bubbles}
+                    options={options}
+                    width={500}
+                    height={500} />
             </div>
         );
     }
