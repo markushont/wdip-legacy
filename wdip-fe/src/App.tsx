@@ -6,6 +6,8 @@ import DatePicker from 'react-date-picker';
 import Header from './Header';
 import { MotionsApi, ChartsApi, PartyApi } from './service/wdip-be';
 import BubbleChart from './modules/BubbleChart';
+import MotionsView from './modules/MotionsView';
+
 
 const DEFAULT_FROM_DATE = new Date(2000, 1, 1);
 const DEFAULT_TO_DATE = new Date();
@@ -107,7 +109,9 @@ class App extends React.Component<any, any> {
             </BubbleChart>
             </Cell>
             <Cell medium={4}/>
+
             <Cell medium={8}>
+            <MotionsView></MotionsView>
             </Cell>
           </Grid>
         </GridContainer>
