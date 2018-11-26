@@ -104,3 +104,9 @@ functions:
       - http:
           path: charts/wordcloud
           method: get
+  getAllParties:
+    handler: apiHandler.getAllParties
+    events:
+      - http:
+          path: partydata/allparties
+          method: get
