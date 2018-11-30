@@ -1,65 +1,119 @@
 import * as React from 'react';
 import { Bubble } from 'react-chartjs-2';
+const colorApproved = "#41B3A3";
+const colorDeclined = "#E27D60";
 
-const data = {
-    datasets: [
-        {
-          label: "China",
-          backgroundColor: "rgba(255,221,50,0.2)",
-          borderColor: "rgba(255,221,50,1)",
-          data: [{
-            x: 3,
-            y: 5.245,
-            r: 15
-          }]
-        }, {
-          label: "Denmark",
-          backgroundColor: "rgba(60,186,159,0.2)",
-          borderColor: "rgba(60,186,159,1)",
-          data: [{
-            x: 5,
-            y: 7.526,
-            r: 10
-          }]
-        }, {
-          label: "Germany",
-          backgroundColor: "rgba(0,0,0,0.2)",
-          borderColor: "#000",
-          data: [{
-            x: 7,
-            y: 6.994,
-            r: 15
-          }]
-        }, {
-          label: "Japan",
-          backgroundColor: "rgba(193,46,12,0.2)",
-          borderColor: "rgba(193,46,12,1)",
-          data: [{
-            x: 5,
-            y: 5.921,
-            r: 15
-          }]
+var options = {
+    legend: {
+        display: false
+    },
+    display: false,
+    scales: {
+        yAxes: [{
+            id: 'y-axis-0',
+/*             ticks: {
+                stepSize: 1
+            }, */
+            display: false
+        }],
+        xAxes: [{
+            id: 'x-axis-0',
+/*             ticks: {
+                stepSize: 1
+            }, */
+            display: false 
+        }]
+    },
+    layout: {
+        padding: {
+            left: 50,
+            right: 50,
+            top: 50,
+            bottom: 50
         }
-      ]
+    }
 }
+
 
 class MotionsView extends React.Component<any, any> {
     constructor(props: any) {
         super(props);
     }
 
+    public setPosition(motionSet: Array<any>) {
+        var length = motionSet.length;
 
+        var rows = Math.floor(Math.sqrt(length));
+        while (length % rows != 0) {
+            rows = rows - 1;
+        }
+
+        let columns = length / rows;
+        let r = length > 50 ? 15 : 30;
+        let x = 0;
+        let y = 0;
+        motionSet.forEach(function (element) {
+            element.backgroundColor = element.data[0].status == "approved" ? colorApproved : colorDeclined;
+            element.data[0].x = x;
+            element.data[0].y = y;
+            element.data[0].r = r;
+
+            if (x < columns - 1) {
+                x++;
+            } else {
+                y--;
+                x = 0;
+            }
+
+        });
+
+        return motionSet;
+
+    }
+
+    public createData(numberOfMotions: number) {
+
+        const approved = numberOfMotions * 0.75;
+
+        var datasets = [];
+
+        var i = 0;
+        for (i; i < approved; i++) {
+            {
+                datasets.push({
+                    data: [{
+                        summary: "this is a summary",
+                        status: "approved"
+                    }]
+                })
+            }
+        }
+
+        for (i; i < numberOfMotions; i++) {
+            {
+                datasets.push({
+                    data: [{
+                        summary: "this is a summary",
+                        status: "declined"
+                    }]
+                })
+            }
+        }
+
+        return datasets;
+
+    }
 
     public render() {
 
+        let motions = { datasets: this.setPosition(this.createData(100)) };
+        console.log(motions);
+
         return (
-            <div>
-                <Bubble
-                    type='bubble'
-                    data={data}
-                    width={500}
-                    height={500} />
-            </div>
+            <Bubble
+                type='bubble'
+                data={motions}
+                options={options} />
         );
     }
 }
