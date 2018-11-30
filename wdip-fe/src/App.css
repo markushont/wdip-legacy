@@ -1,0 +1,28 @@
+
+
+/* Landningsplats */
+.background-enter {
+  transform: translate(300%,0%);
+}
+
+
+
+/* Den aktuella grafens om redan är inne, Förflytta 100% vänster */
+.background-exit.background-exit-active { 
+  transform: translate(-100%);
+} 
+
+
+/* Grafen som ska in ska till position 0%*/
+.background-enter.background-enter-active,
+.background-exit {
+  transform: translate(0%);
+} 
+
+
+.background-enter.background-enter-active, /* enter */
+.background-exit.background-exit-active { /* exit */
+  transition: transform 1000ms ease-in-out; /* hur lång tid transformationen ska ta */
+  transition-timing-function: cubic-bezier(0, 0, 1, 1); /* derivatan beskriver hastigheten. hur snabbt den ska flyttas. 0011 betyder att den är linjär */
+}
+

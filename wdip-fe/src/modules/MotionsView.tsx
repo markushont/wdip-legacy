@@ -3,37 +3,6 @@ import { Bubble } from 'react-chartjs-2';
 const colorApproved = "#41B3A3";
 const colorDeclined = "#E27D60";
 
-var options = {
-    legend: {
-        display: false
-    },
-    display: false,
-    scales: {
-        yAxes: [{
-            id: 'y-axis-0',
-/*             ticks: {
-                stepSize: 1
-            }, */
-            display: false
-        }],
-        xAxes: [{
-            id: 'x-axis-0',
-/*             ticks: {
-                stepSize: 1
-            }, */
-            display: false 
-        }]
-    },
-    layout: {
-        padding: {
-            left: 50,
-            right: 50,
-            top: 50,
-            bottom: 50
-        }
-    }
-}
-
 
 class MotionsView extends React.Component<any, any> {
     constructor(props: any) {
@@ -64,16 +33,13 @@ class MotionsView extends React.Component<any, any> {
                 y--;
                 x = 0;
             }
-
         });
-
         return motionSet;
-
     }
 
     public createData(numberOfMotions: number) {
 
-        const approved = numberOfMotions * 0.75;
+        const approved = numberOfMotions * 0.55;
 
         var datasets = [];
 
@@ -106,14 +72,51 @@ class MotionsView extends React.Component<any, any> {
 
     public render() {
 
-        let motions = { datasets: this.setPosition(this.createData(100)) };
-        console.log(motions);
+        let motions = { datasets: this.setPosition(this.createData(50)) };
+        const divStyle = {
+            position: "fixed",
+            zIndex: -1000,
+        } as React.CSSProperties;
 
+        var options = {
+            legend: {
+                display: false
+            },
+            display: false,
+            scales: {
+                yAxes: [{
+                    id: 'y-axis-0',
+                    /*             ticks: {
+                                    stepSize: 1
+                                }, */
+                    display: false
+                }],
+                xAxes: [{
+                    id: 'x-axis-0',
+                    /*             ticks: {
+                                    stepSize: 1
+                                }, */
+                    display: false
+                }]
+            },
+            layout: {
+                padding: {
+                    left: 50,
+                    right: 50,
+                    top: 50,
+                    bottom: 50
+                }
+            }
+        }
         return (
-            <Bubble
-                type='bubble'
-                data={motions}
-                options={options} />
+            <div style={divStyle}>
+                <Bubble
+                    type='bubble'
+                    data={motions}
+                    options={options}
+                    width={800}
+                    height={800} />
+            </div>
         );
     }
 }
