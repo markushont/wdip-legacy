@@ -99,7 +99,6 @@ class App extends React.Component<any, any> {
           results={this.state.motionsByParty.results}
           partyData={this.state.PartyData}
           changePage = {this.onChangePage.bind(this)}
-
         >
         </BubbleChart>);
     }
@@ -143,15 +142,9 @@ class App extends React.Component<any, any> {
                   {this.renderPage()}
                 </CSSTransition>
               </TransitionGroup>
-
             </Cell>
-
           </Grid>
         </GridContainer>
-
-
-
-
       </div >
     );
   }

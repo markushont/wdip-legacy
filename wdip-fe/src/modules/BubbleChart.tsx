@@ -98,7 +98,6 @@ class BubbleChart extends React.Component<any, any> {
 
             this.normalizer = new Normalizer(minSubmitted, maxSubmitted);
 
-
             bubbles.datasets = this.props.results.map((result: any) => ({
                 label: result.party,
                 data: [{
@@ -110,7 +109,6 @@ class BubbleChart extends React.Component<any, any> {
                 borderWidth: 3,
                 hoverRadius: 20
             }));
-
             
             const partyData = this.props.partyData;
             if(partyData){
