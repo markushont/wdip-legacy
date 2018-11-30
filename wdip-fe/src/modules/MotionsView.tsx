@@ -86,16 +86,10 @@ class MotionsView extends React.Component<any, any> {
             scales: {
                 yAxes: [{
                     id: 'y-axis-0',
-                    /*             ticks: {
-                                    stepSize: 1
-                                }, */
                     display: false
                 }],
                 xAxes: [{
                     id: 'x-axis-0',
-                    /*             ticks: {
-                                    stepSize: 1
-                                }, */
                     display: false
                 }]
             },

@@ -4,7 +4,6 @@ import './App.css';
 import { GridContainer, Grid, Cell } from 'react-foundation';
 import DatePicker from 'react-date-picker';
 import { TransitionGroup, CSSTransition } from 'react-transition-group';
-//import Header from './Header';
 import { MotionsApi, ChartsApi, PartyApi } from './service/wdip-be';
 import BubbleChart from './modules/BubbleChart';
 import MotionsView from './modules/MotionsView';
