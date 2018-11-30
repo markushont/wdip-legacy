@@ -1,0 +1,24 @@
+
+
+.background-enter {
+  transform: translate(300%,0%);
+}
+
+
+.background-exit.background-exit-active { 
+  transform: translate(-100%);
+} 
+
+
+.background-enter.background-enter-active,
+.background-exit {
+  transform: translate(0%);
+} 
+
+
+.background-enter.background-enter-active, 
+.background-exit.background-exit-active { 
+  transition: transform 1000ms ease-in-out; 
+  transition-timing-function: cubic-bezier(0, 0, 1, 1); 
+}
+

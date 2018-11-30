@@ -10,8 +10,6 @@ class BubbleChart extends React.Component<any, any> {
         super(props);
     }
 
-
-
     public render() {
         let bubbles = {
             datasets: Array<any>()
@@ -81,6 +79,10 @@ class BubbleChart extends React.Component<any, any> {
             maintainAspectRatio: false,
             animation: {
                 duration: 2000
+            },
+            onClick: (event: any, activeElements: any) =>
+            {
+                this.props.changePage();
             }
         }
 
@@ -96,7 +98,6 @@ class BubbleChart extends React.Component<any, any> {
 
             this.normalizer = new Normalizer(minSubmitted, maxSubmitted);
 
-
             bubbles.datasets = this.props.results.map((result: any) => ({
                 label: result.party,
                 data: [{
@@ -108,7 +109,6 @@ class BubbleChart extends React.Component<any, any> {
                 borderWidth: 3,
                 hoverRadius: 20
             }));
-
             
             const partyData = this.props.partyData;
             if(partyData){
@@ -119,18 +119,22 @@ class BubbleChart extends React.Component<any, any> {
                     bubble.data[0].fullName = partyData[bubble.label].name;
                 }
             }
-
-
         }
 
+        const divStyle = {
+            position: "fixed",
+            zIndex: -1000
+         } as React.CSSProperties;
+
         return (
-            <div>
+            <div style = {divStyle}>
                 <Bubble
                     type='bubble'
                     data={bubbles}
                     options={options}
-                    width={500}
-                    height={500} />
+                    width={800}
+                    height={800} 
+                   />
             </div>
         );
     }

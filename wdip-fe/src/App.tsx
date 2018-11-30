@@ -3,9 +3,11 @@ import './App.css';
 
 import { GridContainer, Grid, Cell } from 'react-foundation';
 import DatePicker from 'react-date-picker';
-import Header from './Header';
+import { TransitionGroup, CSSTransition } from 'react-transition-group';
 import { MotionsApi, ChartsApi, PartyApi } from './service/wdip-be';
 import BubbleChart from './modules/BubbleChart';
+import MotionsView from './modules/MotionsView';
+
 
 const DEFAULT_FROM_DATE = new Date(2000, 1, 1);
 const DEFAULT_TO_DATE = new Date();
@@ -24,7 +26,8 @@ class App extends React.Component<any, any> {
       toDate: DEFAULT_TO_DATE,
       motionsByParty: {},
       wordCloudData: [],
-      partyData: {}
+      partyData: {},
+      home: true
     };
   }
 
@@ -62,6 +65,10 @@ class App extends React.Component<any, any> {
     }
   }
 
+  public onChangePage() {
+    this.setState({ home: !this.state.home });
+  }
+
   public onChangeFromDate = (value: Date) => {
     this.setState({ fromDate: value }, this.fetchData);
   }
@@ -70,12 +77,37 @@ class App extends React.Component<any, any> {
     this.setState({ toDate: value }, this.fetchData);
   }
 
-  public render() {
+  renderPage() {
+    switch (this.state.home) {
+      case true:
+        return (<BubbleChart
+          key={'BubbleChart'}
+          results={this.state.motionsByParty.results}
+          partyData={this.state.PartyData}
+          changePage = {this.onChangePage.bind(this)}
+          >
+        </BubbleChart>);
+      case false:
+        return (<MotionsView 
+          key={'MotionsView'}
+          changePage = {this.onChangePage.bind(this)}>
+         </MotionsView>);
+      default:
+        console.log("default");
+        return (<BubbleChart
+          key={'BubbleChart'}
+          results={this.state.motionsByParty.results}
+          partyData={this.state.PartyData}
+          changePage = {this.onChangePage.bind(this)}
+        >
+        </BubbleChart>);
+    }
+  }
 
+  public render() {
     const { fromDate, toDate } = this.state;
     return (
-      <div>
-        <Header />
+      <div className="test">
         <GridContainer>
           <Grid >
             <Cell>
@@ -86,35 +118,33 @@ class App extends React.Component<any, any> {
                 Motioner per parti
               </h2>
             </Cell>
-
-            <Cell medium={5}>
+        <Cell medium={6}>
               Från
               <DatePicker
                 onChange={this.onChangeFromDate}
                 value={fromDate}
               />
             </Cell>
-            <Cell medium={5}>
+            <Cell medium={6}>
               Till
               <DatePicker
                 onChange={this.onChangeToDate}
                 value={toDate}
               />
             </Cell>
-            <Cell medium={8}><BubbleChart
-              results={this.state.motionsByParty.results}
-              partyData={this.state.PartyData}>
-            </BubbleChart>
-            </Cell>
-            <Cell medium={4}/>
-            <Cell medium={8}>
+            <Cell>
+              <TransitionGroup
+                className="transitiongroup">
+                <CSSTransition
+                  key={this.state.home}
+                  timeout={1000}
+                  classNames="background">
+                  {this.renderPage()}
+                </CSSTransition>
+              </TransitionGroup>
             </Cell>
           </Grid>
         </GridContainer>
-        
-
-
-
       </div >
     );
   }
