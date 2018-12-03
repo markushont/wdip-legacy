@@ -1,12 +1,13 @@
 import * as React from 'react';
 import './App.css';
+import 'rc-slider/assets/index.css';
 
 import { GridContainer, Grid, Cell } from 'react-foundation';
-import DatePicker from 'react-date-picker';
 import { TransitionGroup, CSSTransition } from 'react-transition-group';
 import { MotionsApi, ChartsApi, PartyApi } from './service/wdip-be';
 import BubbleChart from './modules/BubbleChart';
 import MotionsView from './modules/MotionsView';
+import {Range} from 'rc-slider';
 
 
 const DEFAULT_FROM_DATE = new Date(2000, 1, 1);
@@ -69,12 +70,8 @@ class App extends React.Component<any, any> {
     this.setState({ home: !this.state.home });
   }
 
-  public onChangeFromDate = (value: Date) => {
-    this.setState({ fromDate: value }, this.fetchData);
-  }
-
-  public onChangeToDate = (value: Date) => {
-    this.setState({ toDate: value }, this.fetchData);
+  public onChangeDate = (values: number[]) => {
+    this.setState({ fromDate: new Date(values[0], 1, 1), toDate: new Date(values[1], 1, 1) }, this.fetchData);
   }
 
   renderPage() {
@@ -84,28 +81,32 @@ class App extends React.Component<any, any> {
           key={'BubbleChart'}
           results={this.state.motionsByParty.results}
           partyData={this.state.PartyData}
-          changePage = {this.onChangePage.bind(this)}
-          >
+          changePage={this.onChangePage.bind(this)}
+        >
         </BubbleChart>);
       case false:
-        return (<MotionsView 
+        return (<MotionsView
           key={'MotionsView'}
-          changePage = {this.onChangePage.bind(this)}>
-         </MotionsView>);
+          changePage={this.onChangePage.bind(this)}>
+        </MotionsView>);
       default:
         console.log("default");
         return (<BubbleChart
           key={'BubbleChart'}
           results={this.state.motionsByParty.results}
           partyData={this.state.PartyData}
-          changePage = {this.onChangePage.bind(this)}
+          changePage={this.onChangePage.bind(this)}
         >
         </BubbleChart>);
     }
   }
 
+
   public render() {
-    const { fromDate, toDate } = this.state;
+    const wrapperStyle = { width: 800 };
+
+
+
     return (
       <div className="test">
         <GridContainer>
@@ -118,19 +119,11 @@ class App extends React.Component<any, any> {
                 Motioner per parti
               </h2>
             </Cell>
-        <Cell medium={6}>
-              Från
-              <DatePicker
-                onChange={this.onChangeFromDate}
-                value={fromDate}
-              />
-            </Cell>
-            <Cell medium={6}>
-              Till
-              <DatePicker
-                onChange={this.onChangeToDate}
-                value={toDate}
-              />
+            <div style={wrapperStyle}>
+              <Range value={[this.state.fromDate.getFullYear(), this.state.toDate.getFullYear()]} onChange={this.onChangeDate}
+                min={2001} max={2018}/>
+            </div>
+            <Cell>
             </Cell>
             <Cell>
               <TransitionGroup
@@ -143,6 +136,7 @@ class App extends React.Component<any, any> {
                 </CSSTransition>
               </TransitionGroup>
             </Cell>
+
           </Grid>
         </GridContainer>
       </div >
