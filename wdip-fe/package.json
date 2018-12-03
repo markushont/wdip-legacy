@@ -3,6 +3,8 @@
     "version": "0.1.0",
     "private": true,
     "dependencies": {
+        "@types/rc-slider": "^8.6.0",
+        "@types/react-transition-group": "^2.0.14",
         "@types/recharts": "^1.1.0",
         "chart.js": "^2.7.3",
         "chartjs-plugin-annotation": "^0.5.7",
@@ -10,6 +12,7 @@
         "foundation-sites": "^6.5.0-rc.4",
         "jquery": "^3.3.1",
         "portable-fetch": "^3.0.0",
+        "rc-slider": "^8.6.3",
         "react": "^16.6.0",
         "react-chartjs-2": "^2.7.4",
         "react-d3-cloud": "^0.7.0",
