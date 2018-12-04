@@ -30,7 +30,7 @@
     "nodemon": "^1.18.4",
     "serverless": "^1.30.3",
     "serverless-offline": "^3.25.10",
-    "tsc-watch": "^1.0.30",
+    "tsc-watch": "^1.0.31",
     "tslint": "^5.11.0",
     "typescript": "^3.1.3"
   }
