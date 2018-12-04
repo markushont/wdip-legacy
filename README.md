@@ -18,7 +18,7 @@ This brings up the system containing these components:
 
 * WDIP frontend at http://localhost:3000
 * WDIP backend at http://localhost:3001
-* Elasticsearch at http://locahost:9200
+* Elasticsearch at http://localhost:9200
 * Kibana at http://localhost:5601
 
 The WDIP frontend and backend components reload automatically on file changes without restarting docker containers or applications. The WDIP backend exposes a debug possibility on port 9229, making it possible to set breakpoints and interactively debug the application. If you use Visueal Studio Code, use the debugger configuration _Attach to WDIP-BE_.
