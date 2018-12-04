@@ -4,6 +4,7 @@ const getMotionsByParty = require("./api/getMotionsByParty");
 const motions = require("./api/motions");
 import getWordCloud from "./api/getWordCloud";
 const logger = require("./logger");
+const getAllParties = require("./api/getAllParties");
 
 /**
  * Base response HTTP headers
@@ -56,5 +57,10 @@ module.exports.getWordCloud = async (event, context) => {
     var fromDate = event.queryStringParameters.fromDate;
     var toDate = event.queryStringParameters.toDate;
     let result = await getWordCloud(fromDate, toDate);
+    return responses.success(result);
+};
+
+module.exports.getAllParties = async (event, context) => {
+    let result = await getAllParties();
     return responses.success(result);
 };
