@@ -4,6 +4,10 @@
 
 The following tools are needed for development:
 
+1. Enter ```wdip-fe/``` and run ```npm install```
+
+1. Enter ```wdip-be/``` and run ```npm install```
+
 1. Install Docker for running all system components at https://www.docker.com/products/docker-desktop. 
 
 1. In the root directory of the repository, run
@@ -87,3 +91,19 @@ Using the [serverless](https://www.serverless.com) framework, run the following 
 cd wdip-be
 serverless deploy -v
 ```
+
+## Fetching data locally
+
+Add new data to the DB by accessing ```http://localhost:3001/fetch-motions```. This API supports two operations:
+
+Example ```GET``` request:
+
+    curl http://localhost:3001/fetch-motions
+
+Will fetch all motions that have been created since the last time the script was run.
+
+Example ```POST``` request:
+
+    curl -H "Content-Type: application/json" --request POST -d '{"from":"2018-01-01","to":"2018-12-31"}' http://localhost:3001/fetch-motions
+
+Will fetch all motions within the specified date interval.
