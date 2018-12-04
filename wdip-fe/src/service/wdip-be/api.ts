@@ -194,10 +194,12 @@ export const ChartsApiFetchParamCreator = function (configuration?: Configuratio
         /**
          * 
          * @summary Gets word cloud data, ie keywords and their frequency
+         * @param {string} [fromDate] From which date (inclusive) data should be returned.
+         * @param {string} [toDate] To which date (inclusive) data should be returned.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getWordCloud(options: any = {}): FetchArgs {
+        getWordCloud(fromDate?: string, toDate?: string, options: any = {}): FetchArgs {
             const localVarPath = `/charts/wordcloud`;
             const localVarUrlObj = url.parse(localVarPath, true);
             let baseOptions;
@@ -207,6 +209,14 @@ export const ChartsApiFetchParamCreator = function (configuration?: Configuratio
             const localVarRequestOptions = Object.assign({ method: 'GET' }, baseOptions, options);
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
+
+            if (fromDate !== undefined) {
+                localVarQueryParameter['fromDate'] = (fromDate as any).toISOString();
+            }
+
+            if (toDate !== undefined) {
+                localVarQueryParameter['toDate'] = (toDate as any).toISOString();
+            }
 
             localVarUrlObj.query = Object.assign({}, localVarUrlObj.query, localVarQueryParameter, options.query);
             // fix override query string Detail: https://stackoverflow.com/a/7517673/1077943
@@ -230,11 +240,13 @@ export const ChartsApiFp = function(configuration?: Configuration) {
         /**
          * 
          * @summary Gets word cloud data, ie keywords and their frequency
+         * @param {string} [fromDate] From which date (inclusive) data should be returned.
+         * @param {string} [toDate] To which date (inclusive) data should be returned.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getWordCloud(options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Words> {
-            const localVarFetchArgs = ChartsApiFetchParamCreator(configuration).getWordCloud(options);
+        getWordCloud(fromDate?: string, toDate?: string, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<Words> {
+            const localVarFetchArgs = ChartsApiFetchParamCreator(configuration).getWordCloud(fromDate, toDate, options);
             return (fetch: FetchAPI = portableFetch, basePath: string = BASE_PATH) => {
                 return fetch(basePath + localVarFetchArgs.url, localVarFetchArgs.options).then((response) => {
                     if (response.status >= 200 && response.status < 300) {
@@ -257,11 +269,13 @@ export const ChartsApiFactory = function (configuration?: Configuration, fetch?:
         /**
          * 
          * @summary Gets word cloud data, ie keywords and their frequency
+         * @param {string} [fromDate] From which date (inclusive) data should be returned.
+         * @param {string} [toDate] To which date (inclusive) data should be returned.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getWordCloud(options?: any) {
-            return ChartsApiFp(configuration).getWordCloud(options)(fetch, basePath);
+        getWordCloud(fromDate?: string, toDate?: string, options?: any) {
+            return ChartsApiFp(configuration).getWordCloud(fromDate, toDate, options)(fetch, basePath);
         },
     };
 };
@@ -276,12 +290,14 @@ export class ChartsApi extends BaseAPI {
     /**
      * 
      * @summary Gets word cloud data, ie keywords and their frequency
+     * @param {string} [fromDate] From which date (inclusive) data should be returned.
+     * @param {string} [toDate] To which date (inclusive) data should be returned.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ChartsApi
      */
-    public getWordCloud(options?: any) {
-        return ChartsApiFp(this.configuration).getWordCloud(options)(this.fetch, this.basePath);
+    public getWordCloud(fromDate?: string, toDate?: string, options?: any) {
+        return ChartsApiFp(this.configuration).getWordCloud(fromDate, toDate, options)(this.fetch, this.basePath);
     }
 
 }
@@ -399,6 +415,107 @@ export class MotionsApi extends BaseAPI {
      */
     public getMotionsByParty(fromDate?: string, toDate?: string, options?: any) {
         return MotionsApiFp(this.configuration).getMotionsByParty(fromDate, toDate, options)(this.fetch, this.basePath);
+    }
+
+}
+
+/**
+ * PartyApi - fetch parameter creator
+ * @export
+ */
+export const PartyApiFetchParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * 
+         * @summary Gets data for all the parties, i.e. GAL-TAN position and party color
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getAllParties(options: any = {}): FetchArgs {
+            const localVarPath = `/partydata/allparties`;
+            const localVarUrlObj = url.parse(localVarPath, true);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+            const localVarRequestOptions = Object.assign({ method: 'GET' }, baseOptions, options);
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            localVarUrlObj.query = Object.assign({}, localVarUrlObj.query, localVarQueryParameter, options.query);
+            // fix override query string Detail: https://stackoverflow.com/a/7517673/1077943
+            delete localVarUrlObj.search;
+            localVarRequestOptions.headers = Object.assign({}, localVarHeaderParameter, options.headers);
+
+            return {
+                url: url.format(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * PartyApi - functional programming interface
+ * @export
+ */
+export const PartyApiFp = function(configuration?: Configuration) {
+    return {
+        /**
+         * 
+         * @summary Gets data for all the parties, i.e. GAL-TAN position and party color
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getAllParties(options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<ErrorModel> {
+            const localVarFetchArgs = PartyApiFetchParamCreator(configuration).getAllParties(options);
+            return (fetch: FetchAPI = portableFetch, basePath: string = BASE_PATH) => {
+                return fetch(basePath + localVarFetchArgs.url, localVarFetchArgs.options).then((response) => {
+                    if (response.status >= 200 && response.status < 300) {
+                        return response.json();
+                    } else {
+                        throw response;
+                    }
+                });
+            };
+        },
+    }
+};
+
+/**
+ * PartyApi - factory interface
+ * @export
+ */
+export const PartyApiFactory = function (configuration?: Configuration, fetch?: FetchAPI, basePath?: string) {
+    return {
+        /**
+         * 
+         * @summary Gets data for all the parties, i.e. GAL-TAN position and party color
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getAllParties(options?: any) {
+            return PartyApiFp(configuration).getAllParties(options)(fetch, basePath);
+        },
+    };
+};
+
+/**
+ * PartyApi - object-oriented interface
+ * @export
+ * @class PartyApi
+ * @extends {BaseAPI}
+ */
+export class PartyApi extends BaseAPI {
+    /**
+     * 
+     * @summary Gets data for all the parties, i.e. GAL-TAN position and party color
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PartyApi
+     */
+    public getAllParties(options?: any) {
+        return PartyApiFp(this.configuration).getAllParties(options)(this.fetch, this.basePath);
     }
 
 }
