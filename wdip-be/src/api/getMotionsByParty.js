@@ -54,13 +54,21 @@ async function getMotionsByParty(
 
   const posResponse = getMotions(fromDateStrOverride, toDateStrOverride, "accepted", parties);
   const negResponse = getMotions(fromDateStrOverride, toDateStrOverride, "rejected", parties);
-  const responseQueue = await Promise.all([posResponse, negResponse]);
+  const partiallyAcceptedResponse = getMotions(fromDateStrOverride, toDateStrOverride, "partially_accepted", parties);
+  const responseQueue = await Promise.all([posResponse, negResponse, partiallyAcceptedResponse]);
   var i = 0;
   var partyData = [];
   parties.forEach((party) => {
     const approved = responseQueue[0].responses[i].hits.total;
     const declined = responseQueue[1].responses[i].hits.total;
-    partyData.push({ party: party, submitted: approved + declined, approved: approved, declined: declined });
+    const partiallyAccepted = responseQueue[2].responses[i].hits.total;
+    partyData.push({
+      party: party,
+      submitted: approved + declined + partiallyAccepted,
+      approved: approved,
+      declined: declined,
+      partiallyAccepted: partiallyAccepted
+    });
     i++;
   });
   return { fromDate: fromDateStrOverride, toDate: toDateStrOverride, results: partyData };
