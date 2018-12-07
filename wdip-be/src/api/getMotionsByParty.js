@@ -22,7 +22,7 @@ async function getMotions(fromDateStrOverride = null, toDateStrOverride = null, 
                 term: { "intressent.partibet": party }
               },
               {
-                term: { "forslag.kammaren": outcome }
+                term: { "status": outcome }
               },
               {
                 range: {
@@ -52,8 +52,8 @@ async function getMotionsByParty(
 
   var parties = WDIP_DEFAULT_PARTIES;
 
-  const posResponse = getMotions(fromDateStrOverride, toDateStrOverride, "bifall", parties);
-  const negResponse = getMotions(fromDateStrOverride, toDateStrOverride, "avslag", parties);
+  const posResponse = getMotions(fromDateStrOverride, toDateStrOverride, "accepted", parties);
+  const negResponse = getMotions(fromDateStrOverride, toDateStrOverride, "rejected", parties);
   const responseQueue = await Promise.all([posResponse, negResponse]);
   var i = 0;
   var partyData = [];
