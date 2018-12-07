@@ -1,6 +1,11 @@
 "use strict";
 
 const moment = require("moment");
+const {
+  WDIP_ACCEPTED,
+  WDIP_REJECTED,
+  WDIP_PARTIALLY_ACCEPTED
+} = require("../config/constants");
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -162,11 +167,11 @@ function parseStatusObj(statusObj) {
 
   const nProposals = statusInfo.forslag.proposals.length;
   if (statusInfo.forslag.nAccepted === nProposals) {
-    statusInfo.status = "accepted";
+    statusInfo.status = WDIP_ACCEPTED;
   } else if (statusInfo.forslag.nRejected === nProposals) {
-    statusInfo.status = "rejected";
+    statusInfo.status = WDIP_REJECTED;
   } else {
-    statusInfo.status = "partially_accepted";
+    statusInfo.status = WDIP_PARTIALLY_ACCEPTED;
   }
 
   return statusInfo;

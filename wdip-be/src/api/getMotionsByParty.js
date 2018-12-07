@@ -1,7 +1,16 @@
 "use strict";
 
 const dbClient = require("../dbclient");
-const { WDIP_MOTION_INDEX, WDIP_DEFAULT_PARTIES } = require("../config/config");
+const {
+  WDIP_MOTION_INDEX,
+} = require("../config/config");
+
+const {
+  WDIP_DEFAULT_PARTIES,
+  WDIP_ACCEPTED,
+  WDIP_REJECTED,
+  WDIP_PARTIALLY_ACCEPTED
+} = require("../config/constants");
 
 const logger = require("../logger");
 
@@ -52,9 +61,10 @@ async function getMotionsByParty(
 
   var parties = WDIP_DEFAULT_PARTIES;
 
-  const posResponse = getMotions(fromDateStrOverride, toDateStrOverride, "accepted", parties);
-  const negResponse = getMotions(fromDateStrOverride, toDateStrOverride, "rejected", parties);
-  const partiallyAcceptedResponse = getMotions(fromDateStrOverride, toDateStrOverride, "partially_accepted", parties);
+  const posResponse = getMotions(fromDateStrOverride, toDateStrOverride, WDIP_ACCEPTED, parties);
+  const negResponse = getMotions(fromDateStrOverride, toDateStrOverride, WDIP_REJECTED, parties);
+  const partiallyAcceptedResponse =
+    getMotions(fromDateStrOverride, toDateStrOverride, WDIP_PARTIALLY_ACCEPTED, parties);
   const responseQueue = await Promise.all([posResponse, negResponse, partiallyAcceptedResponse]);
   var i = 0;
   var partyData = [];
