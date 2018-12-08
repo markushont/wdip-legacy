@@ -61,10 +61,19 @@ function parseForslag(dokForslag) {
     const utskottet = proposal.utskottet ? proposal.utskottet.toLowerCase() : "";
     const kammaren = proposal.kammaren ? proposal.kammaren.toLowerCase() : "";
 
-    if (utskottet.includes("bifall") || kammaren.includes("bifall")) {
-      ret.nAccepted += 1;
-    } else if (utskottet.includes("avslag") || kammaren.includes("avslag")) {
-      ret.nRejected += 1;
+    // 'kammaren' takes priority over 'utskottet'
+    if (kammaren.length) {
+      if (kammaren.includes("bifall")) {
+        ret.nAccepted += 1;
+      } else if (kammaren.includes("avslag")) {
+        ret.nRejected += 1;
+      }
+    } else if (utskottet.length) {
+      if (utskottet.includes("bifall")) {
+        ret.nAccepted += 1;
+      } else if (utskottet.includes("avslag")) {
+        ret.nRejected += 1;
+      }
     }
   }
 
