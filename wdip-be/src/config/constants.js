@@ -3,4 +3,4 @@ module.exports = {
     "WDIP_ACCEPTED": "accepted",
     "WDIP_REJECTED": "rejected",
     "WDIP_PARTIALLY_ACCEPTED": "partially_accepted"
-}
+};

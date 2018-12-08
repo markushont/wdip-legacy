@@ -2,7 +2,7 @@
 
 const dbClient = require("../dbclient");
 const {
-  WDIP_MOTION_INDEX,
+  WDIP_MOTION_INDEX
 } = require("../config/config");
 
 const {
