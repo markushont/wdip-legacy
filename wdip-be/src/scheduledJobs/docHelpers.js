@@ -1,6 +1,11 @@
 "use strict";
 
 const moment = require("moment");
+const {
+  WDIP_ACCEPTED,
+  WDIP_REJECTED,
+  WDIP_PARTIALLY_ACCEPTED
+} = require("../config/constants");
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -56,10 +61,19 @@ function parseForslag(dokForslag) {
     const utskottet = proposal.utskottet ? proposal.utskottet.toLowerCase() : "";
     const kammaren = proposal.kammaren ? proposal.kammaren.toLowerCase() : "";
 
-    if (utskottet.includes("bifall") || kammaren.includes("bifall")) {
-      ret.nAccepted += 1;
-    } else if (utskottet.includes("avslag") || kammaren.includes("avslag")) {
-      ret.nRejected += 1;
+    // 'kammaren' takes priority over 'utskottet'
+    if (kammaren.length) {
+      if (kammaren.includes("bifall")) {
+        ret.nAccepted += 1;
+      } else if (kammaren.includes("avslag")) {
+        ret.nRejected += 1;
+      }
+    } else if (utskottet.length) {
+      if (utskottet.includes("bifall")) {
+        ret.nAccepted += 1;
+      } else if (utskottet.includes("avslag")) {
+        ret.nRejected += 1;
+      }
     }
   }
 
@@ -162,11 +176,11 @@ function parseStatusObj(statusObj) {
 
   const nProposals = statusInfo.forslag.proposals.length;
   if (statusInfo.forslag.nAccepted === nProposals) {
-    statusInfo.status = "accepted";
+    statusInfo.status = WDIP_ACCEPTED;
   } else if (statusInfo.forslag.nRejected === nProposals) {
-    statusInfo.status = "rejected";
+    statusInfo.status = WDIP_REJECTED;
   } else {
-    statusInfo.status = "partially_accepted";
+    statusInfo.status = WDIP_PARTIALLY_ACCEPTED;
   }
 
   return statusInfo;
