@@ -6,12 +6,6 @@
     "configurations": [
         {
             "type": "node",
-            "request": "launch",
-            "name": "Launch T",
-            "program": "${workspaceFolder}/wdip-be/src/scheduledJobs/t.js"
-        },
-        {
-            "type": "node",
             "request": "attach",
             "name": "Attach",
             "port": 9229

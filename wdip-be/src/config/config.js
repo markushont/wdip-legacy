@@ -14,5 +14,6 @@ module.exports = {
     "MAX_PAGINATED_PAGES": 400,
     "DATE_ZERO": "2000-01-01",
     "FETCH_MOTIONS": true,
-    "FETCH_PROPOSITIONS": false
+    "FETCH_PROPOSITIONS": false,
+    "SQS_URL": "http://localhost:9324/queue/wdip-import"
 };
