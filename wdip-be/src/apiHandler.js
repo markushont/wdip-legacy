@@ -4,6 +4,7 @@ const getMotionsByParty = require("./api/getMotionsByParty");
 const motions = require("./api/motions");
 import getWordCloud from "./api/getWordCloud";
 import { importPublishServiceParliament } from "./api/admin/ImportPublishServiceParliament";
+import { importSubscriptionServiceParliament } from "./api/admin/ImportSubscruptionServiceParliament";
 const moment = require("moment");
 const logger = require("./logger");
 const getAllParties = require("./api/getAllParties");
@@ -76,4 +77,5 @@ module.exports.adminStartImport = async (event, context) => {
 
 module.exports.adminSqsEvent = async (event, context) => {
     logger.info("Triggered from event.", { eventType: typeof event, contextType: typeof context });
+    importSubscriptionServiceParliament.receiveImportDocumentEvent(event);
 };

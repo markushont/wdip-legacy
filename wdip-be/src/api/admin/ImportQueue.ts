@@ -1,5 +1,5 @@
 import { config, Credentials, SQS } from "aws-sdk";
-import { SendMessageRequest } from "aws-sdk/clients/sqs";
+import { DeleteMessageRequest, SendMessageRequest } from "aws-sdk/clients/sqs";
 import { $enum } from "ts-enum-util";
 import { SQS_URL } from "../../config/config";
 import logger from "../../logger";
@@ -29,6 +29,18 @@ class ImportQueue {
 
         const data = await this.queue.sendMessage(message).promise();
         logger.debug("Document successfully added to the import queue.", data);
+    }
+
+    /**
+     * Deletes a message from the import queue.
+     * @param receiptHandle the receipt handle for the message to delete
+     */
+    public async delete(receiptHandle: string) {
+        const message: DeleteMessageRequest = {
+            ReceiptHandle: receiptHandle,
+            QueueUrl: SQS_URL
+        };
+        await this.queue.deleteMessage(message).promise();
     }
 }
 

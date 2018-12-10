@@ -4,10 +4,15 @@ export enum ImportDocumentType {
 
 export class ImportDocument {
 
+    public static deserialize(str: string): ImportDocument {
+        const obj = JSON.parse(str);
+        return Object.assign(new ImportDocument(), obj);
+    }
+
     public id: string;
     public type: ImportDocumentType;
 
-    constructor(id: string, type: ImportDocumentType) {
+    constructor(id: string = null, type: ImportDocumentType = null) {
         this.id = id;
         this.type = type;
     }
