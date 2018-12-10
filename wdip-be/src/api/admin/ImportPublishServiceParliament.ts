@@ -88,6 +88,7 @@ class ImportPublishServiceParliament {
 
             // Recursively fetch the next page of documents. Note that the last page does not
             // contain the '@nasta_sida' property, causing the recursion to stop.
+            // TODO: Can be the same as the current search if the search is more than 500 pages.
             await this.search(response.data.dokumentlista["@nasta_sida"]);
         } catch (error) {
             logger.error("There was an error fetching documents. Aborting import job.", error);

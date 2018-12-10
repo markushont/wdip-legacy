@@ -1,8 +1,12 @@
-//const config = require("./environment.json");
+// import loadJsonFile from "load-json-file";
 
-//Object.keys(config).forEach(key => {
-//    dynConfig[key] = process.env[key] || config[key];
-//});
+// const config = loadJsonFile.sync("./environment.json");
+
+// Object.keys(config).forEach(key => {
+//     config[key] = process.env[key] || config[key];
+// });
+
+// module.exports = config;
 
 module.exports = {
     "ES_SERVER": "elasticsearch:9200",

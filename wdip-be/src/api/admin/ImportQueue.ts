@@ -1,6 +1,5 @@
 import { config, Credentials, SQS } from "aws-sdk";
 import { DeleteMessageRequest, SendMessageRequest } from "aws-sdk/clients/sqs";
-import { $enum } from "ts-enum-util";
 import { SQS_URL } from "../../config/config";
 import logger from "../../logger";
 import { ImportDocument } from "./ImportDocument";
@@ -11,8 +10,7 @@ class ImportQueue {
 
     constructor() {
         config.update({
-            region: "eu-west-1",
-            credentials: new Credentials("access", "secret")
+            region: "eu-west-1"
         });
     }
 

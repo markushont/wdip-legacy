@@ -4,7 +4,7 @@ const getMotionsByParty = require("./api/getMotionsByParty");
 const motions = require("./api/motions");
 import getWordCloud from "./api/getWordCloud";
 import { importPublishServiceParliament } from "./api/admin/ImportPublishServiceParliament";
-import { importSubscriptionServiceParliament } from "./api/admin/ImportSubscruptionServiceParliament";
+import { importSubscriptionServiceParliament } from "./api/admin/ImportSubscriptionServiceParliament";
 const moment = require("moment");
 const logger = require("./logger");
 const getAllParties = require("./api/getAllParties");

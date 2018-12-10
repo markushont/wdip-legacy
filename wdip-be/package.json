@@ -24,11 +24,11 @@
     "cryptiles": "^4.1.2",
     "elasticsearch": "^15.1.1",
     "fast-safe-stringify": "^2.0.6",
+    "load-json-file": "^5.1.0",
     "moment": "^2.22.2",
     "object-sizeof": "^1.2.0",
     "query-string": "^6.2.0",
     "request": "^2.87.0",
-    "ts-enum-util": "^3.1.0",
     "winston": "^3.1.0"
   },
   "devDependencies": {
