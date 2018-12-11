@@ -118,7 +118,7 @@ functions:
 
 custom:
   serverless-offline-sqs:
-    endpoint: http://localhost:9324
+    endpoint: http://sqs:9324
     region: ${self:provider.region}
     accessKeyId: root
     secretAccessKey: root
