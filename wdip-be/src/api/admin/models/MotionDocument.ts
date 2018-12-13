@@ -22,7 +22,7 @@ export function transformMotionDocument(source: any): MotionDocument {
         fullText: null,
         summary: source.summary,
         documentType: DocumentType.MOTION,
-        stakeholders: transformStakeholders(source.dokIntressent.intressent),
+        stakeholders: transformStakeholders(source.dokintressent.intressent),
         published: moment(source.publicerad),
         documentStatus: DocumentStatus.APPROVED,
         meta: { created: moment(), updated: moment() }
