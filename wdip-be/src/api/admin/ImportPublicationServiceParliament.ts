@@ -1,5 +1,5 @@
 import axios from "axios";
-import moment, { Moment } from "moment";
+import { Moment } from "moment";
 import { stringify } from "query-string";
 import logger from "../../logger";
 import { ImportDocument, ImportDocumentType } from "./ImportDocument";
@@ -14,7 +14,7 @@ import { importQueue } from "./ImportQueue";
  * TODO: When we add more sources other that the parliament, we could extract the common
  *       parts of this import class to an abstract base class.
  */
-class ImportPublishServiceParliament {
+class ImportPublicationServiceParliament {
 
     private isRunning: boolean = false;
     private isStopRequested: boolean = false;
@@ -133,4 +133,4 @@ class ImportPublishServiceParliament {
 
 }
 
-export const importPublishServiceParliament = new ImportPublishServiceParliament();
+export const importPublicationServiceParliament = new ImportPublicationServiceParliament();

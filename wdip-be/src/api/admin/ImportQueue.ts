@@ -1,4 +1,4 @@
-import { config, Credentials, SQS } from "aws-sdk";
+import { config, SQS } from "aws-sdk";
 import { DeleteMessageRequest, SendMessageRequest } from "aws-sdk/clients/sqs";
 import { SQS_URL } from "../../config/config";
 import logger from "../../logger";

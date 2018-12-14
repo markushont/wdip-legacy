@@ -3,7 +3,7 @@
 const getMotionsByParty = require("./api/getMotionsByParty");
 const motions = require("./api/motions");
 import getWordCloud from "./api/getWordCloud";
-import { importPublishServiceParliament } from "./api/admin/ImportPublishServiceParliament";
+import { importPublicationServiceParliament } from "./api/admin/ImportPublicationServiceParliament";
 import { importSubscriptionServiceParliament } from "./api/admin/ImportSubscriptionServiceParliament";
 const moment = require("moment");
 const logger = require("./logger");
@@ -71,11 +71,6 @@ module.exports.getAllParties = async (event, context) => {
 module.exports.adminStartImport = async (event, context) => {
     const fromDate = moment(event.queryStringParameters.fromDate);
     const toDate = moment(event.queryStringParameters.toDate);
-    importPublishServiceParliament.start(fromDate, toDate);
+    importPublicationServiceParliament.start(fromDate, toDate);
     return responses.success({}, 202);
-};
-
-module.exports.adminSqsEvent = async (event, context) => {
-    logger.info("Triggered from event.", { eventType: typeof event, contextType: typeof context });
-    importSubscriptionServiceParliament.receiveImportDocumentEvent(event);
 };

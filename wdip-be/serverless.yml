@@ -110,7 +110,7 @@ functions:
                 fromDate: false
                 toDate: false
   adminSqsEvent:
-    handler: apiHandler.adminSqsEvent
+    handler: eventHandler.importQueueEvent
     events:
       - sqs:
           arn: arn:aws:sqs:eu-west-1:843375259671:wdip-import
