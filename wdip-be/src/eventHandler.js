@@ -1,5 +1,4 @@
-import { importSubscriptionServiceParliament } from "./api/admin/ImportSubscriptionServiceParliament";
-const logger = require("./logger");
+import { importSubscriptionServiceParliament } from "./scheduledJobs/ImportSubscriptionServiceParliament";
 
 module.exports.importQueueEvent = async (event, context) => {
     importSubscriptionServiceParliament.processEvent(event);

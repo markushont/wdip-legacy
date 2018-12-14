@@ -1,7 +1,7 @@
 import axios from "axios";
 import { Moment } from "moment";
 import { stringify } from "query-string";
-import logger from "../../logger";
+import logger from "../logger";
 import { ImportDocument, ImportDocumentType } from "./ImportDocument";
 import { importQueue } from "./ImportQueue";
 

@@ -3,8 +3,8 @@
 const getMotionsByParty = require("./api/getMotionsByParty");
 const motions = require("./api/motions");
 import getWordCloud from "./api/getWordCloud";
-import { importPublicationServiceParliament } from "./api/admin/ImportPublicationServiceParliament";
-import { importSubscriptionServiceParliament } from "./api/admin/ImportSubscriptionServiceParliament";
+import { importPublicationServiceParliament } from "./scheduledJobs/ImportPublicationServiceParliament";
+import { importSubscriptionServiceParliament } from "./scheduledJobs/ImportSubscriptionServiceParliament";
 const moment = require("moment");
 const logger = require("./logger");
 const getAllParties = require("./api/getAllParties");

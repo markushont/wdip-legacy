@@ -1,11 +1,11 @@
 import { Message, MessageList, ReceiveMessageResult } from "aws-sdk/clients/sqs";
 import axios from "axios";
-import { WDIP_MOTION_INDEX } from "../../config/config";
-import dbClient from "../../dbclient";
-import logger from "../../logger";
+import { WDIP_MOTION_INDEX } from "../config/config";
+import dbClient from "../dbclient";
+import logger from "../logger";
+import { transformMotionDocument } from "../models/MotionDocument";
 import { ImportDocument } from "./ImportDocument";
 import { ImportSubscriptionService } from "./ImportSubscriptionService";
-import { transformMotionDocument } from "./models/MotionDocument";
 
 class ImportSubscriptionServiceParliament extends ImportSubscriptionService {
 

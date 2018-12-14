@@ -1,5 +1,5 @@
 import { Message } from "aws-sdk/clients/sqs";
-import logger = require("../../logger");
+import logger = require("../logger");
 import { importQueue } from "./ImportQueue";
 
 export abstract class ImportSubscriptionService {
