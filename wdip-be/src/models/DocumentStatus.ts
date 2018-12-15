@@ -1,4 +1,4 @@
 export enum DocumentStatus {
     APPROVED = "APPROVED",
-    REJECTED = "REJECTES"
+    REJECTED = "REJECTED"
 }

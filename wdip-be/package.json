@@ -13,7 +13,14 @@
     "build-ts": "./node_modules/.bin/tsc",
     "tslint": "./node_modules/.bin/tslint -c tslint.json -p tsconfig.json",
     "debug": "./node_modules/.bin/tsc-watch --compiler typescript/bin/tsc --onSuccess 'npm run debug-lint-start'",
-    "debug-lint-start": "npm run tslint && node --inspect=0.0.0.0:9229 ./node_modules/.bin/serverless offline start --location ./dist --host 0.0.0.0 --port 3001"
+    "debug-lint-start": "npm run tslint && node --inspect=0.0.0.0:9229 ./node_modules/.bin/serverless offline start --location ./dist --host 0.0.0.0 --port 3001",
+    "test": "jest",
+    "test:watch": "jest --watch"
+  },
+  "husky": {
+    "hooks": {
+      "pre-push": "npm test"
+    }
   },
   "dependencies": {
     "@types/elasticsearch": "^5.0.26",
@@ -32,10 +39,15 @@
     "winston": "^3.1.0"
   },
   "devDependencies": {
+    "@types/jest": "^23.3.10",
+    "husky": "^1.2.1",
+    "jest": "^23.6.0",
+    "jest-extended": "^0.11.0",
     "nodemon": "^1.18.7",
     "serverless": "^1.34.1",
     "serverless-offline": "^3.25.6",
     "serverless-offline-sqs": "^1.6.0",
+    "ts-jest": "^23.10.5",
     "ts-node": "^7.0.1",
     "tsc-watch": "^1.0.31",
     "tslint": "^5.11.0",
