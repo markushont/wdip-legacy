@@ -3,6 +3,6 @@ module.exports = {
   testEnvironment: "node",
   rootDir: "./src",
   collectCoverage: true,
-  coverageDirectory: "./",
+  coverageDirectory: "../coverage",
   setupTestFrameworkScriptFile: "jest-extended"
 };
