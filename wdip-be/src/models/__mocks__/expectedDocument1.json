@@ -1,0 +1,100 @@
+{
+    "documentStatus": "APPROVED",
+    "documentSubtype": "Kommittémotion",
+    "documentType": "MOTION",
+    "fullText": null,
+    "id": "H5024010",
+    "meta": {
+        "created": "1978-01-13",
+        "updated": "1978-01-13"
+    },
+    "originalId": "H5024010",
+    "proposals": [
+        {
+            "chamberStatus": "REJECTED",
+            "committeeStatus": "REJECTED",
+            "wording": "Riksdagen avslår propositionen."
+        },
+        {
+            "chamberStatus": "REJECTED",
+            "committeeStatus": "REJECTED",
+            "wording": "Riksdagen ställer sig bakom det som anförs i motionen om att utreda en amnesti för explosiva varor i samverkan mellan Polismyndigheten och Försvarsmakten och tillkännager detta för regeringen."
+        }
+    ],
+    "published": "2018-03-22T00:00:00.000Z",
+    "stakeholders": [
+        {
+            "id": "0308306375022",
+            "name": "Roger Haddad",
+            "party": {
+                "abbreviation": "L",
+                "id": "l",
+                "name": "Liberalerna"
+            },
+            "role": "undertecknare"
+        },
+        {
+            "id": "0446541913415",
+            "name": "Allan Widman",
+            "party": {
+                "abbreviation": "L",
+                "id": "l",
+                "name": "Liberalerna"
+            },
+            "role": "undertecknare"
+        },
+        {
+            "id": "0731442709013",
+            "name": "Christer Nylander",
+            "party": {
+                "abbreviation": "L",
+                "id": "l",
+                "name": "Liberalerna"
+            },
+            "role": "undertecknare"
+        },
+        {
+            "id": "0582811195313",
+            "name": "Tina Acketoft",
+            "party": {
+                "abbreviation": "L",
+                "id": "l",
+                "name": "Liberalerna"
+            },
+            "role": "undertecknare"
+        },
+        {
+            "id": "0737073162411",
+            "name": "Emma Carlsson Löfdahl",
+            "party": {
+                "abbreviation": "L",
+                "id": "l",
+                "name": "Liberalerna"
+            },
+            "role": "undertecknare"
+        },
+        {
+            "id": "023767922422",
+            "name": "Mats Persson",
+            "party": {
+                "abbreviation": "L",
+                "id": "l",
+                "name": "Liberalerna"
+            },
+            "role": "undertecknare"
+        },
+        {
+            "id": "0414687558527",
+            "name": "Maria Weimer",
+            "party": {
+                "abbreviation": "L",
+                "id": "l",
+                "name": "Liberalerna"
+            },
+            "role": "undertecknare"
+        }
+    ],
+    "subTitle": "av Roger Haddad m.fl. (L)",
+    "summary": null,
+    "title": "med anledning av prop. 2017/18:116 En amnesti för explosiva varor"
+}

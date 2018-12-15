@@ -1,0 +1,225 @@
+{
+    "dokumentstatus": {
+        "dokument": {
+            "hangar_id": "4983776",
+            "dok_id": "H5024010",
+            "rm": "2017/18",
+            "beteckning": "4010",
+            "typ": "mot",
+            "subtyp": "Kommittémotion",
+            "doktyp": "mot",
+            "typrubrik": "Motion 2017/18:4010 av Roger Haddad m.fl. (L)",
+            "dokumentnamn": "Motion",
+            "debattnamn": "Motion",
+            "tempbeteckning": "L",
+            "organ": "FöU",
+            "mottagare": null,
+            "nummer": "4010",
+            "slutnummer": "0",
+            "datum": "2018-03-22 00:00:00",
+            "systemdatum": "2018-05-02 16:43:14",
+            "publicerad": "2018-03-22 00:00:00",
+            "titel": "med anledning av prop. 2017/18:116 En amnesti för explosiva varor",
+            "subtitel": "av Roger Haddad m.fl. (L)",
+            "status": "Klar",
+            "htmlformat": "html",
+            "relaterat_id": null,
+            "source": "Filur",
+            "sourceid": "3a1520c5-b7bd-4ab3-8094-f68e1e9247e7",
+            "dokument_url_text": "http://data.riksdagen.se/dokument/H5024010/text",
+            "dokument_url_html": "http://data.riksdagen.se/dokument/H5024010",
+            "dokumentstatus_url_xml": "http://data.riksdagen.se/dokumentstatus/H5024010"
+        },
+        "dokforslag": {
+            "forslag": [
+                {
+                    "nummer": "1",
+                    "beteckning": null,
+                    "lydelse": "Riksdagen avslår propositionen.",
+                    "lydelse2": null,
+                    "utskottet": "Avslag",
+                    "kammaren": "Avslag",
+                    "behandlas_i": "2017/18:FöU13",
+                    "behandlas_i_punkt": null,
+                    "kammarbeslutstyp": null,
+                    "intressent": "FöU",
+                    "avsnitt": null,
+                    "grundforfattning": null,
+                    "andringsforfattning": null
+                },
+                {
+                    "nummer": "2",
+                    "beteckning": null,
+                    "lydelse": "Riksdagen ställer sig bakom det som anförs i motionen om att utreda en amnesti för explosiva varor i samverkan mellan Polismyndigheten och Försvarsmakten och tillkännager detta för regeringen.",
+                    "lydelse2": null,
+                    "utskottet": "Avslag",
+                    "kammaren": "Avslag",
+                    "behandlas_i": "2017/18:FöU13",
+                    "behandlas_i_punkt": null,
+                    "kammarbeslutstyp": null,
+                    "intressent": "FöU",
+                    "avsnitt": null,
+                    "grundforfattning": null,
+                    "andringsforfattning": null
+                }
+            ]
+        },
+        "dokaktivitet": {
+            "aktivitet": [
+                {
+                    "kod": "INL",
+                    "namn": "Inlämnad",
+                    "datum": "2018-03-22 15:20:08",
+                    "status": "inträffat",
+                    "ordning": "0",
+                    "process": "behandling"
+                },
+                {
+                    "kod": "Granskad",
+                    "namn": "Granskad",
+                    "datum": "2018-03-23 13:06:23",
+                    "status": "inträffat",
+                    "ordning": "0",
+                    "process": "behandling"
+                },
+                {
+                    "kod": "B",
+                    "namn": "Bordlagd",
+                    "datum": "2018-03-26 00:00:00",
+                    "status": "inträffat",
+                    "ordning": "0",
+                    "process": "behandling"
+                },
+                {
+                    "kod": "HÄN",
+                    "namn": "Hänvisad",
+                    "datum": "2018-03-27 00:00:00",
+                    "status": "inträffat",
+                    "ordning": "0",
+                    "process": "behandling"
+                }
+            ]
+        },
+        "dokintressent": {
+            "intressent": [
+                {
+                    "intressent_id": "0308306375022",
+                    "namn": "Roger Haddad",
+                    "partibet": "L",
+                    "ordning": "1",
+                    "roll": "undertecknare"
+                },
+                {
+                    "intressent_id": "0446541913415",
+                    "namn": "Allan Widman",
+                    "partibet": "L",
+                    "ordning": "2",
+                    "roll": "undertecknare"
+                },
+                {
+                    "intressent_id": "0731442709013",
+                    "namn": "Christer Nylander",
+                    "partibet": "L",
+                    "ordning": "3",
+                    "roll": "undertecknare"
+                },
+                {
+                    "intressent_id": "0582811195313",
+                    "namn": "Tina Acketoft",
+                    "partibet": "L",
+                    "ordning": "4",
+                    "roll": "undertecknare"
+                },
+                {
+                    "intressent_id": "0737073162411",
+                    "namn": "Emma Carlsson Löfdahl",
+                    "partibet": "L",
+                    "ordning": "5",
+                    "roll": "undertecknare"
+                },
+                {
+                    "intressent_id": "023767922422",
+                    "namn": "Mats Persson",
+                    "partibet": "L",
+                    "ordning": "6",
+                    "roll": "undertecknare"
+                },
+                {
+                    "intressent_id": "0414687558527",
+                    "namn": "Maria Weimer",
+                    "partibet": "L",
+                    "ordning": "7",
+                    "roll": "undertecknare"
+                }
+            ]
+        },
+        "dokuppgift": {
+            "uppgift": [
+                {
+                    "kod": "motkat",
+                    "namn": "Motionskategori",
+                    "text": "Följdmotion",
+                    "dok_id": "H5024010",
+                    "systemdatum": "2018-05-02 16:42:11"
+                },
+                {
+                    "kod": "motgrund",
+                    "namn": "Motionsgrund",
+                    "text": "Proposition 2017/18:116",
+                    "dok_id": "H5024010",
+                    "systemdatum": "2018-05-02 16:42:11"
+                },
+                {
+                    "kod": "tilldelat",
+                    "namn": "Tilldelat",
+                    "text": "Försvarsutskottet",
+                    "dok_id": "H5024010",
+                    "systemdatum": "2018-05-02 16:42:11"
+                },
+                {
+                    "kod": "statustext",
+                    "namn": "statustext",
+                    "text": "Ärendet är avslutat",
+                    "dok_id": "H5024010",
+                    "systemdatum": "2018-05-04 12:22:09"
+                }
+            ]
+        },
+        "dokbilaga": {
+            "bilaga": [
+                {
+                    "dok_id": "H5024010",
+                    "titel": "med anledning av prop. 2017/18:116 En amnesti för explosiva varor",
+                    "subtitel": "av Roger Haddad m.fl. (L)",
+                    "filnamn": "mot_201718__4010.docx",
+                    "filstorlek": "61369",
+                    "filtyp": "docx",
+                    "fil_url": "http://data.riksdagen.se/fil/2A8C6C1E-7D60-49EE-A81E-52AFDAAB0A85"
+                },
+                {
+                    "dok_id": "H5024010",
+                    "titel": "med anledning av prop. 2017/18:116 En amnesti för explosiva varor",
+                    "subtitel": "av Roger Haddad m.fl. (L)",
+                    "filnamn": "mot_201718__4010.pdf",
+                    "filstorlek": "74334",
+                    "filtyp": "pdf",
+                    "fil_url": "http://data.riksdagen.se/fil/42D6E5B0-2686-418B-9695-A3083BF6CC65"
+                }
+            ]
+        },
+        "dokreferens": {
+            "referens": {
+                "referenstyp": "behandlas_i",
+                "uppgift": "2017/18:FöU13",
+                "ref_dok_id": "H501FöU13",
+                "ref_dok_typ": "bet",
+                "ref_dok_rm": "2017/18",
+                "ref_dok_bet": "FöU13",
+                "ref_dok_titel": "En amnesti för explosiva varor",
+                "ref_dok_subtitel": null,
+                "ref_dok_subtyp": "bet",
+                "ref_dok_dokumentnamn": "Betänkande"
+            }
+        }
+    }
+}

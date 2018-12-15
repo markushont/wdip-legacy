@@ -18,18 +18,18 @@ export interface MotionDocument extends BaseDocument {
 
 export function transformMotionDocument(source: any): MotionDocument {
     return {
-        id: source.dok_id,
-        originalId: source.dok_id,
-        title: source.titel,
-        subTitle: source.subtitel,
+        id: source.dokument.dok_id || null,
+        originalId: source.dokument.dok_id || null,
+        title: source.dokument.titel || null,
+        subTitle: source.dokument.subtitel || null,
         fullText: null,
-        summary: source.summary,
+        summary: source.dokument.summary || null,
         documentType: DocumentType.MOTION,
-        documentSubtype: source.subtyp,
+        documentSubtype: source.dokument.subtyp || null,
         stakeholders: transformStakeholders(source.dokintressent.intressent),
         proposals: transformProposals(source.dokforslag.forslag),
-        published: moment(source.publicerad),
+        published: moment.utc(source.dokument.publicerad),
         documentStatus: DocumentStatus.APPROVED,
-        meta: { created: moment(), updated: moment() }
+        meta: { created: moment.utc(), updated: moment.utc() }
     };
 }
