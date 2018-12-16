@@ -50,6 +50,21 @@ const expectedProposal2: Proposal = {
 
 describe("Propsal tests", () => {
 
+    test("No proposals", () => {
+        expect(transformProposals([])).
+            toEqual([]);
+    });
+
+    test("Null proposals", () => {
+        expect(transformProposals(null)).
+            toEqual([]);
+    });
+
+    test("Undefined proposals", () => {
+        expect(transformProposals(undefined)).
+            toEqual([]);
+    });
+
     test("Single proposal", () => {
         expect(transformProposals(sourceProposal1)).
             toEqual([expectedProposal1]);

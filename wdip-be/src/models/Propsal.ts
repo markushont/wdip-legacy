@@ -13,9 +13,12 @@ export interface Proposal {
  * @param source the source json object for propsals
  */
 export function transformProposals(source: any): Proposal[] {
+    if (!source) { return []; }
+
     if (Array.isArray(source)) {
         return source.map((proposal) => transformProposal(proposal));
     }
+
     return [transformProposal(source)];
 }
 

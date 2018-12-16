@@ -49,6 +49,11 @@ describe("Stakeholder tests", () => {
             toEqual([]);
     });
 
+    test("Single stakeholder", () => {
+        expect(transformStakeholders(sourceStakeholder1)).
+            toEqual([expectedStakeholder1]);
+    });
+
     test("List of stakeholders", () => {
         expect(transformStakeholders(sourceStakeholders)).
             toEqual([expectedStakeholder1, expectedStakeholder2]);

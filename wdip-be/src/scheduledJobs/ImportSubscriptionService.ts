@@ -23,7 +23,7 @@ export abstract class ImportSubscriptionService {
                 // Delete the message from the queue
                 importQueue.delete(message.ReceiptHandle);
             } catch (error) {
-                logger.error("There was an error processing the event message.", { error: error.message });
+                logger.error("There was an error processing the event message.", { record, error: error.message });
             }
         }
     }

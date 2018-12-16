@@ -7,6 +7,22 @@ export interface Stakeholder {
     role: string;
 }
 
+/**
+ * Transforms one or many stakeholders to the WDIP data format. If the source
+ * input is an array, each of the elemets are transformed, otherwise the
+ * source itself is transformed.
+ * @param source the source json object for stakeholders
+ */
+export function transformStakeholders(source: any): Stakeholder[] {
+    if (!source) { return []; }
+
+    if (Array.isArray(source)) {
+        return source.map((stakeholder) => transformStakeholder(stakeholder));
+    }
+
+    return [transformStakeholder(source)];
+}
+
 function transformStakeholder(source: any): Stakeholder {
     return {
         id: source.intressent_id,
@@ -14,10 +30,4 @@ function transformStakeholder(source: any): Stakeholder {
         party: partyFromAbbreviation(source.partibet),
         role: source.roll
     };
-}
-
-export function transformStakeholders(source: any[]): Stakeholder[] {
-    if (!source) { return []; }
-
-    return source.map((s) => transformStakeholder(s));
 }
