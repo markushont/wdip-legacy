@@ -21,7 +21,7 @@ export abstract class ImportSubscriptionService {
                 await this.processEventMessage(message);
 
                 // Delete the message from the queue
-                importQueue.delete(message.ReceiptHandle);
+                await importQueue.delete(message.ReceiptHandle);
             } catch (error) {
                 logger.error("There was an error processing the event message.", { record, error: error.message });
             }

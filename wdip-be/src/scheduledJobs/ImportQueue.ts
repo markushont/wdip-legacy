@@ -1,5 +1,5 @@
 import { config, SQS } from "aws-sdk";
-import { DeleteMessageRequest, SendMessageRequest } from "aws-sdk/clients/sqs";
+import { DeleteMessageRequest, GetQueueAttributesRequest, SendMessageRequest } from "aws-sdk/clients/sqs";
 import { SQS_URL } from "../config/config";
 import logger from "../logger";
 import { ImportDocument } from "./ImportDocument";
@@ -39,7 +39,21 @@ class ImportQueue {
             QueueUrl: SQS_URL
         };
         await this.queue.deleteMessage(message).promise();
+        logger.debug("Message successfully deleted from the import queue.", { receiptHandle });
     }
+
+    /**
+     * Gets status attributes, such as number of unprocessed messages, for the import queue.
+     */
+    public async getStatus() {
+        const params: GetQueueAttributesRequest = {
+            AttributeNames: ["All"],
+            QueueUrl: SQS_URL
+        };
+        const { Attributes } = await this.queue.getQueueAttributes(params).promise();
+        return Attributes;
+    }
+
 }
 
 export const importQueue = new ImportQueue();

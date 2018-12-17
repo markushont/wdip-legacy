@@ -5,6 +5,7 @@ tenant: markushont
 
 plugins:
   - serverless-offline-sqs
+  - serverless-offline-scheduler
   - serverless-offline
 
 provider:
@@ -115,6 +116,10 @@ functions:
       - sqs:
           arn: arn:aws:sqs:eu-west-1:843375259671:wdip-import
           batchSize: 1
+  queueStatus:
+    handler: scheduledJobsHandler.queueStatus
+    events:
+      - schedule: rate(1 minute)
 
 custom:
   serverless-offline-sqs:

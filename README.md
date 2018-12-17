@@ -92,7 +92,7 @@ cd wdip-be
 serverless deploy -v
 ```
 
-## Fetching data locally
+## Fetching data locally, version 1
 
 Add new data to the DB by accessing ```http://localhost:3001/fetch-motions```. This API supports two operations:
 
@@ -107,3 +107,18 @@ Example ```POST``` request:
     curl -H "Content-Type: application/json" --request POST -d '{"from":"2018-01-01","to":"2018-12-31"}' http://localhost:3001/fetch-motions
 
 Will fetch all motions within the specified date interval.
+
+## Fetching data locally, version 2
+
+The second data import functionality uses a queue (Amazon SQS) where documents that are about to be imported are put. A lambda function consumes these queue messages and populates the database accordingly. This should give us greater stability and the ability to import data for a long period. There are two main parts of the import functionality:
+
+1. A publication service searches the parliament public API and adds a queue message for each found document.
+1. A subscription service gets triggered whenever there is a new message on the queue. It fetches the full content of the document, transposes it to the WDIP data format, and saves it to the Elastic Search database.
+
+The publication service can be triggered by a REST call, supplying a date range:
+
+    curl -X POST http://localhost:3001/admin/import?fromDate=2018-01-01&toDate=2018-02-01
+
+### Import queue status
+
+There is a queue status function that gets triggered every minute. It queries the queue for status information such as number of unprocessed messages and saves it to the Elastic Search database. This allows us to monitor the import progress and chart it using Kibana.
