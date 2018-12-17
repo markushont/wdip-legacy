@@ -1,0 +1,115 @@
+{
+    "dokumentstatus": {
+        "dokument": {},
+        "dokforslag": {
+            "forslag": []
+        },
+        "dokaktivitet": {
+            "aktivitet": [
+                {
+                    "kod": "INL",
+                    "namn": "Inlämnad",
+                    "datum": "2018-03-22 15:20:08",
+                    "status": "inträffat",
+                    "ordning": "0",
+                    "process": "behandling"
+                },
+                {
+                    "kod": "Granskad",
+                    "namn": "Granskad",
+                    "datum": "2018-03-23 13:06:23",
+                    "status": "inträffat",
+                    "ordning": "0",
+                    "process": "behandling"
+                },
+                {
+                    "kod": "B",
+                    "namn": "Bordlagd",
+                    "datum": "2018-03-26 00:00:00",
+                    "status": "inträffat",
+                    "ordning": "0",
+                    "process": "behandling"
+                },
+                {
+                    "kod": "HÄN",
+                    "namn": "Hänvisad",
+                    "datum": "2018-03-27 00:00:00",
+                    "status": "inträffat",
+                    "ordning": "0",
+                    "process": "behandling"
+                }
+            ]
+        },
+        "dokintressent": {
+            "intressent": []
+        },
+        "dokuppgift": {
+            "uppgift": [
+                {
+                    "kod": "motkat",
+                    "namn": "Motionskategori",
+                    "text": "Följdmotion",
+                    "dok_id": "H5024010",
+                    "systemdatum": "2018-05-02 16:42:11"
+                },
+                {
+                    "kod": "motgrund",
+                    "namn": "Motionsgrund",
+                    "text": "Proposition 2017/18:116",
+                    "dok_id": "H5024010",
+                    "systemdatum": "2018-05-02 16:42:11"
+                },
+                {
+                    "kod": "tilldelat",
+                    "namn": "Tilldelat",
+                    "text": "Försvarsutskottet",
+                    "dok_id": "H5024010",
+                    "systemdatum": "2018-05-02 16:42:11"
+                },
+                {
+                    "kod": "statustext",
+                    "namn": "statustext",
+                    "text": "Ärendet är avslutat",
+                    "dok_id": "H5024010",
+                    "systemdatum": "2018-05-04 12:22:09"
+                }
+            ]
+        },
+        "dokbilaga": {
+            "bilaga": [
+                {
+                    "dok_id": "H5024010",
+                    "titel": "med anledning av prop. 2017/18:116 En amnesti för explosiva varor",
+                    "subtitel": "av Roger Haddad m.fl. (L)",
+                    "filnamn": "mot_201718__4010.docx",
+                    "filstorlek": "61369",
+                    "filtyp": "docx",
+                    "fil_url": "http://data.riksdagen.se/fil/2A8C6C1E-7D60-49EE-A81E-52AFDAAB0A85"
+                },
+                {
+                    "dok_id": "H5024010",
+                    "titel": "med anledning av prop. 2017/18:116 En amnesti för explosiva varor",
+                    "subtitel": "av Roger Haddad m.fl. (L)",
+                    "filnamn": "mot_201718__4010.pdf",
+                    "filstorlek": "74334",
+                    "filtyp": "pdf",
+                    "fil_url": "http://data.riksdagen.se/fil/42D6E5B0-2686-418B-9695-A3083BF6CC65"
+                }
+            ]
+        },
+        "dokreferens": {
+            "referens": {
+                "referenstyp": "behandlas_i",
+                "uppgift": "2017/18:FöU13",
+                "ref_dok_id": "H501FöU13",
+                "ref_dok_typ": "bet",
+                "ref_dok_rm": "2017/18",
+                "ref_dok_bet": "FöU13",
+                "ref_dok_titel": "En amnesti för explosiva varor",
+                "ref_dok_subtitel": null,
+                "ref_dok_subtyp": "bet",
+                "ref_dok_dokumentnamn": "Betänkande"
+            }
+        }
+    }
+}

@@ -21,11 +21,22 @@ services:
       - 5601:5601
     environment: 
       ELASTICSEARCH_URL: "http://elasticsearch:9200"
+  sqs:
+    image: roribio16/alpine-sqs:latest
+    container_name: wdip-sqs
+    volumes:
+      - ./config/sqs/elasticmq.conf:/opt/config/elasticmq.conf
+    ports:
+      - 9324:9324
+      - 9325:9325
+    stdin_open: true
+    tty: true
   wdip-be:
     image: amaysim/serverless:1.30.3
     container_name: wdip-be
     depends_on:
       - elasticsearch
+      - sqs
     ports: 
       - 3001:3001
       - 9229:9229
@@ -33,6 +44,7 @@ services:
     #   - SLS_DEBUG=* # Enable for verbose logging from serverless
     volumes: 
       - ./wdip-be:/app
+      - ./config/.aws:/root/.aws
     working_dir: /app
     command: npm run debug
   wdip-fe:
