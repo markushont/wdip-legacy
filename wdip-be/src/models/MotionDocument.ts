@@ -2,11 +2,9 @@ import moment from "moment";
 import { BaseDocument } from "./BaseDocument";
 import { DocumentStatus } from "./DocumentStatus";
 import { DocumentType } from "./DocumentType";
-import { Proposal, transformProposals, determineProposalStatus } from "./Propsal";
-import { Stakeholder, transformStakeholders } from "./Stakeholder";
 import { ProposalStatus } from "./ProposalStatus";
-import { loggers } from "winston";
-import logger = require("../logger");
+import { determineProposalStatus, Proposal, transformProposals } from "./Propsal";
+import { Stakeholder, transformStakeholders } from "./Stakeholder";
 
 export interface MotionDocument extends BaseDocument {
     title: string;
