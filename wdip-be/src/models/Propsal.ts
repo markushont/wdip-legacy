@@ -29,3 +29,18 @@ function transformProposal(source: any) {
         chamberStatus: transformProposalStatus(source.kammaren)
     };
 }
+
+/**
+ * Given a proposal, determines it's status. The chamberStatus and committeeStatus are interpreted so that
+ * chamberStatus takes precidence.
+ * @param proposal the proposal to determine status for
+ */
+export function determineProposalStatus(proposal: Proposal): ProposalStatus {
+    // If chamberstatus is set, use that as the proposal status, otherwise use the committee status.
+    if (proposal.chamberStatus && proposal.chamberStatus !== ProposalStatus.UNKNOWN) {
+        return proposal.chamberStatus;
+    } else if (proposal.committeeStatus) {
+        return proposal.committeeStatus;
+    }
+    return ProposalStatus.UNKNOWN;
+}

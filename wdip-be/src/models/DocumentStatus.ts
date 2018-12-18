@@ -1,4 +1,6 @@
 export enum DocumentStatus {
     APPROVED = "APPROVED",
-    REJECTED = "REJECTED"
+    APPROVED_PARTIALLY = "APPROVED_PARTIALLY",
+    REJECTED = "REJECTED",
+    PENDING = "PENDING"
 }

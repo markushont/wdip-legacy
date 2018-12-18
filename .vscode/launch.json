@@ -10,7 +10,9 @@
             "request": "launch",
             "program": "${workspaceFolder}/wdip-be/node_modules/jest/bin/jest",
             "args": [
-                "--runInBand"
+                "--runInBand",
+                "--coverage",
+                "false"
             ],
             "cwd": "${workspaceFolder}/wdip-be",
             "console": "integratedTerminal",

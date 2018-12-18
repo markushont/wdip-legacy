@@ -1,6 +1,6 @@
 import "jest-extended";
 import { ProposalStatus } from "../ProposalStatus";
-import { Proposal, transformProposals } from "../Propsal";
+import { determineProposalStatus, Proposal, transformProposals } from "../Propsal";
 
 const sourceProposal1 = {
     nummer: "1",
@@ -73,6 +73,26 @@ describe("Propsal tests", () => {
     test("Multiple proposals", () => {
         expect(transformProposals(sourceProposals)).
             toEqual([expectedProposal1, expectedProposal2]);
+    });
+
+});
+
+describe("Determine proposal status", () => {
+
+    test.each([
+        [ProposalStatus.APPROVED, ProposalStatus.APPROVED, ProposalStatus.APPROVED],
+        [ProposalStatus.APPROVED, ProposalStatus.REJECTED, ProposalStatus.REJECTED],
+        [ProposalStatus.APPROVED, ProposalStatus.UNKNOWN, ProposalStatus.APPROVED],
+        [ProposalStatus.REJECTED, ProposalStatus.APPROVED, ProposalStatus.APPROVED],
+        [ProposalStatus.REJECTED, ProposalStatus.REJECTED, ProposalStatus.REJECTED],
+        [ProposalStatus.REJECTED, ProposalStatus.UNKNOWN, ProposalStatus.REJECTED],
+        [ProposalStatus.UNKNOWN, ProposalStatus.APPROVED, ProposalStatus.APPROVED],
+        [ProposalStatus.UNKNOWN, ProposalStatus.REJECTED, ProposalStatus.REJECTED],
+        [null, ProposalStatus.APPROVED, ProposalStatus.APPROVED],
+        [ProposalStatus.APPROVED, null, ProposalStatus.APPROVED],
+        [null, null, ProposalStatus.UNKNOWN]
+    ])("Proposal status [committee %s, chamber %s]", (committeeStatus, chamberStatus, expectedProposalStatus) => {
+        expect(determineProposalStatus({ committeeStatus, chamberStatus, wording: null })).toBe(expectedProposalStatus);
     });
 
 });
