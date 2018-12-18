@@ -1,5 +1,3 @@
-import logger = require("../logger");
-
 export enum ProposalStatus {
     APPROVED = "APPROVED",
     REJECTED = "REJECTED",
@@ -15,6 +13,5 @@ export function transformProposalStatus(source: any): ProposalStatus {
             return ProposalStatus.REJECTED;
         }
     }
-    logger.warn("Could not transform proposal.", { source });
     return ProposalStatus.UNKNOWN;
 }
