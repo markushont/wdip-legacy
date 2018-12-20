@@ -1,11 +1,11 @@
-import { WDIP_MOTION_INDEX } from "../config/config";
+import config from "../config/config";
 import dbClient from "../dbclient";
 import logger from "../logger";
 
 export default async function getWordCloud(fromDateStr, toDateStr) {
 
   const params = {
-    index: WDIP_MOTION_INDEX,
+    index: config.WDIP_MOTION_INDEX,
     body: {
       query: {
         range: {
