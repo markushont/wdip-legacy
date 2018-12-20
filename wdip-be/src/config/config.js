@@ -1,14 +1,4 @@
-// import loadJsonFile from "load-json-file";
-
-// const config = loadJsonFile.sync("./environment.json");
-
-// Object.keys(config).forEach(key => {
-//     config[key] = process.env[key] || config[key];
-// });
-
-// module.exports = config;
-
-module.exports = {
+const defaultConfig = {
     "ES_SERVER": "elasticsearch:9200",
     "ES_USERNAME": null,
     "ES_PASSWORD": null,
@@ -22,3 +12,10 @@ module.exports = {
     "FETCH_PROPOSITIONS": false,
     "SQS_URL": "http://sqs:9324/queue/wdip-import"
 };
+
+const config = {};
+for (const key of Object.keys(defaultConfig)) {
+    config[key] = process.env[key] || defaultConfig[key];
+}
+
+export default config;

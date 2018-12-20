@@ -25,6 +25,7 @@ class ImportPublicationServiceParliament {
      * Starts the import job.
      */
     public async start(from: Moment, to: Moment) {
+        logger.debug(`TESTING: ${process.env.TEST}`);
         // Nothing to do if the job is already running.
         if (this.isRunning) { return; }
 

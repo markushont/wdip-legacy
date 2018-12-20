@@ -35,12 +35,7 @@ provider:
         - dynamodb:DeleteItem
       Resource: "arn:aws:dynamodb:eu-west-1:512130172746:table/motions"
 
-  environment:
-    MOTION_REQUEST_LOG_TABLE: "motion-request-log"
-    MOTION_TABLE: "motions"
-    PENDING_INDEX: "pending-motions-index" # global secondary index for pending documents
-    DATE_ZERO: "2000-01-01"
-    DB_ITEM_MAX_SIZE: 300000 # Dynamodb max item size 400 kB
+  environment: ${file(./environment.yml)}
 
 functions:
   fetchMotions:
