@@ -15,51 +15,9 @@ provider:
   profile: wdip-test
   stage: dev
   region: eu-west-1
-  iamRoleStatements:
-    - Effect: "Allow"
-      Action:
-        - dynamodb:Query
-        - dynamodb:Scan
-        - dynamodb:GetItem
-        - dynamodb:PutItem
-        - dynamodb:UpdateItem
-        - dynamodb:DeleteItem
-      Resource: "arn:aws:dynamodb:eu-west-1:512130172746:table/motion-request-log"
-    - Effect: "Allow"
-      Action:
-        - dynamodb:Query
-        - dynamodb:Scan
-        - dynamodb:GetItem
-        - dynamodb:PutItem
-        - dynamodb:UpdateItem
-        - dynamodb:DeleteItem
-      Resource: "arn:aws:dynamodb:eu-west-1:512130172746:table/motions"
-
   environment: ${file(./environment.yml)}
 
 functions:
-  fetchMotions:
-    handler: scheduledJobsHandler.fetchMotions
-    events:
-      # Every Sunday at 00:00, see https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/ScheduledEvents.html#CronExpressions
-      - schedule:
-          rate: cron(0 0 ? * SUN *)
-          enabled: false
-      - http:
-          path: fetch-motions
-          method: get
-      - http:
-          path: fetch-motions
-          method: post
-  refreshPendingMotions:
-    handler: scheduledJobsHandler.refreshPendingMotions
-    events:
-      # Every day at 02:00
-      - schedule:
-          rate: cron(0 2 * * ? *)
-      - http:
-          path: refresh-pending-motions
-          method: get
   getPendingMotions:
     handler: apiHandler.getPendingMotions
     events:
