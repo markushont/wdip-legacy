@@ -64,14 +64,18 @@ functions:
               querystrings:
                 fromDate: false
                 toDate: false
-  adminSqsEvent:
-    handler: eventHandler.importQueueEvent
+  adminStartUpdateImport:
+    handler: scheduledJobsHandler.startUpdateImport
+    events:
+      - schedule: rate(1 minute)
+  adminHandleImportQueueEvent:
+    handler: eventHandler.handleImportQueueEvent
     events:
       - sqs:
           arn: arn:aws:sqs:eu-west-1:843375259671:wdip-import
           batchSize: 1
-  queueStatus:
-    handler: scheduledJobsHandler.queueStatus
+  adminLogQueueStatus:
+    handler: scheduledJobsHandler.logQueueStatus
     events:
       - schedule: rate(1 minute)
 

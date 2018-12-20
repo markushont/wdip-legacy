@@ -18,10 +18,13 @@ export interface MotionDocument extends BaseDocument {
 }
 
 export function transformMotionDocument(source: any): MotionDocument {
+    if (!source.dokument.dok_id) {
+        throw new Error("The source document must have a defined document ID.");
+    }
     const proposals = transformProposals(source.dokforslag.forslag);
     return {
-        id: source.dokument.dok_id || null,
-        originalId: source.dokument.dok_id || null,
+        id: `${DocumentType.MOTION}:${source.dokument.dok_id}`,
+        originalId: source.dokument.dok_id,
         title: source.dokument.titel || null,
         subTitle: source.dokument.subtitel || null,
         fullText: null,

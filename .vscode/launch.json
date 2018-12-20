@@ -45,19 +45,6 @@
             ]
         },
         {
-            "type": "node",
-            "request": "launch",
-            "name": "Debug fetch-motions",
-            "program": "${workspaceRoot}/fetch-motions/node_modules/.bin/sls",
-            "localRoot": "${workspaceRoot}/fetch-motions",
-            "args": [
-                "invoke",
-                "local",
-                "-f",
-                "fetchMotions"
-            ]
-        },
-        {
             "name": "Debug WDIP-FE",
             "type": "chrome",
             "request": "launch",
