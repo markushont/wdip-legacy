@@ -1,6 +1,6 @@
-import { config, SQS } from "aws-sdk";
+import { config as awsConfig, SQS } from "aws-sdk";
 import { DeleteMessageRequest, GetQueueAttributesRequest, SendMessageRequest } from "aws-sdk/clients/sqs";
-import { SQS_URL } from "../config/config";
+import config from "../config/config";
 import logger from "../logger";
 import { ImportDocument } from "./ImportDocument";
 
@@ -9,7 +9,7 @@ class ImportQueue {
     private queue = new SQS({ apiVersion: "2012-11-05", region: "eu-west-1" });
 
     constructor() {
-        config.update({
+        awsConfig.update({
             region: "eu-west-1"
         });
     }
@@ -22,7 +22,7 @@ class ImportQueue {
     public async add(doc: ImportDocument) {
         const message: SendMessageRequest = {
             MessageBody: doc.serialize(),
-            QueueUrl: SQS_URL
+            QueueUrl: config.SQS_URL
         };
 
         const data = await this.queue.sendMessage(message).promise();
@@ -36,7 +36,7 @@ class ImportQueue {
     public async delete(receiptHandle: string) {
         const message: DeleteMessageRequest = {
             ReceiptHandle: receiptHandle,
-            QueueUrl: SQS_URL
+            QueueUrl: config.SQS_URL
         };
         await this.queue.deleteMessage(message).promise();
         logger.debug("Message successfully deleted from the import queue.", { receiptHandle });
@@ -48,7 +48,7 @@ class ImportQueue {
     public async getStatus() {
         const params: GetQueueAttributesRequest = {
             AttributeNames: ["All"],
-            QueueUrl: SQS_URL
+            QueueUrl: config.SQS_URL
         };
         const { Attributes } = await this.queue.getQueueAttributes(params).promise();
         return Attributes;

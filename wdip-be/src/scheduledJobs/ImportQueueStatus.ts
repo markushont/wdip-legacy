@@ -1,4 +1,4 @@
-import { QUEUE_STATUS_INDEX } from "../config/config";
+import config from "../config/config";
 import dbClient from "../dbclient";
 import logger from "../logger";
 import { transformFromSqs } from "../models/QueueStatus";
@@ -10,7 +10,7 @@ class ImportQueueStatus {
         try {
             const attributes = await importQueue.getStatus();
             await dbClient.index({
-                index: QUEUE_STATUS_INDEX,
+                index: config.QUEUE_STATUS_INDEX,
                 type: "sqs-status",
                 body: transformFromSqs(attributes)
             });

@@ -15,8 +15,7 @@ provider:
   profile: wdip-test
   stage: dev
   region: eu-west-1
-  environment:
-    MOTION_TABLE: "motions"
+  environment: ${file(./environment.yml)}
 
 functions:
   getPendingMotions:

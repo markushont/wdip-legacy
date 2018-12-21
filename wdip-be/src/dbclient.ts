@@ -1,8 +1,8 @@
 import { Client } from "elasticsearch";
-import { ES_SERVER } from "./config/config";
+import config from "./config/config";
 
 export const dbClient = new Client({
-    host: ES_SERVER,
+    host: config.ES_SERVER,
     log: "info"
 });
 
