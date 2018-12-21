@@ -1,9 +1,4 @@
-import axios from "axios";
-import { Moment } from "moment";
-import { stringify } from "query-string";
-import logger from "../logger";
-import { ImportDocument, ImportDocumentType } from "./ImportDocument";
-import { importQueue } from "./ImportQueue";
+import moment from "moment";
 
 /**
  * Handles the job for importing documents from the parliament to the WDIP database by
@@ -37,12 +32,14 @@ export abstract class ImportPublicationService {
     /**
      * Gets the status for the current or last run of the import job.
      */
-    public status() {
+    public getStatus() {
         return {
             isRunning: this.isRunning,
             isStopRequested: this.isStopRequested,
             numberOfSuccesses: this.numberOfSuccesses,
-            numberOfErrors: this.numberOfErrors
+            numberOfErrors: this.numberOfErrors,
+            jobName: this.constructor.name,
+            timestamp: moment.utc()
         };
     }
 

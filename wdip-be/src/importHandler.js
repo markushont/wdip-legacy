@@ -28,6 +28,11 @@ module.exports.handleImportQueueEvent = async (event, context) => {
   importSubscriptionServiceParliament.processEvent(event);
 };
 
+module.exports.logImportPublicationStatus = (event, context) => {
+  ipsParliamentDateRange.logStatus();
+  ipsParliamentUpdate.logStatus();
+};
+
 module.exports.logQueueStatus = (event, context) => {
   importQueueStatus.logStatus();
 };

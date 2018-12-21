@@ -1,4 +1,3 @@
 WDIP_MOTION_INDEX: "motions"
-QUEUE_STATUS_INDEX: "sqs-status"
 FETCH_MOTONS: true
 FETCH_PROPOSITIONS: true

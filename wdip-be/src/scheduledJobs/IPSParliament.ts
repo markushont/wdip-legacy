@@ -1,4 +1,6 @@
 import axios from "axios";
+import config from "../config/config";
+import dbClient from "../dbclient";
 import logger from "../logger";
 import { ImportDocument, ImportDocumentType } from "./ImportDocument";
 import { ImportPublicationService } from "./ImportPublicationService";
@@ -11,6 +13,23 @@ import { importQueue } from "./ImportQueue";
  * import by having multiple workers picking up the events.
  */
 export abstract class IPSParliament extends ImportPublicationService {
+
+    /**
+     * Logs the current status of the import job to the database for monitoring.
+     */
+    public async logStatus() {
+        try {
+            const status = this.getStatus();
+            await dbClient.index({
+                index: config.STATUS_INDEX_IPS,
+                type: config.STATUS_INDEX_IPS,
+                body: status
+            });
+            logger.debug("Import publication service status successfully logged.");
+        } catch (error) {
+            logger.error("There was an error logging the import publication service status.", { error });
+        }
+    }
 
     /**
      * Fetches data from the given search url and adds the result to the processing queue. The search
@@ -28,7 +47,10 @@ export abstract class IPSParliament extends ImportPublicationService {
 
         // End import if the url is not set.
         if (!url) {
-            logger.info("Import job finished.", { numberOfDocuments: this.numberOfSuccesses });
+            logger.info("Import publication job finished.", {
+                numberOfSuccesses: this.numberOfSuccesses,
+                numberOfErrors: this.numberOfErrors
+            });
             this.isRunning = false;
             this.isStopRequested = false;
             return;
@@ -40,7 +62,6 @@ export abstract class IPSParliament extends ImportPublicationService {
             logger.debug("Fetching data.", { url });
             const response = await axios.get(url);
 
-            logger.debug("Processing recieved documents.");
             this.processDocuments(response.data.dokumentlista.dokument);
 
             // Recursively fetch the next page of documents. Note that the last page does not

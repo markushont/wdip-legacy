@@ -4,7 +4,7 @@ const BASE_10 = 10;
 
 export interface QueueStatus {
     queueName: string;
-    created: Moment;
+    timestamp: Moment;
     delaySeconds: number;
     receiveMessageWaitTimeSeconds: number;
     approximateNumberOfMessages: number;
@@ -15,7 +15,7 @@ export interface QueueStatus {
 
 export function transformFromSqs(sqsAttributes: SQS.QueueAttributeMap) {
     return {
-        created: moment.utc(),
+        timestamp: moment.utc(),
         delaySeconds: parseInt(sqsAttributes.DelaySeconds, BASE_10),
         receiveMessageWaitTimeSeconds: parseInt(sqsAttributes.ReceiveMessageWaitTimeSeconds, BASE_10),
         approximateNumberOfMessages: parseInt(sqsAttributes.ApproximateNumberOfMessages, BASE_10),

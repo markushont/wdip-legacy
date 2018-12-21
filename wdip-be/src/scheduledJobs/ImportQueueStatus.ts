@@ -10,8 +10,8 @@ class ImportQueueStatus {
         try {
             const attributes = await importQueue.getStatus();
             await dbClient.index({
-                index: config.QUEUE_STATUS_INDEX,
-                type: "sqs-status",
+                index: config.STATUS_INDEX_SQS,
+                type: config.STATUS_INDEX_SQS,
                 body: transformFromSqs(attributes)
             });
             logger.debug("Import queue status successfully logged.");
