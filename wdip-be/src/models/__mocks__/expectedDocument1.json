@@ -1,9 +1,9 @@
 {
-    "documentStatus": "APPROVED",
+    "documentStatus": "REJECTED",
     "documentSubtype": "Kommittémotion",
     "documentType": "MOTION",
     "fullText": null,
-    "id": "H5024010",
+    "id": "MOTION:H5024010",
     "meta": {
         "created": "1978-01-13",
         "updated": "1978-01-13"

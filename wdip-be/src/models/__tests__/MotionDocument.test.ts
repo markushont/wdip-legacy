@@ -21,7 +21,7 @@ delete expectedDocument2.published;
 
 describe("MotionDocument tests", () => {
 
-    xtest("Correctly transformed document", () => {
+    test("Correctly transformed document", () => {
         const doc = transformMotionDocument(sourceDocument1.dokumentstatus);
         expect(doc).toMatchObject(expectedDocument1);
         expect(isMoment(doc.published)).toBeTrue();
@@ -29,12 +29,17 @@ describe("MotionDocument tests", () => {
         expect(isMoment(doc.meta.updated)).toBeTrue();
     });
 
-    xtest("Correctly incomplete document", () => {
+    test("Incomplete document", () => {
         const doc = transformMotionDocument(sourceDocument2.dokumentstatus);
         expect(doc).toMatchObject(expectedDocument2);
         expect(isMoment(doc.published)).toBeTrue();
         expect(isMoment(doc.meta.created)).toBeTrue();
         expect(isMoment(doc.meta.updated)).toBeTrue();
+    });
+
+    test("Document source id is required", () => {
+        const sourceDoc = { dokument: {} };
+        expect(() => transformMotionDocument(sourceDoc)).toThrowError();
     });
 
 });
@@ -106,6 +111,15 @@ describe("Document status tests", () => {
     test("Multiple propsosals, pending", () => {
         const proposals: Proposal[] = [propApproved1, propRejected1, propUnknown];
         expect(determineDocumentStatus(proposals)).toBe(DocumentStatus.PENDING);
+    });
+
+    test("No propsosals", () => {
+        const proposals: Proposal[] = [];
+        expect(determineDocumentStatus(proposals)).toBe(DocumentStatus.PENDING);
+    });
+
+    test("Null propsosals", () => {
+        expect(determineDocumentStatus(null)).toBe(DocumentStatus.PENDING);
     });
 
 });

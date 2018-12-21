@@ -1,6 +1,8 @@
 {
     "dokumentstatus": {
-        "dokument": {},
+        "dokument": {
+            "dok_id": "H5024010"
+        },
         "dokforslag": {
             "forslag": []
         },

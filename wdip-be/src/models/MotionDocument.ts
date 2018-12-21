@@ -21,7 +21,13 @@ export function transformMotionDocument(source: any): MotionDocument {
     if (!source.dokument.dok_id) {
         throw new Error("The source document must have a defined document ID.");
     }
-    const proposals = transformProposals(source.dokforslag.forslag);
+
+    // Transfor the proposals (if any exists)
+    let proposals = [];
+    if (source.dokforslag) {
+        proposals = transformProposals(source.dokforslag.forslag);
+    }
+
     return {
         id: `${DocumentType.MOTION}:${source.dokument.dok_id}`,
         originalId: source.dokument.dok_id,
@@ -48,6 +54,8 @@ export function transformMotionDocument(source: any): MotionDocument {
  * @param proposals the list of proposals
  */
 export function determineDocumentStatus(proposals: Proposal[]): DocumentStatus {
+    if (!proposals || proposals.length === 0) { return DocumentStatus.PENDING; }
+
     // Count the different statuses for the proposals.
     const statuses = proposals.
         map(

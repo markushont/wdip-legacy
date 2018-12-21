@@ -12,8 +12,16 @@ module.exports.adminStartImport = async (event, context) => {
 };
 
 module.exports.startUpdateImport = async (event, context) => {
-  const fromDate = moment().subtract(1, "day");
+  // Default update to start from one day ago.
+  let fromDate = moment().subtract(1, "day");
+
+  // If this is a POST request with a fromDate input parameter, use it instead.
+  if (event && event.queryStringParameters && event.queryStringParameters.fromDate) {
+    fromDate = moment(event.queryStringParameters.fromDate);
+  }
+
   ipsParliamentUpdate.start(fromDate);
+  return responses.success({}, 202);
 };
 
 module.exports.handleImportQueueEvent = async (event, context) => {

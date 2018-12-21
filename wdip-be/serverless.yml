@@ -67,6 +67,13 @@ functions:
     handler: importHandler.startUpdateImport
     events:
       - schedule: rate(1 day)
+      - http:
+          path: admin/import/update
+          method: post
+          requests:
+            parameters:
+              querystrings:
+                fromDate: false
   adminHandleImportQueueEvent:
     handler: importHandler.handleImportQueueEvent
     events:
