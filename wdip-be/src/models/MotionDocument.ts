@@ -22,10 +22,16 @@ export function transformMotionDocument(source: any): MotionDocument {
         throw new Error("The source document must have a defined document ID.");
     }
 
-    // Transfor the proposals (if any exists)
+    // Transform the proposals (if any exists)
     let proposals = [];
     if (source.dokforslag) {
         proposals = transformProposals(source.dokforslag.forslag);
+    }
+
+    // Transform the stakeholders (if any exists)
+    let stakeholders = [];
+    if (source.dokintressent) {
+        stakeholders = transformStakeholders(source.dokintressent.intressent);
     }
 
     return {
@@ -37,7 +43,7 @@ export function transformMotionDocument(source: any): MotionDocument {
         summary: source.dokument.summary || null,
         documentType: DocumentType.MOTION,
         documentSubtype: source.dokument.subtyp || null,
-        stakeholders: transformStakeholders(source.dokintressent.intressent),
+        stakeholders,
         proposals,
         published: moment.utc(source.dokument.publicerad),
         documentStatus: determineDocumentStatus(proposals),
