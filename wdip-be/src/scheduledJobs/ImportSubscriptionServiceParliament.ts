@@ -1,4 +1,4 @@
-import { Message, MessageList, ReceiveMessageResult } from "aws-sdk/clients/sqs";
+import { Message } from "aws-sdk/clients/sqs";
 import axios from "axios";
 import config from "../config/config";
 import dbClient from "../dbclient";
@@ -21,7 +21,7 @@ class ImportSubscriptionServiceParliament extends ImportSubscriptionService {
         motion.fullText = sourceFullText;
 
         // 3. Store the document in ES
-        dbClient.index({ index: config.WDIP_MOTION_INDEX, type: motion.documentType, body: motion });
+        dbClient.index({ index: config.WDIP_MOTION_INDEX, id: motion.id, type: motion.documentType, body: motion });
     }
 
     private async fetchDocumentStatus(importDocument: ImportDocument): Promise<any> {

@@ -18,17 +18,32 @@ export interface MotionDocument extends BaseDocument {
 }
 
 export function transformMotionDocument(source: any): MotionDocument {
-    const proposals = transformProposals(source.dokforslag.forslag);
+    if (!source.dokument.dok_id) {
+        throw new Error("The source document must have a defined document ID.");
+    }
+
+    // Transform the proposals (if any exists)
+    let proposals = [];
+    if (source.dokforslag) {
+        proposals = transformProposals(source.dokforslag.forslag);
+    }
+
+    // Transform the stakeholders (if any exists)
+    let stakeholders = [];
+    if (source.dokintressent) {
+        stakeholders = transformStakeholders(source.dokintressent.intressent);
+    }
+
     return {
-        id: source.dokument.dok_id || null,
-        originalId: source.dokument.dok_id || null,
+        id: `${DocumentType.MOTION}:${source.dokument.dok_id}`,
+        originalId: source.dokument.dok_id,
         title: source.dokument.titel || null,
         subTitle: source.dokument.subtitel || null,
         fullText: null,
         summary: source.dokument.summary || null,
         documentType: DocumentType.MOTION,
         documentSubtype: source.dokument.subtyp || null,
-        stakeholders: transformStakeholders(source.dokintressent.intressent),
+        stakeholders,
         proposals,
         published: moment.utc(source.dokument.publicerad),
         documentStatus: determineDocumentStatus(proposals),
@@ -45,6 +60,8 @@ export function transformMotionDocument(source: any): MotionDocument {
  * @param proposals the list of proposals
  */
 export function determineDocumentStatus(proposals: Proposal[]): DocumentStatus {
+    if (!proposals || proposals.length === 0) { return DocumentStatus.PENDING; }
+
     // Count the different statuses for the proposals.
     const statuses = proposals.
         map(

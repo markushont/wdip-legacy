@@ -5,7 +5,8 @@ const defaultConfig = {
     "WDIP_MOTION_INDEX": "motions",
     "WDIP_MOTION_REQUEST_LOG_INDEX": "motion-request-log",
     "WDIP_DEFAULT_PARTIES": ["s", "m", "l", "kd", "v", "sd", "c", "mp"],
-    "QUEUE_STATUS_INDEX": "sqs-status",
+    "STATUS_INDEX_SQS": "status-sqs",
+    "STATUS_INDEX_IPS": "status-ips",
     "FETCH_MOTIONS": true,
     "FETCH_PROPOSITIONS": false,
     "SQS_URL": "http://sqs:9324/queue/wdip-import"

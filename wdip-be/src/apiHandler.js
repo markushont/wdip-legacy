@@ -3,10 +3,6 @@
 const getMotionsByParty = require("./api/getMotionsByParty");
 const motions = require("./api/motions");
 import getWordCloud from "./api/getWordCloud";
-import { importPublicationServiceParliament } from "./scheduledJobs/ImportPublicationServiceParliament";
-import { importSubscriptionServiceParliament } from "./scheduledJobs/ImportSubscriptionServiceParliament";
-const moment = require("moment");
-const logger = require("./logger");
 const getAllParties = require("./api/getAllParties");
 
 /**
@@ -66,11 +62,4 @@ module.exports.getWordCloud = async (event, context) => {
 module.exports.getAllParties = async (event, context) => {
     let result = await getAllParties();
     return responses.success(result);
-};
-
-module.exports.adminStartImport = async (event, context) => {
-    const fromDate = moment(event.queryStringParameters.fromDate);
-    const toDate = moment(event.queryStringParameters.toDate);
-    importPublicationServiceParliament.start(fromDate, toDate);
-    return responses.success({}, 202);
 };
