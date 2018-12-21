@@ -1,16 +1,18 @@
 "use strict";
 
-const dbClient = require("../dbclient");
-const { WDIP_MOTION_INDEX } = require("../config/config");
-const logger = require("../logger");
+import config from "../config/config";
+import dbClient from "../dbclient";
+import logger from "../logger";
+import { DocumentStatus } from "../models/DocumentStatus";
+import { DocumentType } from "../models/DocumentType";
 
-async function getMotionById(id) {
+async function getMotionById(id: string) {
     logger.debug(`Will query for motion ${id}.`);
 
     const params = {
-        index: WDIP_MOTION_INDEX,
-        type: "docs",
-        id: id
+        index: config.WDIP_MOTION_INDEX,
+        type: DocumentType.MOTION,
+        id
     };
 
     try {
@@ -18,7 +20,7 @@ async function getMotionById(id) {
         logger.debug("Got document.", doc);
         return doc;
     } catch (error) {
-        logger.error(`Failed to query table ${WDIP_MOTION_INDEX}.`, error);
+        logger.error(`Failed to query table ${config.WDIP_MOTION_INDEX}.`, error);
         return null;
     }
 }
@@ -27,13 +29,13 @@ async function getPendingMotions() {
     logger.debug("Getting pending motions from index.");
 
     const params = {
-        index: WDIP_MOTION_INDEX,
-        q: "isPending:true"
+        index: config.WDIP_MOTION_INDEX,
+        q: `documentStatus:${DocumentStatus.PENDING}`
     };
 
     try {
-        const response = await client.search(params);
-        let pendingIds = response.map(({ _id }) => _id);
+        const response = await dbClient.search(params);
+        const pendingIds = response.hits.hits.map(({ _id }) => _id);
         logger.debug("Pending motions: ", pendingIds);
         return pendingIds;
     } catch (error) {
