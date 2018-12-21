@@ -54,7 +54,7 @@ functions:
           path: partydata/allparties
           method: get
   adminStartImport:
-    handler: apiHandler.adminStartImport
+    handler: importHandler.adminStartImport
     events:
       - http:
           path: admin/import
@@ -65,17 +65,17 @@ functions:
                 fromDate: false
                 toDate: false
   adminStartUpdateImport:
-    handler: scheduledJobsHandler.startUpdateImport
+    handler: importHandler.startUpdateImport
     events:
-      - schedule: rate(1 minute)
+      - schedule: rate(1 day)
   adminHandleImportQueueEvent:
-    handler: eventHandler.handleImportQueueEvent
+    handler: importHandler.handleImportQueueEvent
     events:
       - sqs:
           arn: arn:aws:sqs:eu-west-1:843375259671:wdip-import
           batchSize: 1
   adminLogQueueStatus:
-    handler: scheduledJobsHandler.logQueueStatus
+    handler: importHandler.logQueueStatus
     events:
       - schedule: rate(1 minute)
 
