@@ -1,0 +1,55 @@
+{
+    "documentReferences": [
+        {
+            "type": "REPORT",
+            "id": "H401NU25"
+        },
+        {
+            "type": "CONSEQUENT_MOTION",
+            "id": "H4023743"
+        }
+    ],
+    "documentStatus": "APPROVED",
+    "documentSubtype": "prop",
+    "documentType": "PROPOSITION",
+    "fullText": null,
+    "id": "PROPOSITION:H403187",
+    "meta": {
+        "created": "1978-01-13",
+        "updated": "1978-01-13"
+    },
+    "originalId": "H403187",
+    "proposals": [
+        {
+            "chamberStatus": "APPROVED",
+            "committeeStatus": "APPROVED",
+            "wording": "Riksdagen godkänner avtalet mellan Konungariket Sveriges regering och Konungariket Norges regering om ändring av avtal om en gemensam marknad för elcertifikat (avsnitt 3). "
+        }
+    ],
+    "published": "2017-05-11T00:00:00.000Z",
+    "stakeholders": [
+        {
+            "id": "0218878014918",
+            "name": "Stefan Löfven",
+            "party": {
+                "abbreviation": "S",
+                "id": "s",
+                "name": "Socialdemokraterna"
+            },
+            "role": "Statsråd1"
+        },
+        {
+            "id": "0973474532717",
+            "name": "Ibrahim Baylan",
+            "party": {
+                "abbreviation": "S",
+                "id": "s",
+                "name": "Socialdemokraterna"
+            },
+            "role": "Statsråd2"
+        }
+    ],
+    "subTitle": null,
+    "summary": null,
+    "title": "Avtal om ändring av avtalet mellan Sverige och Norge om en gemensam elcertifikatsmarknad"
+}
