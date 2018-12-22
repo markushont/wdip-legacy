@@ -1,4 +1,5 @@
 import moment from "moment";
+import config from "../config/config";
 
 /**
  * Handles the job for importing documents from the parliament to the WDIP database by
@@ -23,11 +24,21 @@ export abstract class ImportPublicationService {
         // Nothing to do if the job is already running.
         if (this.isRunning) { return; }
 
+        // Schedule status logging
+        if (config.STATUS_INTERVAL_IPS_MS > 0) {
+            setInterval(this.logStatus, config.STATUS_INTERVAL_IPS_MS);
+        }
+
         // Start the job with the default url.
         this.numberOfSuccesses = 0;
         this.numberOfErrors = 0;
         await this.search(this.getStartUrl(...args));
     }
+
+    /**
+     * Logs the current status of the import job to the database for monitoring.
+     */
+    protected abstract logStatus();
 
     /**
      * Gets the status for the current or last run of the import job.

@@ -17,7 +17,7 @@ export abstract class IPSParliament extends ImportPublicationService {
     /**
      * Logs the current status of the import job to the database for monitoring.
      */
-    public async logStatus() {
+    protected async logStatus() {
         try {
             const status = this.getStatus();
             await dbClient.index({
