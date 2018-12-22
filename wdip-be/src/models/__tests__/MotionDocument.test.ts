@@ -4,7 +4,7 @@ import { isMoment } from "moment";
 import { DocumentStatus } from "../DocumentStatus";
 import { determineDocumentStatus, MotionDocument, transformMotionDocument } from "../MotionDocument";
 import { ProposalStatus } from "../ProposalStatus";
-import { Proposal } from "../Propsal";
+import { Proposal } from "../Proposal";
 
 const sourceDocument1: any = loadJsonFile("src/models/__mocks__/motionDocument1.json");
 const expectedDocument1: MotionDocument = loadJsonFile("src/models/__mocks__/expectedDocument1.json");

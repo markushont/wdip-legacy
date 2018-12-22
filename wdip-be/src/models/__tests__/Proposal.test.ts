@@ -1,6 +1,6 @@
 import "jest-extended";
 import { ProposalStatus } from "../ProposalStatus";
-import { determineProposalStatus, Proposal, transformProposals } from "../Propsal";
+import { determineProposalStatus, Proposal, transformProposals } from "../Proposal";
 
 const sourceProposal1 = {
     nummer: "1",

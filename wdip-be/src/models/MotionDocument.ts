@@ -3,7 +3,7 @@ import { BaseDocument } from "./BaseDocument";
 import { DocumentStatus } from "./DocumentStatus";
 import { DocumentType } from "./DocumentType";
 import { ProposalStatus } from "./ProposalStatus";
-import { determineProposalStatus, Proposal, transformProposals } from "./Propsal";
+import { determineProposalStatus, Proposal, transformProposals } from "./Proposal";
 import { Stakeholder, transformStakeholders } from "./Stakeholder";
 
 export interface MotionDocument extends BaseDocument {
