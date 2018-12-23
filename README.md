@@ -92,25 +92,9 @@ cd wdip-be
 serverless deploy -v
 ```
 
-## Fetching data locally, version 1
+## Fetching data locally
 
-Add new data to the DB by accessing ```http://localhost:3001/fetch-motions```. This API supports two operations:
-
-Example ```GET``` request:
-
-    curl http://localhost:3001/fetch-motions
-
-Will fetch all motions that have been created since the last time the script was run.
-
-Example ```POST``` request:
-
-    curl -H "Content-Type: application/json" --request POST -d '{"from":"2018-01-01","to":"2018-12-31"}' http://localhost:3001/fetch-motions
-
-Will fetch all motions within the specified date interval.
-
-## Fetching data locally, version 2
-
-The second data import functionality uses a queue (Amazon SQS) where documents that are about to be imported are put. A lambda function consumes these queue messages and populates the database accordingly. This should give us greater stability and the ability to import data for a long period. There are two main parts of the import functionality:
+The data import functionality uses a queue (Amazon SQS) where documents that are about to be imported are put. A lambda function consumes these queue messages and populates the database accordingly. This should give us greater stability and the ability to import data for a long period. There are two main parts of the import functionality:
 
 1. A publication service searches the parliament public API and adds a queue message for each found document.
 1. A subscription service gets triggered whenever there is a new message on the queue. It fetches the full content of the document, transposes it to the WDIP data format, and saves it to the Elastic Search database.
@@ -122,3 +106,56 @@ The publication service can be triggered by a REST call, supplying a date range:
 ### Import queue status
 
 There is a queue status function that gets triggered every minute. It queries the queue for status information such as number of unprocessed messages and saves it to the Elastic Search database. This allows us to monitor the import progress and chart it using Kibana.
+
+## Runtime config
+
+When starting the complete docker compose environment, a runtime service is started to take care of setting up development defaults. This allows us to use standard Docker images and should make it a bit easier to share a working development environment.
+
+The runtime config currently updates:
+
+* Kibana dashboard with jobs and queue visualizations
+
+### Updating Kibana settings
+
+If you want to update the default Kibana configuration, do the following:
+
+1. Make changes in the Kibana interface
+1. Export the changes by running the following command, updating it appropriately:
+
+    ```bash
+    curl -X POST "http://localhost:5601/api/saved_objects/_bulk_get" -H 'kbn-xsrf: true' -H 'Content-Type: application/json' -d'
+    [
+        {
+            "type": "index-pattern",
+            "id": "47d82ec0-050b-11e9-9624-e1344b4a29b4"
+        },
+        {
+            "type": "index-pattern",
+            "id": "a75cd810-0172-11e9-8792-11383dceacf8"
+        },
+        {
+            "type": "dashboard",
+            "id": "3389d330-0176-11e9-8792-11383dceacf8"
+        },
+        {
+            "type":"visualization",
+            "id":"7d2da2c0-050c-11e9-9624-e1344b4a29b4"
+        },
+        {
+            "type":"visualization",
+            "id":"01ef09a0-050c-11e9-9624-e1344b4a29b4"
+        },
+        {
+            "type":"visualization",
+            "id":"7a60c8d0-0177-11e9-8792-11383dceacf8"
+        }
+    ]
+    '
+    ```
+
+1. Put the result in the `./config/runtime/kibana/default.json` and manually make sure
+    * that the file starts with the array of saved objects (ie remove the topmost node).
+    * all `updated_at` fields are removed.
+1. Test your changes by running `docker-compose up runtime-config`.
+1. Commit your changes.
+1. At next start of the runtime config service, the new settings will be applied. Note that this will be pushed to other developers as well, overwriting the Kibana objects if they already exist, so be mindful of your changes.
