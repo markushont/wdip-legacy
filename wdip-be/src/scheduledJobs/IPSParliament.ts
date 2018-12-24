@@ -17,7 +17,7 @@ export abstract class IPSParliament extends ImportPublicationService {
     /**
      * Logs the current status of the import job to the database for monitoring.
      */
-    public async logStatus() {
+    protected async logStatus() {
         try {
             const status = this.getStatus();
             await dbClient.index({
@@ -38,26 +38,10 @@ export abstract class IPSParliament extends ImportPublicationService {
      * @param url the search url to fetch
      */
     protected async search(url: string = null) {
-        // Halt the execution if stop is requested.
-        if (this.isStopRequested) {
-            this.isRunning = false;
-            this.isStopRequested = false;
-            return;
-        }
-
-        // End import if the url is not set.
-        if (!url) {
-            logger.info("Import publication job finished.", {
-                numberOfSuccesses: this.numberOfSuccesses,
-                numberOfErrors: this.numberOfErrors
-            });
-            this.isRunning = false;
-            this.isStopRequested = false;
-            return;
-        }
+        // Halt the execution if stop is requested or there is no url
+        if (this.isStopRequested || !url) { return; }
 
         // Fetch the search url and process the result
-        this.isRunning = true;
         try {
             logger.debug("Fetching data.", { url });
             const response = await axios.get(url);
@@ -70,8 +54,7 @@ export abstract class IPSParliament extends ImportPublicationService {
             await this.search(response.data.dokumentlista["@nasta_sida"]);
         } catch (error) {
             logger.error("There was an error fetching documents. Aborting import job.", error);
-            this.isRunning = false;
-            this.isStopRequested = false;
+            return;
         }
     }
 
