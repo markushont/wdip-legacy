@@ -1,4 +1,5 @@
 import axios from "axios";
+import { parseUrl, stringify } from "query-string";
 import config from "../config/config";
 import dbClient from "../dbclient";
 import logger from "../logger";
@@ -50,8 +51,8 @@ export abstract class IPSParliament extends ImportPublicationService {
 
             // Recursively fetch the next page of documents. Note that the last page does not
             // contain the '@nasta_sida' property, causing the recursion to stop.
-            // TODO: Can be the same as the current search if the search is more than 500 pages.
-            await this.search(response.data.dokumentlista["@nasta_sida"]);
+            const newUrl = this.trimParliamentUrl(response.data.dokumentlista["@nasta_sida"]);
+            await this.search(newUrl);
         } catch (error) {
             logger.error("There was an error fetching documents. Aborting import job.", error);
             return;
@@ -72,6 +73,18 @@ export abstract class IPSParliament extends ImportPublicationService {
                 this.numberOfErrors++;
             }
         }
+    }
+
+    /**
+     * Trims the given url by removing unnecessary parameters. For long running queries,
+     * these parameters will otherwise grow by each page fetched from the search API.
+     * @param inputUrl the url from the previous search result
+     */
+    private trimParliamentUrl(inputUrl: string): string {
+        const parsed = parseUrl(inputUrl);
+        delete parsed.query.u17;
+        delete parsed.query.caller;
+        return parsed.url + "?" + stringify(parsed.query);
     }
 
 }
