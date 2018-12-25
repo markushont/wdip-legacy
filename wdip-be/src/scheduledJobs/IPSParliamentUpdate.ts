@@ -7,6 +7,10 @@ import { IPSParliament } from "./IPSParliament";
  * running searches against the public API and publishing document events on the import
  * queue. The events on the queue are handled separately and allows us to scale the
  * import by having multiple workers picking up the events.
+ *
+ * This subclass handles updates from a certain date. The Parliament API has a field
+ * called systemdatum, which is set everytime a document is updated. The search API
+ * only allows us to set a from-date when using the systemdatum.
  */
 class IPSParliamentUpdate extends IPSParliament {
 
@@ -17,7 +21,7 @@ class IPSParliamentUpdate extends IPSParliament {
     protected getStartUrl(from: Moment): string {
         const queryParams = {
             doktyp: "mot",
-            systemdatum: from.format("YYYY-MM-DD"),
+            ts: from.format("YYYY-MM-DD"), // systemdatum
             sort: "datum",
             sortorder: "asc",
             utformat: "json"
