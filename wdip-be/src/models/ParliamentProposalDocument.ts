@@ -7,7 +7,7 @@ import { determineProposalStatus, Proposal, transformProposals } from "./Proposa
 import { ProposalStatus } from "./ProposalStatus";
 import { Stakeholder, transformStakeholders } from "./Stakeholder";
 
-export interface MotionDocument extends BaseDocument {
+export interface ParliamentProposalDocument extends BaseDocument {
     title: string;
     subTitle: string;
     documentType: DocumentType;
@@ -19,7 +19,7 @@ export interface MotionDocument extends BaseDocument {
     documentReferences: DocumentReference[];
 }
 
-export function transformMotionDocument(source: any): MotionDocument {
+export function transformParliamentProposalDocument(source: any): ParliamentProposalDocument {
     if (!source.dokument.dok_id) {
         throw new Error("The source document must have a defined document ID.");
     }
