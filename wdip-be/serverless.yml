@@ -61,12 +61,20 @@ functions:
           requests:
             parameters:
               querystrings:
+                documentType: false
                 fromDate: false
                 toDate: false
   adminStartUpdateImport:
     handler: importHandler.startUpdateImport
     events:
-      - schedule: rate(1 day)
+      - schedule:
+          rate: rate(1 day)
+          input:
+            documentType: mot
+      - schedule:
+          rate: rate(1 day)
+          input:
+            documentType: prop
       - http:
           path: admin/import/update
           method: post
@@ -74,6 +82,7 @@ functions:
             parameters:
               querystrings:
                 fromDate: false
+                documentType: false
   adminHandleImportQueueEvent:
     handler: importHandler.handleImportQueueEvent
     events:

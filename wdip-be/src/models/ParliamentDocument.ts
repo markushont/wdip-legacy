@@ -1,23 +1,25 @@
 import moment from "moment";
 import { BaseDocument } from "./BaseDocument";
+import { DocumentReference, transformDocumentReferences } from "./DocumentReference";
 import { DocumentStatus } from "./DocumentStatus";
-import { DocumentType } from "./DocumentType";
+import { DocumentType, transformDocumentType } from "./DocumentType";
+import { determineProposalStatus, Proposal, transformProposals } from "./Proposal";
 import { ProposalStatus } from "./ProposalStatus";
-import { determineProposalStatus, Proposal, transformProposals } from "./Propsal";
 import { Stakeholder, transformStakeholders } from "./Stakeholder";
 
-export interface MotionDocument extends BaseDocument {
+export interface ParliamentDocument extends BaseDocument {
     title: string;
     subTitle: string;
-    documentType: DocumentType.MOTION;
+    documentType: DocumentType;
     documentSubtype: string;
     stakeholders: Stakeholder[];
     proposals: Proposal[];
     summary: string;
     fullText: string;
+    documentReferences: DocumentReference[];
 }
 
-export function transformMotionDocument(source: any): MotionDocument {
+export function transformParliamentDocument(source: any): ParliamentDocument {
     if (!source.dokument.dok_id) {
         throw new Error("The source document must have a defined document ID.");
     }
@@ -34,19 +36,23 @@ export function transformMotionDocument(source: any): MotionDocument {
         stakeholders = transformStakeholders(source.dokintressent.intressent);
     }
 
+    // Get document type
+    const documentType = transformDocumentType(source.dokument.doktyp);
+
     return {
-        id: `${DocumentType.MOTION}:${source.dokument.dok_id}`,
+        id: `${documentType}:${source.dokument.dok_id}`,
         originalId: source.dokument.dok_id,
         title: source.dokument.titel || null,
         subTitle: source.dokument.subtitel || null,
         fullText: null,
         summary: source.dokument.summary || null,
-        documentType: DocumentType.MOTION,
+        documentType,
         documentSubtype: source.dokument.subtyp || null,
         stakeholders,
         proposals,
         published: moment.utc(source.dokument.publicerad),
         documentStatus: determineDocumentStatus(proposals),
+        documentReferences: transformDocumentReferences(source.dokreferens),
         meta: { created: moment.utc(), updated: moment.utc() }
     };
 }

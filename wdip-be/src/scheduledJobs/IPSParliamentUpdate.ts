@@ -1,5 +1,6 @@
 import { Moment } from "moment";
 import { stringify } from "query-string";
+import { getDocumentTypeString } from "../models/DocumentType";
 import { IPSParliament } from "./IPSParliament";
 
 /**
@@ -12,7 +13,7 @@ import { IPSParliament } from "./IPSParliament";
  * called systemdatum, which is set everytime a document is updated. The search API
  * only allows us to set a from-date when using the systemdatum.
  */
-class IPSParliamentUpdate extends IPSParliament {
+export class IPSParliamentUpdate extends IPSParliament {
 
     /**
      * Returns a start search url, given the input date.
@@ -20,7 +21,7 @@ class IPSParliamentUpdate extends IPSParliament {
      */
     protected getStartUrl(from: Moment): string {
         const queryParams = {
-            doktyp: "mot",
+            doktyp: getDocumentTypeString(this.documentType),
             ts: from.format("YYYY-MM-DD"), // systemdatum
             sort: "datum",
             sortorder: "asc",
@@ -31,5 +32,3 @@ class IPSParliamentUpdate extends IPSParliament {
     }
 
 }
-
-export const ipsParliamentUpdate = new IPSParliamentUpdate();

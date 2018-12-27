@@ -8,8 +8,6 @@ const defaultConfig = {
     "STATUS_INDEX_SQS": "status-sqs",
     "STATUS_INDEX_IPS": "status-ips",
     "STATUS_INTERVAL_IPS_MS": 1000,
-    "FETCH_MOTIONS": true,
-    "FETCH_PROPOSITIONS": false,
     "SQS_URL": "http://sqs:9324/queue/wdip-import"
 };
 

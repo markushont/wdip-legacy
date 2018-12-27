@@ -2,15 +2,25 @@ import "jest-extended";
 import { sync as loadJsonFile } from "load-json-file";
 import { isMoment } from "moment";
 import { DocumentStatus } from "../DocumentStatus";
-import { determineDocumentStatus, MotionDocument, transformMotionDocument } from "../MotionDocument";
+import {
+    determineDocumentStatus,
+    ParliamentDocument,
+    transformParliamentDocument
+} from "../ParliamentDocument";
+import { Proposal } from "../Proposal";
 import { ProposalStatus } from "../ProposalStatus";
-import { Proposal } from "../Propsal";
 
 const sourceDocument1: any = loadJsonFile("src/models/__mocks__/motionDocument1.json");
-const expectedDocument1: MotionDocument = loadJsonFile("src/models/__mocks__/expectedDocument1.json");
+const expectedDocument1: ParliamentDocument =
+    loadJsonFile("src/models/__mocks__/expectedDocument1.json");
 
 const sourceDocument2: any = loadJsonFile("src/models/__mocks__/motionDocument2.json");
-const expectedDocument2: MotionDocument = loadJsonFile("src/models/__mocks__/expectedDocument2.json");
+const expectedDocument2: ParliamentDocument =
+    loadJsonFile("src/models/__mocks__/expectedDocument2.json");
+
+const sourceDocument3: any = loadJsonFile("src/models/__mocks__/motionDocument3.json");
+const expectedDocument3: ParliamentDocument =
+    loadJsonFile("src/models/__mocks__/expectedDocument3.json");
 
 // Seems hard to compare instances of moments. This workaround removes them and the test
 // checks for the existance, which at least is something. TODO: Make better.
@@ -18,11 +28,13 @@ delete expectedDocument1.meta;
 delete expectedDocument1.published;
 delete expectedDocument2.meta;
 delete expectedDocument2.published;
+delete expectedDocument3.meta;
+delete expectedDocument3.published;
 
 describe("MotionDocument tests", () => {
 
     test("Correctly transformed document", () => {
-        const doc = transformMotionDocument(sourceDocument1.dokumentstatus);
+        const doc = transformParliamentDocument(sourceDocument1.dokumentstatus);
         expect(doc).toMatchObject(expectedDocument1);
         expect(isMoment(doc.published)).toBeTrue();
         expect(isMoment(doc.meta.created)).toBeTrue();
@@ -30,8 +42,16 @@ describe("MotionDocument tests", () => {
     });
 
     test("Incomplete document", () => {
-        const doc = transformMotionDocument(sourceDocument2.dokumentstatus);
+        const doc = transformParliamentDocument(sourceDocument2.dokumentstatus);
         expect(doc).toMatchObject(expectedDocument2);
+        expect(isMoment(doc.published)).toBeTrue();
+        expect(isMoment(doc.meta.created)).toBeTrue();
+        expect(isMoment(doc.meta.updated)).toBeTrue();
+    });
+
+    test("Correctly transformed proposition", () => {
+        const doc = transformParliamentDocument(sourceDocument3.dokumentstatus);
+        expect(doc).toMatchObject(expectedDocument3);
         expect(isMoment(doc.published)).toBeTrue();
         expect(isMoment(doc.meta.created)).toBeTrue();
         expect(isMoment(doc.meta.updated)).toBeTrue();
@@ -39,7 +59,7 @@ describe("MotionDocument tests", () => {
 
     test("Document source id is required", () => {
         const sourceDoc = { dokument: {} };
-        expect(() => transformMotionDocument(sourceDoc)).toThrowError();
+        expect(() => transformParliamentDocument(sourceDoc)).toThrowError();
     });
 
 });

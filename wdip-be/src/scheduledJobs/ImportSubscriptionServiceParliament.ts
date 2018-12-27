@@ -3,7 +3,7 @@ import axios from "axios";
 import config from "../config/config";
 import dbClient from "../dbclient";
 import logger from "../logger";
-import { transformMotionDocument } from "../models/MotionDocument";
+import { transformParliamentDocument } from "../models/ParliamentDocument";
 import { ImportDocument } from "./ImportDocument";
 import { ImportSubscriptionService } from "./ImportSubscriptionService";
 
@@ -17,11 +17,13 @@ class ImportSubscriptionServiceParliament extends ImportSubscriptionService {
         const sourceFullText = await this.fetchDocumentFullText(sourceStatus.dokument.dokument_url_text);
 
         // 2. Transpose the document to WDIP format
-        const motion = transformMotionDocument(sourceStatus);
-        motion.fullText = sourceFullText;
+        const proposalDoc = transformParliamentDocument(sourceStatus);
+        proposalDoc.fullText = sourceFullText;
 
         // 3. Store the document in ES
-        dbClient.index({ index: config.WDIP_MOTION_INDEX, id: motion.id, type: motion.documentType, body: motion });
+        // TODO: 'type' needs to be something more general but ES6 and newer allows for
+        //       only one type per index. Introduce breaking changes in separate feature?
+        dbClient.index({ index: config.WDIP_MOTION_INDEX, id: proposalDoc.id, type: "MOTION", body: proposalDoc });
     }
 
     private async fetchDocumentStatus(importDocument: ImportDocument): Promise<any> {
