@@ -6,10 +6,21 @@ import { IPSParliamentDateRange } from "./scheduledJobs/IPSParliamentDateRange";
 import { IPSParliamentUpdate } from "./scheduledJobs/IPSParliamentUpdate";
 import moment from "moment";
 
+function hasParameter(event, parameter) {
+  return event && event.queryStringParameters && event.queryStringParameters[parameter];
+}
+
 module.exports.adminStartImport = async (event, context) => {
-  const fromDate = moment(event.queryStringParameters.fromDate);
-  const toDate = moment(event.queryStringParameters.toDate);
-  const docTypeStr = event.queryStringParameters.documentType || "";
+  const fromDate = hasParameter(event, "fromDate") ?
+    moment(event.queryStringParameters.fromDate) :
+    moment().subtract(1, "year");
+  const toDate = hasParameter(event, "toDate") ?
+    moment(event.queryStringParameters.toDate) :
+    moment();
+  const docTypeStr = hasParameter(event, "documentType") ?
+    event.queryStringParameters.documentType :
+    "";
+
   const documentType = transformDocumentType(docTypeStr);
   const ipsParliamentDateRange = new IPSParliamentDateRange(documentType);
   ipsParliamentDateRange.start(fromDate, toDate);
@@ -18,21 +29,25 @@ module.exports.adminStartImport = async (event, context) => {
 
 module.exports.startUpdateImport = async (event, context) => {
   // Default update to start from one day ago.
-  let fromDate = moment().subtract(1, "day");
+  // If this is a post request with a query parameter, use it.
+  const fromDate = hasParameter(event, "fromDate") ?
+    moment(event.queryStringParameters.fromDate) :
+    moment().subtract(1, "day");
 
-  // If this is a POST request with a fromDate input parameter, use it instead.
-  if (event && event.queryStringParameters && event.queryStringParameters.fromDate) {
-    fromDate = moment(event.queryStringParameters.fromDate);
-  }
+  const docTypeStr = hasParameter(event, "documentType") ?
+    event.queryStringParameters.documentType :
+    "";
+
+  const docType = transformDocumentType(docTypeStr);
 
   // Run motion update job
-  if (config.FETCH_MOTIONS) {
+  if (docTypeStr.length || docType === DocumentType.MOTION) {
     const ipsParliamentUpdateMot = new IPSParliamentUpdate(DocumentType.MOTION);
     ipsParliamentUpdateMot.start(fromDate);
   }
 
   // Run proposition update job
-  if (config.FETCH_PROPOSITIONS) {
+  if (docTypeStr.length || docType === DocumentType.PROPOSITION) {
     const ipsParliamentUpdateProp = new IPSParliamentUpdate(DocumentType.PROPOSITION);
     ipsParliamentUpdateProp.start(fromDate);
   }

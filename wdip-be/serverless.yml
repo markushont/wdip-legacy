@@ -75,6 +75,7 @@ functions:
             parameters:
               querystrings:
                 fromDate: false
+                documentType: false
   adminHandleImportQueueEvent:
     handler: importHandler.handleImportQueueEvent
     events:
