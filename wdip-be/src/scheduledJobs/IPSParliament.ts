@@ -1,4 +1,5 @@
 import axios from "axios";
+import { parseUrl, stringify } from "query-string";
 import config from "../config/config";
 import dbClient from "../dbclient";
 import logger from "../logger";
@@ -25,7 +26,7 @@ export abstract class IPSParliament extends ImportPublicationService {
     /**
      * Logs the current status of the import job to the database for monitoring.
      */
-    public async logStatus() {
+    protected async logStatus() {
         try {
             const status = this.getStatus();
             await dbClient.index({
@@ -46,26 +47,10 @@ export abstract class IPSParliament extends ImportPublicationService {
      * @param url the search url to fetch
      */
     protected async search(url: string = null) {
-        // Halt the execution if stop is requested.
-        if (this.isStopRequested) {
-            this.isRunning = false;
-            this.isStopRequested = false;
-            return;
-        }
-
-        // End import if the url is not set.
-        if (!url) {
-            logger.info("Import publication job finished.", {
-                numberOfSuccesses: this.numberOfSuccesses,
-                numberOfErrors: this.numberOfErrors
-            });
-            this.isRunning = false;
-            this.isStopRequested = false;
-            return;
-        }
+        // Halt the execution if stop is requested or there is no url
+        if (this.isStopRequested || !url) { return; }
 
         // Fetch the search url and process the result
-        this.isRunning = true;
         try {
             logger.debug("Fetching data.", { url });
             const response = await axios.get(url);
@@ -74,12 +59,11 @@ export abstract class IPSParliament extends ImportPublicationService {
 
             // Recursively fetch the next page of documents. Note that the last page does not
             // contain the '@nasta_sida' property, causing the recursion to stop.
-            // TODO: Can be the same as the current search if the search is more than 500 pages.
-            await this.search(response.data.dokumentlista["@nasta_sida"]);
+            const newUrl = this.trimParliamentUrl(response.data.dokumentlista["@nasta_sida"]);
+            await this.search(newUrl);
         } catch (error) {
             logger.error("There was an error fetching documents. Aborting import job.", error);
-            this.isRunning = false;
-            this.isStopRequested = false;
+            return;
         }
     }
 
@@ -97,6 +81,18 @@ export abstract class IPSParliament extends ImportPublicationService {
                 this.numberOfErrors++;
             }
         }
+    }
+
+    /**
+     * Trims the given url by removing unnecessary parameters. For long running queries,
+     * these parameters will otherwise grow by each page fetched from the search API.
+     * @param inputUrl the url from the previous search result
+     */
+    private trimParliamentUrl(inputUrl: string): string {
+        const parsed = parseUrl(inputUrl);
+        delete parsed.query.u17;
+        delete parsed.query.caller;
+        return parsed.url + "?" + stringify(parsed.query);
     }
 
 }

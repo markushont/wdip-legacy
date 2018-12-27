@@ -58,6 +58,13 @@ services:
       - ./wdip-fe:/app
     working_dir: /app
     command: npm start
+  runtime-config:
+    build: ./config/runtime
+    container_name: wdip-runtime-config
+    depends_on: 
+      - kibana
+    volumes: 
+      - ./config/runtime/kibana:/runtime/kibana
 
 volumes: 
   elasticsearch:

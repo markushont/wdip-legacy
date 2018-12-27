@@ -7,6 +7,7 @@ const defaultConfig = {
     "WDIP_DEFAULT_PARTIES": ["s", "m", "l", "kd", "v", "sd", "c", "mp"],
     "STATUS_INDEX_SQS": "status-sqs",
     "STATUS_INDEX_IPS": "status-ips",
+    "STATUS_INTERVAL_IPS_MS": 1000,
     "SQS_URL": "http://sqs:9324/queue/wdip-import"
 };
 
