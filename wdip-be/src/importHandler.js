@@ -1,5 +1,4 @@
-import { config } from "./config/config";
-import { DocumentType, transformDocumentType } from "./models/DocumentType";
+import { transformDocumentType } from "./models/DocumentType";
 import { importQueueStatus } from "./scheduledJobs/ImportQueueStatus";
 import { importSubscriptionServiceParliament } from "./scheduledJobs/ImportSubscriptionServiceParliament";
 import { IPSParliamentDateRange } from "./scheduledJobs/IPSParliamentDateRange";
@@ -19,7 +18,7 @@ module.exports.adminStartImport = async (event, context) => {
     moment();
   const docTypeStr = hasParameter(event, "documentType") ?
     event.queryStringParameters.documentType :
-    "";
+    "mot";
 
   const documentType = transformDocumentType(docTypeStr);
   const ipsParliamentDateRange = new IPSParliamentDateRange(documentType);
@@ -34,23 +33,17 @@ module.exports.startUpdateImport = async (event, context) => {
     moment(event.queryStringParameters.fromDate) :
     moment().subtract(1, "day");
 
-  const docTypeStr = hasParameter(event, "documentType") ?
-    event.queryStringParameters.documentType :
-    "";
+  let docTypeStr = "mot";
+  if (hasParameter(event, "documentType")) { // invoked via http post
+    docTypeStr = event.queryStringParameters.documentType;
+  } else if (event && event.documentType) { // invoked via cron
+    docTypeStr = event.documentType;
+  }
 
   const docType = transformDocumentType(docTypeStr);
 
-  // Run motion update job
-  if (!docTypeStr.length || docType === DocumentType.MOTION) {
-    const ipsParliamentUpdateMot = new IPSParliamentUpdate(DocumentType.MOTION);
-    ipsParliamentUpdateMot.start(fromDate);
-  }
-
-  // Run proposition update job
-  if (!docTypeStr.length || docType === DocumentType.PROPOSITION) {
-    const ipsParliamentUpdateProp = new IPSParliamentUpdate(DocumentType.PROPOSITION);
-    ipsParliamentUpdateProp.start(fromDate);
-  }
+  const ipsParliamentUpdate = new IPSParliamentUpdate(docType);
+  ipsParliamentUpdate.start(fromDate);
 
   return responses.success({}, 202);
 };

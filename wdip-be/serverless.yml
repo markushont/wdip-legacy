@@ -67,7 +67,14 @@ functions:
   adminStartUpdateImport:
     handler: importHandler.startUpdateImport
     events:
-      - schedule: rate(1 day)
+      - schedule:
+          rate: rate(1 day)
+          input:
+            documentType: mot
+      - schedule:
+          rate: rate(1 day)
+          input:
+            documentType: prop
       - http:
           path: admin/import/update
           method: post
