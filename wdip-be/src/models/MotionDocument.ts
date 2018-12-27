@@ -1,10 +1,10 @@
 import moment from "moment";
 import { BaseDocument } from "./BaseDocument";
+import { DocumentReference, transformDocumentReferences } from "./DocumentReference";
 import { DocumentStatus } from "./DocumentStatus";
 import { DocumentType, transformDocumentType } from "./DocumentType";
-import { DocumentReference, transformDocumentReferences } from "./DocumentReference";
-import { ProposalStatus } from "./ProposalStatus";
 import { determineProposalStatus, Proposal, transformProposals } from "./Proposal";
+import { ProposalStatus } from "./ProposalStatus";
 import { Stakeholder, transformStakeholders } from "./Stakeholder";
 
 export interface MotionDocument extends BaseDocument {
@@ -37,7 +37,7 @@ export function transformMotionDocument(source: any): MotionDocument {
     }
 
     // Get document type
-    const documentType = transformDocumentType(source);
+    const documentType = transformDocumentType(source.dokument.doktyp);
 
     return {
         id: `${documentType}:${source.dokument.dok_id}`,

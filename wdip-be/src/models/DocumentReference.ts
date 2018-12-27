@@ -15,7 +15,7 @@ export function transformDocumentReferences(source: any): DocumentReference[] {
     if (Array.isArray(source.referens)) {
         return source.referens
         .map((referens) => transformDocumentReference(referens))
-        .filter((referens) => { return referens != null; });
+        .filter((referens) => referens != null);
     }
 
     return [transformDocumentReference(source.referens)];

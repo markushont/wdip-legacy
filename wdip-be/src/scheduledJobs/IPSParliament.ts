@@ -2,6 +2,7 @@ import axios from "axios";
 import config from "../config/config";
 import dbClient from "../dbclient";
 import logger from "../logger";
+import { DocumentType } from "../models/DocumentType";
 import { ImportDocument, ImportDocumentType } from "./ImportDocument";
 import { ImportPublicationService } from "./ImportPublicationService";
 import { importQueue } from "./ImportQueue";
@@ -13,6 +14,13 @@ import { importQueue } from "./ImportQueue";
  * import by having multiple workers picking up the events.
  */
 export abstract class IPSParliament extends ImportPublicationService {
+
+    protected documentType: DocumentType = DocumentType.MOTION;
+
+    constructor(documentType: DocumentType) {
+        super();
+        this.documentType = documentType;
+    }
 
     /**
      * Logs the current status of the import job to the database for monitoring.

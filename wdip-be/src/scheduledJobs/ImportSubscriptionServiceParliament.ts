@@ -21,7 +21,9 @@ class ImportSubscriptionServiceParliament extends ImportSubscriptionService {
         motion.fullText = sourceFullText;
 
         // 3. Store the document in ES
-        dbClient.index({ index: config.WDIP_MOTION_INDEX, id: motion.id, type: motion.documentType, body: motion });
+        // TODO: 'type' needs to be something more general but ES6 and newer allows for
+        //       only one type per index. Introduce breaking changes in separate feature?
+        dbClient.index({ index: config.WDIP_MOTION_INDEX, id: motion.id, type: "MOTION", body: motion });
     }
 
     private async fetchDocumentStatus(importDocument: ImportDocument): Promise<any> {

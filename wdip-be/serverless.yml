@@ -61,6 +61,7 @@ functions:
           requests:
             parameters:
               querystrings:
+                documentType: false
                 fromDate: false
                 toDate: false
   adminStartUpdateImport:

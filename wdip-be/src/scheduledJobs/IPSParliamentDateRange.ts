@@ -1,5 +1,6 @@
 import { Moment } from "moment";
 import { stringify } from "query-string";
+import { getDocumentTypeString } from "../models/DocumentType";
 import { IPSParliament } from "./IPSParliament";
 
 /**
@@ -8,7 +9,7 @@ import { IPSParliament } from "./IPSParliament";
  * queue. The events on the queue are handled separately and allows us to scale the
  * import by having multiple workers picking up the events.
  */
-class IPSParliamentDateRange extends IPSParliament {
+export class IPSParliamentDateRange extends IPSParliament {
 
     /**
      * Returns a start search url, given the input dates.
@@ -17,7 +18,7 @@ class IPSParliamentDateRange extends IPSParliament {
      */
     protected getStartUrl(from: Moment, to: Moment): string {
         const queryParams = {
-            doktyp: "mot",
+            doktyp: getDocumentTypeString(this.documentType),
             from: from.format("YYYY-MM-DD"),
             tom: to.format("YYYY-MM-DD"),
             sort: "datum",
@@ -29,5 +30,3 @@ class IPSParliamentDateRange extends IPSParliament {
     }
 
 }
-
-export const ipsParliamentDateRange = new IPSParliamentDateRange();
