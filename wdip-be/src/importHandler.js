@@ -41,13 +41,13 @@ module.exports.startUpdateImport = async (event, context) => {
   const docType = transformDocumentType(docTypeStr);
 
   // Run motion update job
-  if (docTypeStr.length || docType === DocumentType.MOTION) {
+  if (!docTypeStr.length || docType === DocumentType.MOTION) {
     const ipsParliamentUpdateMot = new IPSParliamentUpdate(DocumentType.MOTION);
     ipsParliamentUpdateMot.start(fromDate);
   }
 
   // Run proposition update job
-  if (docTypeStr.length || docType === DocumentType.PROPOSITION) {
+  if (!docTypeStr.length || docType === DocumentType.PROPOSITION) {
     const ipsParliamentUpdateProp = new IPSParliamentUpdate(DocumentType.PROPOSITION);
     ipsParliamentUpdateProp.start(fromDate);
   }
