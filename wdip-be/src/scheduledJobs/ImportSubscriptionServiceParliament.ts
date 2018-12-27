@@ -3,7 +3,7 @@ import axios from "axios";
 import config from "../config/config";
 import dbClient from "../dbclient";
 import logger from "../logger";
-import { transformParliamentProposalDocument } from "../models/ParliamentProposalDocument";
+import { transformParliamentDocument } from "../models/ParliamentDocument";
 import { ImportDocument } from "./ImportDocument";
 import { ImportSubscriptionService } from "./ImportSubscriptionService";
 
@@ -17,7 +17,7 @@ class ImportSubscriptionServiceParliament extends ImportSubscriptionService {
         const sourceFullText = await this.fetchDocumentFullText(sourceStatus.dokument.dokument_url_text);
 
         // 2. Transpose the document to WDIP format
-        const proposalDoc = transformParliamentProposalDocument(sourceStatus);
+        const proposalDoc = transformParliamentDocument(sourceStatus);
         proposalDoc.fullText = sourceFullText;
 
         // 3. Store the document in ES
