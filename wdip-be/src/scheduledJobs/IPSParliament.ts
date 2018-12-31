@@ -89,6 +89,8 @@ export abstract class IPSParliament extends ImportPublicationService {
      * @param inputUrl the url from the previous search result
      */
     private trimParliamentUrl(inputUrl: string): string {
+        if (!inputUrl) { return null; }
+
         const parsed = parseUrl(inputUrl);
         delete parsed.query.u17;
         delete parsed.query.caller;
