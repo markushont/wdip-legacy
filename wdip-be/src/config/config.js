@@ -8,7 +8,7 @@ const defaultConfig = {
     "STATUS_INDEX_SQS": "status-sqs",
     "STATUS_INDEX_IPS": "status-ips",
     "STATUS_INTERVAL_IPS_MS": 1000,
-    "SQS_URL": "http://sqs:9324/queue/wdip-import"
+    "SQS_URL": "http://sqs:9324/queue/wdip-import-local"
 };
 
 const config = {};

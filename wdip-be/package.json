@@ -13,7 +13,7 @@
     "build-ts": "./node_modules/.bin/tsc",
     "tslint": "./node_modules/.bin/tslint -c tslint.json -p tsconfig.json",
     "debug": "./node_modules/.bin/tsc-watch --compiler typescript/bin/tsc --onSuccess 'npm run debug-lint-start'",
-    "debug-lint-start": "npm run tslint && node --inspect=0.0.0.0:9229 ./node_modules/.bin/serverless offline start --location ./dist --host 0.0.0.0 --port 3001",
+    "debug-lint-start": "npm run tslint && node --inspect=0.0.0.0:9229 ./node_modules/.bin/serverless offline start --location ./dist --host 0.0.0.0 --port 3001 --stage local",
     "test": "jest",
     "test:watch": "jest --watch"
   },
