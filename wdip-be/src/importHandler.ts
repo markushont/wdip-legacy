@@ -1,9 +1,10 @@
+import moment from "moment";
+import httpResponses from "./httpResponses";
 import { transformDocumentType } from "./models/DocumentType";
 import { importQueueStatus } from "./scheduledJobs/ImportQueueStatus";
 import { importSubscriptionServiceParliament } from "./scheduledJobs/ImportSubscriptionServiceParliament";
 import { IPSParliamentDateRange } from "./scheduledJobs/IPSParliamentDateRange";
 import { IPSParliamentUpdate } from "./scheduledJobs/IPSParliamentUpdate";
-import moment from "moment";
 
 function hasParameter(event, parameter) {
   return event && event.queryStringParameters && event.queryStringParameters[parameter];
@@ -23,7 +24,7 @@ module.exports.adminStartImport = async (event, context) => {
   const documentType = transformDocumentType(docTypeStr);
   const ipsParliamentDateRange = new IPSParliamentDateRange(documentType);
   ipsParliamentDateRange.start(fromDate, toDate);
-  return responses.success({}, 202);
+  return httpResponses.success({}, 202);
 };
 
 module.exports.startUpdateImport = async (event, context) => {
@@ -45,7 +46,7 @@ module.exports.startUpdateImport = async (event, context) => {
   const ipsParliamentUpdate = new IPSParliamentUpdate(docType);
   ipsParliamentUpdate.start(fromDate);
 
-  return responses.success({}, 202);
+  return httpResponses.success({}, 202);
 };
 
 module.exports.handleImportQueueEvent = async (event, context) => {

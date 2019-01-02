@@ -6,7 +6,7 @@ import logger from "../logger";
 import { DocumentStatus } from "../models/DocumentStatus";
 import { DocumentType } from "../models/DocumentType";
 
-async function getMotionById(id: string) {
+export async function getMotionById(id: string) {
     logger.debug(`Will query for motion ${id}.`);
 
     const params = {
@@ -25,7 +25,7 @@ async function getMotionById(id: string) {
     }
 }
 
-async function getPendingMotions() {
+export async function getPendingMotions() {
     logger.debug("Getting pending motions from index.");
 
     const params = {
@@ -43,5 +43,3 @@ async function getPendingMotions() {
         return null;
     }
 }
-
-module.exports = { byId: getMotionById, pending: getPendingMotions };

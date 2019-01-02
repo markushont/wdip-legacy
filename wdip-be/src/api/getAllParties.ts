@@ -1,6 +1,4 @@
-import logger from "../logger";
-
-async function getAllParties() {
+export default async function getAllParties() {
   /* Positions according to the parties themselves,
   from https://www.svt.se/special/partir%C3%B6sten-valjarna-och-partierna-om-ideologi/ */
   return {
@@ -15,5 +13,3 @@ async function getAllParties() {
   };
 
 }
-
-module.exports = getAllParties;

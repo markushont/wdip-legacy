@@ -49,7 +49,7 @@ async function getMotions(outcome: string,
   }
 }
 
-async function getMotionsByParty(fromDateStrOverride?: string, toDateStrOverride?: string) {
+export default async function getMotionsByParty(fromDateStrOverride?: string, toDateStrOverride?: string) {
 
   const parties = config.WDIP_DEFAULT_PARTIES;
 
@@ -77,5 +77,3 @@ async function getMotionsByParty(fromDateStrOverride?: string, toDateStrOverride
   return { fromDate: fromDateStrOverride, toDate: toDateStrOverride, results: partyData };
 
 }
-
-module.exports = getMotionsByParty;
