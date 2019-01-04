@@ -16,21 +16,20 @@ provider:
   region: eu-west-1
   environment: ${file(./environment_${opt:stage, "local"}.yml)}
   enableScheduled: false
-
-iamRoleStatements:
-  - Effect: Allow
-    Action:
-      - es:ESHttpPost
-      - es:ESHttpPut
-      - es:ESHttpDelete
-      - es:ESHttpGet
-      - sqs:ReceiveMessage
-      - sqs:DeleteMessage
-      - sqs:GetQueueAttributes
-      - sqs:SendMessage
-    Resource:
-      - arn:aws:es:${self:provider.region}:843375259671:*
-      - arn:aws:sqs:${self:provider.region}:843375259671:wdip-import-${opt:stage, "local"}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - es:ESHttpPost
+        - es:ESHttpPut
+        - es:ESHttpDelete
+        - es:ESHttpGet
+        - sqs:ReceiveMessage
+        - sqs:DeleteMessage
+        - sqs:GetQueueAttributes
+        - sqs:SendMessage
+      Resource:
+        - arn:aws:es:${self:provider.region}:843375259671:domain/wdip-${opt:stage, "local"}
+        - arn:aws:sqs:${self:provider.region}:843375259671:wdip-import-${opt:stage, "local"}
 
 functions:
   getPendingMotions:
