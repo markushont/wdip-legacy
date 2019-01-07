@@ -1,15 +1,17 @@
+import moment from "moment";
+import httpResponses from "./httpResponses";
 import { transformDocumentType } from "./models/DocumentType";
 import { importQueueStatus } from "./scheduledJobs/ImportQueueStatus";
 import { importSubscriptionServiceParliament } from "./scheduledJobs/ImportSubscriptionServiceParliament";
 import { IPSParliamentDateRange } from "./scheduledJobs/IPSParliamentDateRange";
 import { IPSParliamentUpdate } from "./scheduledJobs/IPSParliamentUpdate";
-import moment from "moment";
 
 function hasParameter(event, parameter) {
   return event && event.queryStringParameters && event.queryStringParameters[parameter];
 }
 
 module.exports.adminStartImport = async (event, context) => {
+  // Deduce date range and document type
   const fromDate = hasParameter(event, "fromDate") ?
     moment(event.queryStringParameters.fromDate) :
     moment().subtract(1, "year");
@@ -19,11 +21,16 @@ module.exports.adminStartImport = async (event, context) => {
   const docTypeStr = hasParameter(event, "documentType") ?
     event.queryStringParameters.documentType :
     "mot";
-
   const documentType = transformDocumentType(docTypeStr);
-  const ipsParliamentDateRange = new IPSParliamentDateRange(documentType);
-  ipsParliamentDateRange.start(fromDate, toDate);
-  return responses.success({}, 202);
+
+  // Run import job
+  try {
+    const ipsParliamentDateRange = new IPSParliamentDateRange(documentType);
+    await ipsParliamentDateRange.start(fromDate, toDate);
+    return httpResponses.success({}, 202);
+  } catch (error) {
+    return httpResponses.error(error);
+  }
 };
 
 module.exports.startUpdateImport = async (event, context) => {
@@ -39,17 +46,25 @@ module.exports.startUpdateImport = async (event, context) => {
   } else if (event && event.documentType) { // invoked via cron
     docTypeStr = event.documentType;
   }
-
   const docType = transformDocumentType(docTypeStr);
 
-  const ipsParliamentUpdate = new IPSParliamentUpdate(docType);
-  ipsParliamentUpdate.start(fromDate);
-
-  return responses.success({}, 202);
+  // Run import job
+  try {
+    const ipsParliamentUpdate = new IPSParliamentUpdate(docType);
+    await ipsParliamentUpdate.start(fromDate);
+    return httpResponses.success({}, 202);
+  } catch (error) {
+    return httpResponses.error(error);
+  }
 };
 
 module.exports.handleImportQueueEvent = async (event, context) => {
-  importSubscriptionServiceParliament.processEvent(event);
+  try {
+    await importSubscriptionServiceParliament.processEvent(event);
+    return httpResponses.success({}, 202);
+  } catch (error) {
+    return httpResponses.error(error);
+  }
 };
 
 module.exports.logQueueStatus = (event, context) => {

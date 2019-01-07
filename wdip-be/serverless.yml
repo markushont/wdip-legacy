@@ -1,9 +1,10 @@
 service: wdip-be
 
-app: motioner
-tenant: markushont
+app: wdip-be
+tenant: hejare
 
 plugins:
+  - serverless-plugin-typescript
   - serverless-offline-sqs
   - serverless-offline-scheduler
   - serverless-offline
@@ -11,27 +12,40 @@ plugins:
 provider:
   name: aws
   runtime: nodejs8.10
-  timeout: 300
   profile: wdip-test
-  stage: dev
   region: eu-west-1
-  environment: ${file(./environment.yml)}
+  environment: ${file(./environment_${opt:stage, "local"}.yml)}
+  enableScheduled: false
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - es:ESHttpPost
+        - es:ESHttpPut
+        - es:ESHttpDelete
+        - es:ESHttpGet
+        - sqs:ReceiveMessage
+        - sqs:DeleteMessage
+        - sqs:GetQueueAttributes
+        - sqs:SendMessage
+      Resource:
+        - arn:aws:es:${self:provider.region}:843375259671:domain/wdip-${opt:stage, "local"}
+        - arn:aws:sqs:${self:provider.region}:843375259671:wdip-import-${opt:stage, "local"}
 
 functions:
   getPendingMotions:
-    handler: apiHandler.getPendingMotions
+    handler: src/apiHandler.getPendingMotions
     events:
       - http:
           path: motions/pending
           method: get
   getMotionsByParty:
-    handler: apiHandler.getMotionsByParty
+    handler: src/apiHandler.getMotionsByParty
     events:
       - http:
           path: motions/byparty
           method: get
   getMotion:
-    handler: apiHandler.getMotionById
+    handler: src/apiHandler.getMotionById
     events:
       - http:
           path: motions/{id}
@@ -41,19 +55,19 @@ functions:
               paths:
                 id: true
   getWordCloud:
-    handler: apiHandler.getWordCloud
+    handler: src/apiHandler.getWordCloud
     events:
       - http:
           path: charts/wordcloud
           method: get
   getAllParties:
-    handler: apiHandler.getAllParties
+    handler: src/apiHandler.getAllParties
     events:
       - http:
           path: partydata/allparties
           method: get
   adminStartImport:
-    handler: importHandler.adminStartImport
+    handler: src/importHandler.adminStartImport
     events:
       - http:
           path: admin/import
@@ -65,14 +79,16 @@ functions:
                 fromDate: false
                 toDate: false
   adminStartUpdateImport:
-    handler: importHandler.startUpdateImport
+    handler: src/importHandler.startUpdateImport
     events:
       - schedule:
           rate: rate(1 day)
+          enabled: ${self:provider.enableScheduled}
           input:
             documentType: mot
       - schedule:
           rate: rate(1 day)
+          enabled: ${self:provider.enableScheduled}
           input:
             documentType: prop
       - http:
@@ -84,15 +100,17 @@ functions:
                 fromDate: false
                 documentType: false
   adminHandleImportQueueEvent:
-    handler: importHandler.handleImportQueueEvent
+    handler: src/importHandler.handleImportQueueEvent
     events:
       - sqs:
-          arn: arn:aws:sqs:eu-west-1:843375259671:wdip-import
+          arn: arn:aws:sqs:eu-west-1:843375259671:wdip-import-${opt:stage, "local"}
           batchSize: 1
   adminLogQueueStatus:
-    handler: importHandler.logQueueStatus
+    handler: src/importHandler.logQueueStatus
     events:
-      - schedule: rate(1 minute)
+      - schedule:
+          rate: rate(1 minute)
+          enabled: ${self:provider.enableScheduled}
 
 custom:
   serverless-offline-sqs:
@@ -101,5 +119,3 @@ custom:
     accessKeyId: root
     secretAccessKey: root
     skipCacheInvalidation: false
-  serverless-offline:
-    location: ./dist

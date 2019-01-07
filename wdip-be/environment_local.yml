@@ -1,0 +1,6 @@
+AWS_REGION: ${self:provider.region}
+ES_SERVER: "elasticsearch:9200"
+WDIP_MOTION_INDEX: "motions"
+STATUS_INDEX_SQS: "status-sqs"
+STATUS_INDEX_IPS: "status-ips"
+SQS_URL: "http://sqs:9324/queue/wdip-import-local"

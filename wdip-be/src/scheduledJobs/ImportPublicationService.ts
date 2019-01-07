@@ -94,7 +94,7 @@ export abstract class ImportPublicationService {
         if (config.STATUS_INTERVAL_IPS_MS > 0) {
             // Log a first time before we start the timer
             this.logStatus();
-            this.logIntervalId = setInterval(this.logStatus.bind(this), config.STATUS_INTERVAL_IPS_MS);
+            this.logIntervalId = global.setInterval(this.logStatus.bind(this), config.STATUS_INTERVAL_IPS_MS);
         }
     }
 

@@ -1,0 +1,6 @@
+AWS_REGION: ${self:provider.region}
+ES_SERVER: "https://search-wdip-test-ytqqffn4oexhp3db2uwevgqocy.eu-west-1.es.amazonaws.com"
+WDIP_MOTION_INDEX: "motions"
+STATUS_INDEX_SQS: "status-sqs"
+STATUS_INDEX_IPS: "status-ips"
+SQS_URL: "https://sqs.eu-west-1.amazonaws.com/843375259671/wdip-import-test"

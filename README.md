@@ -83,14 +83,16 @@ rm -rf wdip-fe/src/service/wdip-be
 docker run --rm -v ${PWD}:/local openapitools/openapi-generator-cli generate -i /local/wdip-be/src/api/swagger.yml -g typescript-fetch -o /local/wdip-fe/src/service/wdip-be
 ```
 
-## Deploying the backend
+## Deploying the backend (not necessary for local development)
 
 Using the [serverless](https://www.serverless.com) framework, run the following command to deploy a new version to AWS Lambda:
 
 ```bash
 cd wdip-be
-serverless deploy -v
+serverless deploy -v -s [stage]
 ```
+
+Specifying [stage] (can be e.g. 'test') will include the correct configuration (DB endpoints etc.) into the deployment package. Please ensure that the environment actually exists on AWS before deploying.
 
 ## Fetching data locally
 
