@@ -10,7 +10,7 @@ class ImportQueue {
 
     constructor() {
         awsConfig.update({
-            region: "eu-west-1"
+            region: config.AWS_REGION
         });
     }
 

@@ -9,10 +9,11 @@
     "url": "https://github.com/hejare/aws-motioner-data.git"
   },
   "scripts": {
+    "clean": "rm -rf .build",
     "build": "npm run build-ts && npm run tslint",
     "build-ts": "./node_modules/.bin/tsc",
     "tslint": "./node_modules/.bin/tslint -c tslint.json -p tsconfig.json",
-    "debug": "npm run tslint && node --inspect=0.0.0.0:9229 ./node_modules/.bin/serverless offline start --host 0.0.0.0 --port 3001 --stage local",
+    "debug": "npm run clean && npm run tslint && node --inspect=0.0.0.0:9229 ./node_modules/.bin/serverless offline start --host 0.0.0.0 --port 3001 --stage local",
     "test": "npm run tslint && jest",
     "test:watch": "jest --watch"
   },
@@ -30,6 +31,7 @@
     "cryptiles": "^4.1.2",
     "elasticsearch": "^15.1.1",
     "fast-safe-stringify": "^2.0.6",
+    "http-aws-es": "^6.0.0",
     "load-json-file": "^5.1.0",
     "moment": "^2.22.2",
     "object-sizeof": "^1.2.0",
@@ -40,6 +42,7 @@
   "devDependencies": {
     "@types/jest": "^23.3.10",
     "@types/query-string": "^6.1.1",
+    "@types/http-aws-es": "^1.1.3",
     "husky": "^1.2.1",
     "jest": "^23.6.0",
     "jest-extended": "^0.11.0",

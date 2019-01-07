@@ -1,4 +1,5 @@
 const defaultConfig = {
+    "AWS_REGION": "eu-west-1",
     "ES_SERVER": "elasticsearch:9200",
     "ES_USERNAME": null,
     "ES_PASSWORD": null,
