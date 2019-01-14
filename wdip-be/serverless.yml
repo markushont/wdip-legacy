@@ -27,9 +27,11 @@ provider:
         - sqs:DeleteMessage
         - sqs:GetQueueAttributes
         - sqs:SendMessage
+        - lambda:InvokeFunction
       Resource:
         - arn:aws:es:${self:provider.region}:843375259671:domain/wdip-${opt:stage, "local"}
         - arn:aws:sqs:${self:provider.region}:843375259671:wdip-import-${opt:stage, "local"}
+        - arn:aws:lambda:${self:provider.region}:843375259671:*
 
 functions:
   getPendingMotions:
@@ -99,6 +101,17 @@ functions:
               querystrings:
                 fromDate: false
                 documentType: false
+  adminContinueImport:
+    handler: src/importHandler.continueImport
+    events:
+      - http:
+          path: admin/import/continue
+          method: post
+          requests:
+            parameters:
+              queryStrings:
+                documentType: false
+                startUrl: true
   adminHandleImportQueueEvent:
     handler: src/importHandler.handleImportQueueEvent
     events:

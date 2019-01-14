@@ -2,8 +2,9 @@ import axios from "axios";
 import { parseUrl, stringify } from "query-string";
 import config from "../config/config";
 import dbClient from "../dbclient";
+import lambda from "../lambdaClient";
 import logger from "../logger";
-import { DocumentType } from "../models/DocumentType";
+import { DocumentType, getDocumentTypeString } from "../models/DocumentType";
 import { ImportDocument, ImportDocumentType } from "./ImportDocument";
 import { ImportPublicationService } from "./ImportPublicationService";
 import { importQueue } from "./ImportQueue";
@@ -18,9 +19,14 @@ export abstract class IPSParliament extends ImportPublicationService {
 
     protected documentType: DocumentType = DocumentType.MOTION;
 
-    constructor(documentType: DocumentType) {
+    private context: any = null;
+    private allowContinue: boolean = true;
+
+    constructor(documentType: DocumentType, context: any, allowContinue: boolean = true) {
         super();
         this.documentType = documentType;
+        this.context = context;
+        this.allowContinue = allowContinue;
     }
 
     /**
@@ -60,6 +66,25 @@ export abstract class IPSParliament extends ImportPublicationService {
             // Recursively fetch the next page of documents. Note that the last page does not
             // contain the '@nasta_sida' property, causing the recursion to stop.
             const newUrl = this.trimParliamentUrl(response.data.dokumentlista["@nasta_sida"]);
+
+            // Trigger new lambda if we're running out of execution time
+            if (newUrl && this.allowContinue && this.context && this.context.getRemainingTimeInMillis) {
+                if (this.context.getRemainingTimeInMillis() < 500) {
+                    logger.warn("Ran out of execution time, invoking new Lambda");
+                    const requestParams = {
+                        queryStringParameters: {
+                            startUrl: newUrl,
+                            documentType: getDocumentTypeString(this.documentType)
+                        }
+                    };
+                    lambda.invoke({
+                        FunctionName: `${config.AWS_APPLICATION_NAME}-adminContinueImport`,
+                        Payload: JSON.stringify(requestParams, null, 2)
+                    });
+                    this.stop();
+                }
+            }
+
             await this.search(newUrl);
         } catch (error) {
             logger.error("There was an error fetching documents. Aborting import job.", error);
