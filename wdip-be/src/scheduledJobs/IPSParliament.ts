@@ -22,6 +22,11 @@ export abstract class IPSParliament extends ImportPublicationService {
     private context: any = null;
     private allowContinue: boolean = true;
 
+    /**
+     * @param documentType the document type for the current execution
+     * @param context reference to lambda context (from handler)
+     * @param allowContinue set to true to allow invoking new lambdas before this one times out
+     */
     constructor(documentType: DocumentType, context: any, allowContinue: boolean = true) {
         super();
         this.documentType = documentType;
