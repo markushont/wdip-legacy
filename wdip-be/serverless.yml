@@ -68,8 +68,8 @@ functions:
       - http:
           path: partydata/allparties
           method: get
-  adminStartImport:
-    handler: src/importHandler.adminStartImport
+  routeAdminStartImport:
+    handler: src/importHandler.routeAdminStartImport
     events:
       - http:
           path: admin/import
@@ -80,6 +80,19 @@ functions:
                 documentType: false
                 fromDate: false
                 toDate: false
+  adminStartImport:
+    handler: src/importHandler.adminStartImport
+  routeAdminStartUpdateImport:
+    handler: src/importHandler.routeAdminStartUpdateImport
+    events:
+      - http:
+          path: admin/import/update
+          method: post
+          requests:
+            parameters:
+              querystrings:
+                fromDate: false
+                documentType: false
   adminStartUpdateImport:
     handler: src/importHandler.startUpdateImport
     events:
@@ -93,14 +106,6 @@ functions:
           enabled: ${self:provider.enableScheduled}
           input:
             documentType: prop
-      - http:
-          path: admin/import/update
-          method: post
-          requests:
-            parameters:
-              querystrings:
-                fromDate: false
-                documentType: false
   adminContinueImport:
     handler: src/importHandler.continueImport
     events:
