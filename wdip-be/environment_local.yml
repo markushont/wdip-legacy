@@ -1,4 +1,3 @@
-AWS_REGION: ${self:provider.region}
 ES_SERVER: "elasticsearch:9200"
 SQS_URL: "http://sqs:9324/queue/wdip-import-local"
 STATUS_INDEX_IPS: "status-ips"

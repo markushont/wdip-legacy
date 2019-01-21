@@ -6,10 +6,11 @@ export default async function getWordCloud(fromDateStr, toDateStr) {
 
   const params = {
     index: config.WDIP_MOTION_INDEX,
+    type: "MOTION",
     body: {
       query: {
         range: {
-          dateStr: {
+          published: {
             gte: fromDateStr,
             lte: toDateStr
           }
@@ -19,7 +20,7 @@ export default async function getWordCloud(fromDateStr, toDateStr) {
         keywords: {
           significant_text:
           {
-            field: "titel",
+            field: "fullText",
             min_doc_count: 2
           }
         }
