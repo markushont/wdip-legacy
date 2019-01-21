@@ -6,7 +6,6 @@ import { transformDocumentType } from "./models/DocumentType";
 import { importQueueStatus } from "./scheduledJobs/ImportQueueStatus";
 import { importSubscriptionServiceParliament } from "./scheduledJobs/ImportSubscriptionServiceParliament";
 import { IPSParliamentDateRange } from "./scheduledJobs/IPSParliamentDateRange";
-import { IPSParliamentStartUrl } from "./scheduledJobs/IPSParliamentStartUrl";
 import { IPSParliamentUpdate } from "./scheduledJobs/IPSParliamentUpdate";
 
 function hasParameter(event, parameter) {
@@ -87,25 +86,6 @@ export const startUpdateImport = async (event, context) => {
     return httpResponses.success({}, 202);
   } catch (error) {
     return httpResponses.error(error);
-  }
-};
-
-export const continueImport = async (event, context) => {
-  const startUrl = hasParameter(event, "startUrl") ? event.queryStringParameters.startUrl : null;
-
-  if (startUrl) {
-    const docTypeStr = hasParameter(event, "documentType") ? event.queryStringParameters.documentType : "mot";
-    const documentType = transformDocumentType(docTypeStr);
-
-    try {
-      const ipsParliamentStartUrl = new IPSParliamentStartUrl(documentType, context);
-      await ipsParliamentStartUrl.start(startUrl);
-      return httpResponses.success({}, 202);
-    } catch (error) {
-      return httpResponses.error(error);
-    }
-  } else {
-    return httpResponses.error("No valid startUrl passed");
   }
 };
 

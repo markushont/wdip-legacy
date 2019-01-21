@@ -71,25 +71,6 @@ export abstract class IPSParliament extends ImportPublicationService {
             // Recursively fetch the next page of documents. Note that the last page does not
             // contain the '@nasta_sida' property, causing the recursion to stop.
             const newUrl = this.trimParliamentUrl(response.data.dokumentlista["@nasta_sida"]);
-
-            // Trigger new lambda if we're running out of execution time
-            if (newUrl && this.allowContinue && this.context && this.context.getRemainingTimeInMillis) {
-                if (this.context.getRemainingTimeInMillis() < 500) {
-                    logger.warn("Ran out of execution time, invoking new Lambda");
-                    const requestParams = {
-                        queryStringParameters: {
-                            startUrl: newUrl,
-                            documentType: getDocumentTypeString(this.documentType)
-                        }
-                    };
-                    lambda.invoke({
-                        FunctionName: `${config.AWS_APPLICATION_NAME}-adminContinueImport`,
-                        Payload: JSON.stringify(requestParams, null, 2)
-                    });
-                    this.stop();
-                }
-            }
-
             await this.search(newUrl);
         } catch (error) {
             logger.error("There was an error fetching documents. Aborting import job.", error);

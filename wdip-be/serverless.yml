@@ -106,17 +106,6 @@ functions:
           enabled: ${self:provider.enableScheduled}
           input:
             documentType: prop
-  adminContinueImport:
-    handler: src/importHandler.continueImport
-    events:
-      - http:
-          path: admin/import/continue
-          method: post
-          requests:
-            parameters:
-              queryStrings:
-                documentType: false
-                startUrl: true
   adminHandleImportQueueEvent:
     handler: src/importHandler.handleImportQueueEvent
     events:
