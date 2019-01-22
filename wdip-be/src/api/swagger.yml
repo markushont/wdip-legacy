@@ -25,17 +25,21 @@ paths:
           required: false
           schema:
             type: string
-            format: date
+            #format: date, see https://github.com/OpenAPITools/openapi-generator/issues/926
         - name: toDate
           in: query
           description: To which date (inclusive) data should be returned.
           required: false
           schema:
             type: string
-            format: date
+            #format: date
       responses:
         '200':
           description: A list of all motions by party
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
           content:
             application/json:    
               schema:
@@ -45,7 +49,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorModel"
+                $ref: "#/components/schemas/Partys"
   /charts/wordcloud:
     get:
       summary: Gets word cloud data, ie keywords and their frequency
@@ -59,14 +63,14 @@ paths:
           required: false
           schema:
             type: string
-            format: date
+            #format: date
         - name: toDate
           in: query
           description: To which date (inclusive) data should be returned.
           required: false
           schema:
             type: string
-            format: date
+            #format: date
       responses:
         '200':
           description: A list of words and their number of appearances
@@ -86,7 +90,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorModel"
+                $ref: "#/components/schemas/Partys"
 components:
   schemas:
     MotionsByParty:
@@ -97,10 +101,10 @@ components:
       properties:
         fromDate:
           type: string
-          format: date
+          #format: date
         toDate:
           type: string
-          format: date
+          #format: date
         results:
           type: array
           items:
@@ -127,6 +131,28 @@ components:
       type: array
       items:
         $ref: "#/components/schemas/Word"
+    Party:
+      required:
+        - id
+        - x
+        - y
+        - color
+        - name
+      properties:
+        id:
+          type: string
+        x:
+          type: integer
+        y:
+          type: integer
+        color:
+          type: string
+        name:
+          type: string
+    Partys:
+      type: array
+      items:
+        $ref: "#/components/schemas/Party"
     ErrorModel:
       required:
         - code
