@@ -80,9 +80,8 @@ The backend API is defined in an OpenAPI definition file (at wdip-be/api/swagger
 rm -rf wdip-fe/src/service/wdip-be
 
 # Generate the new API client
-docker run --rm -v ${PWD}:/local openapitools/openapi-generator-cli:v3.3.4 generate -i /local/wdip-be/src/api/swagger.yml -g typescript-fetch -o /local/wdip-fe/src/service/wdip-be
+docker run --rm -v ${PWD}:/local openapitools/openapi-generator-cli generate -i /local/wdip-be/src/api/swagger.yml -g typescript-fetch -o /local/wdip-fe/src/service/wdip-be
 ```
-3.3.4 is the latest stable release. The upcoming beta release of 4.0.0 is set to Janaury/February and contains breaking changes. 
 
 ## Deploying the backend (not necessary for local development)
 
