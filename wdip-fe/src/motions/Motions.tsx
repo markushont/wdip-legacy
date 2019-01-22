@@ -106,7 +106,7 @@ class Motions extends React.Component<any, MotionsState> {
                                     />
                                     <Route
                                         path={`${match.path}/:party`}
-                                        component={MotionsView}
+                                        render={(props) => <MotionsView {...props} fromYear={fromYear} toYear={toYear} />}
                                     />
                                 </Switch>
                             </CSSTransition>

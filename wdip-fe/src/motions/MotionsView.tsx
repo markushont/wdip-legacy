@@ -1,78 +1,87 @@
 import * as React from 'react';
-import { Bubble } from 'react-chartjs-2';
+import { Bubble, ChartData } from 'react-chartjs-2';
+import * as chartjs from "chart.js";
+import { MotionsApi, Motions, Motion } from "../service/wdip-be";
+
 const colorApproved = "#41B3A3";
-const colorDeclined = "#E27D60";
+const colorPending  = "#FADA5E";
+const colorRejected = "#E27D60";
 
+interface MotionsViewState {
+    motions: Motions;
+}
 
-class MotionsView extends React.Component<any, any> {
+class MotionsView extends React.Component<any, MotionsViewState> {
+
+    motionsApi: MotionsApi = new MotionsApi();
+
     constructor(props: any) {
         super(props);
+        this.state = {
+            motions: {
+                total: 0,
+                startResult: 0,
+                endResult: 0,
+                results: []
+            }
+        }
     }
 
-    public setPosition(motionSet: Array<any>) {
-        var length = motionSet.length;
-
-        var rows = Math.floor(Math.sqrt(length));
-        while (length % rows != 0) {
-            rows = rows - 1;
-        }
-
-        let columns = length / rows;
-        let r = length > 50 ? 15 : 30;
-        let x = 0;
-        let y = 0;
-        motionSet.forEach(function (element) {
-            element.backgroundColor = element.data[0].status == "approved" ? colorApproved : colorDeclined;
-            element.data[0].x = x;
-            element.data[0].y = y;
-            element.data[0].r = r;
-
-            if (x < columns - 1) {
-                x++;
-            } else {
-                y--;
-                x = 0;
+    private async getPartyData() {
+        if (this.props.fromYear && this.props.toYear) {
+            const { match } = this.props;
+            try {
+                const id = match && match.params ? match.params.party : "";
+                const fromDate = `${this.props.fromYear}-01-01`;
+                const toDate = `${this.props.toYear}-12-31`;
+                const result = await this.motionsApi.getMotionsForParty({ id, fromDate, toDate });
+                this.setState({ motions: result });
+            } catch (error) {
+                console.error(error);
             }
-        });
-        return motionSet;
+        }
     }
 
-    public createData(numberOfMotions: number) {
+    componentWillMount() {
+        this.getPartyData();
+    }
 
-        const approved = numberOfMotions * 0.55;
+    componentWillReceiveProps() {
+        this.getPartyData();
+    }
 
-        var datasets = [];
+    private layout(motion: Motion, index: number, array: Motion[]): chartjs.ChartDataSets {
+        const length = array.length;
+        const columns = Math.floor(Math.sqrt(length));
+        const rows = Math.floor(length / columns);
+        const r = length > 50 ? 15 : 30;
 
-        var i = 0;
-        for (i; i < approved; i++) {
-            {
-                datasets.push({
-                    data: [{
-                        summary: "this is a summary",
-                        status: "approved"
-                    }]
-                })
-            }
+        const x = index % columns;
+        const y = rows - Math.floor(index / columns);
+        let backgroundColor = colorRejected;
+        switch (motion.documentStatus) {
+            case "PENDING":
+                backgroundColor = colorPending;
+                break;
+            case "APPROVED":
+                backgroundColor = colorApproved;
+                break;
+            case "REJECTED":
+                backgroundColor = colorRejected;
+                break;
         }
 
-        for (i; i < numberOfMotions; i++) {
-            {
-                datasets.push({
-                    data: [{
-                        summary: "this is a summary",
-                        status: "declined"
-                    }]
-                })
-            }
+        return {
+            backgroundColor,
+            data: [{ x, y, r }],
+            label: motion.id
         }
-
-        return datasets;
-
     }
 
     public render() {
-
-        let motions = { datasets: this.setPosition(this.createData(50)) };
+        const layoutedMotions: chartjs.ChartDataSets[] = this.state.motions.results
+            ? this.state.motions.results.map<chartjs.ChartDataSets>(this.layout)
+            : [];
         const divStyle = {
             position: "fixed",
             zIndex: -1000,
@@ -106,7 +115,7 @@ class MotionsView extends React.Component<any, any> {
             <div style={divStyle}>
                 <Bubble
                     type='bubble'
-                    data={motions}
+                    data={{ datasets: layoutedMotions }}
                     options={options}
                     width={800}
                     height={800} />
