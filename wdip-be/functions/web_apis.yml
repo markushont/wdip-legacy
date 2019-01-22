@@ -10,6 +10,20 @@ getMotionsByParty:
     - http:
         path: motions/byparty
         method: get
+getMotionsForParty:
+  handler: src/apiHandler.getMotionsForParty
+  events:
+    - http:
+        path: motions/byparty/{id}
+        method: get
+        requests:
+          parameters:
+            querystrings:
+              fromDate: false
+              toDate: false
+              fromResultNo: false
+            paths:
+              id: true
 getMotion:
   handler: src/apiHandler.getMotionById
   events:
@@ -30,5 +44,5 @@ getAllParties:
   handler: src/apiHandler.getAllParties
   events:
     - http:
-        path: partydata/allparties
+        path: parties
         method: get

@@ -1,24 +1,56 @@
 "use strict";
 
-import moment from "moment";
+import moment, { Moment } from "moment";
 import getAllParties from "./api/getAllParties";
 import getMotionsByParty from "./api/getMotionsByParty";
+import getMotionsForParty from "./api/getMotionsForParty";
 import getWordCloud from "./api/getWordCloud";
 import { getMotionById, getPendingMotions } from "./api/motions";
 import httpResponses from "./httpResponses";
 
-module.exports.getMotionsByParty = async (event, context) => {
+interface DateInterval {
+    fromDate: Moment;
+    toDate: Moment;
+}
+
+function getDateInterval(event: any): DateInterval {
     const today = moment();
-    let fromDate  = today.format("YYYY-MM-DD"); // defaults to today
-    let toDate = today.subtract(1, "month").format("YYYY-MM-DD"); // defaults to last month
+    let fromDate  = today; // defaults to today
+    let toDate = today.subtract(1, "month"); // defaults to last month
 
     if (event && event.queryStringParameters) {
-        fromDate = event.queryStringParameters.fromDate || fromDate;
-        toDate = event.queryStringParameters.toDate || toDate;
+        if (event.queryStringParameters.fromDate) {
+            fromDate = moment(event.queryStringParameters.fromDate);
+        }
+
+        if (event.queryStringParameters.toDate) {
+            toDate = moment(event.queryStringParameters.toDate);
+        }
     }
 
+    return { fromDate, toDate };
+}
+
+module.exports.getMotionsByParty = async (event, context) => {
+    const { fromDate, toDate } = getDateInterval(event);
+    const fromDateStr = fromDate.format("YYYY-MM-DD");
+    const toDateStr = toDate.format("YYYY-MM-DD");
+
     try {
-        const result = await getMotionsByParty(fromDate, toDate);
+        const result = await getMotionsByParty(fromDateStr, toDateStr);
+        return httpResponses.success(result);
+    } catch (error) {
+        return httpResponses.error(error);
+    }
+};
+
+module.exports.getMotionsForParty = async (event, context) => {
+    const id = decodeURIComponent(event.pathParameters.id);
+    const { fromDate, toDate } = getDateInterval(event);
+    const fromResultNo = event.queryStringParameters.fromResultNo;
+
+    try {
+        const result = await getMotionsForParty(id, fromDate, toDate, fromResultNo);
         return httpResponses.success(result);
     } catch (error) {
         return httpResponses.error(error);
@@ -45,17 +77,12 @@ module.exports.getPendingMotions = async (event, context) => {
 };
 
 module.exports.getWordCloud = async (event, context) => {
-    const today = moment();
-    let fromDate  = today.format("YYYY-MM-DD"); // defaults to today
-    let toDate = today.subtract(1, "month").format("YYYY-MM-DD"); // defaults to last month
-
-    if (event && event.queryStringParameters) {
-        fromDate = event.queryStringParameters.fromDate || fromDate;
-        toDate = event.queryStringParameters.toDate || toDate;
-    }
+    const { fromDate, toDate } = getDateInterval(event);
+    const fromDateStr = fromDate.format("YYYY-MM-DD");
+    const toDateStr = toDate.format("YYYY-MM-DD");
 
     try {
-        const result = await getWordCloud(fromDate, toDate);
+        const result = await getWordCloud(fromDateStr, toDateStr);
         return httpResponses.success(result);
     } catch (error) {
         return httpResponses.error(error);

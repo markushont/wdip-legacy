@@ -50,6 +50,46 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Partys"
+  /motions/byparty/{id}:
+    get:
+      summary: Gets motions for the specified party and time period
+      operationId: getMotionsForParty
+      tags:
+        - motions
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: Identifier for party
+        - in: query
+          name: fromDate
+          description: From which date (inclusive) data should be returned.
+          required: false
+          schema:
+            type: string
+            #format: date
+        - in: query
+          name: toDate
+          description: To which date (inclusive) data should be returned.
+          required: false
+          schema:
+            type: string
+            #format: date
+        - in: query
+          name: fromResultNo
+          description: Where to begin the batch of results (pagination) 
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: A list of motions
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Motions"
   /charts/wordcloud:
     get:
       summary: Gets word cloud data, ie keywords and their frequency
@@ -78,7 +118,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Words"
-  /partydata/allparties:
+  /parties:
     get:
       summary: Gets data for all the parties, i.e. GAL-TAN position and party color
       operationId: getAllParties
@@ -153,6 +193,64 @@ components:
       type: array
       items:
         $ref: "#/components/schemas/Party"
+    Proposal:
+      required:
+        - wording
+        - committeeStatus
+        - chamberStatus
+      properties:
+        wording:
+          type: string
+        committeeStatus:
+          type: string
+        chamberStatus:
+          type: string
+    Stakeholder:
+      required:
+        - id
+        - name
+        - party
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        party:
+            $ref: "#/components/schemas/Party"
+    Motion:
+      required:
+        - id
+        - documentStatus
+        - documentType
+        - proposals
+        - stakeholders
+      properties:
+        id:
+          type: string
+        documentStatus:
+          type: string
+        documentType:
+          type: string
+        proposals:
+          type: array
+          items:
+            $ref: "#/components/schemas/Proposal"
+        stakeholders:
+          type: array
+          items:
+            $ref: "#/components/schemas/Stakeholder"
+    Motions:
+      properties:
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/Motion"
+        total:
+          type: integer
+        startResult:
+          type: integer
+        endResult:
+          type: integer
     ErrorModel:
       required:
         - code

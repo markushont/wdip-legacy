@@ -14,6 +14,9 @@
 
 import * as runtime from '../runtime';
 import {
+    Motions,
+    MotionsFromJSON,
+    MotionsToJSON,
     MotionsByParty,
     MotionsByPartyFromJSON,
     MotionsByPartyToJSON,
@@ -25,6 +28,13 @@ import {
 export interface GetMotionsByPartyRequest {
     fromDate?: string;
     toDate?: string;
+}
+
+export interface GetMotionsForPartyRequest {
+    id: string;
+    fromDate?: string;
+    toDate?: string;
+    fromResultNo?: number;
 }
 
 /**
@@ -63,6 +73,48 @@ export class MotionsApi extends runtime.BaseAPI {
      */
     async getMotionsByParty(requestParameters: GetMotionsByPartyRequest): Promise<MotionsByParty> {
         const response = await this.getMotionsByPartyRaw(requestParameters);
+        return await response.value();
+    }
+
+    /**
+     * Gets motions for the specified party and time period
+     */
+    async getMotionsForPartyRaw(requestParameters: GetMotionsForPartyRequest): Promise<runtime.ApiResponse<Motions>> {
+        if (requestParameters.id === null || requestParameters.id === undefined) {
+            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling getMotionsForParty.');
+        }
+
+        const queryParameters: runtime.HTTPQuery = {};
+
+        if (requestParameters.fromDate !== undefined) {
+            queryParameters['fromDate'] = requestParameters.fromDate;
+        }
+
+        if (requestParameters.toDate !== undefined) {
+            queryParameters['toDate'] = requestParameters.toDate;
+        }
+
+        if (requestParameters.fromResultNo !== undefined) {
+            queryParameters['fromResultNo'] = requestParameters.fromResultNo;
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/motions/byparty/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        });
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => MotionsFromJSON(jsonValue));
+    }
+
+    /**
+     * Gets motions for the specified party and time period
+     */
+    async getMotionsForParty(requestParameters: GetMotionsForPartyRequest): Promise<Motions> {
+        const response = await this.getMotionsForPartyRaw(requestParameters);
         return await response.value();
     }
 

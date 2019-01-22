@@ -33,7 +33,7 @@ export class PartyApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/partydata/allparties`,
+            path: `/parties`,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
