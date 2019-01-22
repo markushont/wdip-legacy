@@ -1,0 +1,45 @@
+adminStartImport:
+  handler: src/importHandler.adminStartImport
+  events:
+    - http:
+        path: admin/import
+        method: post
+        requests:
+          parameters:
+            querystrings:
+              documentType: false
+              fromDate: false
+              toDate: false
+adminStartUpdateImport:
+  handler: src/importHandler.startUpdateImport
+  events:
+    - schedule:
+        rate: rate(1 day)
+        enabled: ${self:provider.enableScheduled}
+        input:
+          documentType: mot
+    - schedule:
+        rate: rate(1 day)
+        enabled: ${self:provider.enableScheduled}
+        input:
+          documentType: prop
+    - http:
+        path: admin/import/update
+        method: post
+        requests:
+          parameters:
+            querystrings:
+              fromDate: false
+              documentType: false
+adminHandleImportQueueEvent:
+  handler: src/importHandler.handleImportQueueEvent
+  events:
+    - sqs:
+        arn: arn:aws:sqs:eu-west-1:843375259671:wdip-import-${opt:stage, "local"}
+        batchSize: 1
+adminLogQueueStatus:
+  handler: src/importHandler.logQueueStatus
+  events:
+    - schedule:
+        rate: rate(1 minute)
+        enabled: ${self:provider.enableScheduled}
