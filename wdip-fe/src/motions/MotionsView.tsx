@@ -1,7 +1,10 @@
 import * as React from 'react';
-import { Bubble, ChartData } from 'react-chartjs-2';
+import { Bubble } from 'react-chartjs-2';
+import { Route } from "react-router-dom";
 import * as chartjs from "chart.js";
 import { MotionsApi, Motions, Motion } from "../service/wdip-be";
+import { MotionInfo } from "./MotionInfo";
+import "./MotionsView.css";
 
 const colorApproved = "#41B3A3";
 const colorPending  = "#FADA5E";
@@ -9,6 +12,7 @@ const colorRejected = "#E27D60";
 
 interface MotionsViewState {
     motions: Motions;
+    selectedMotionId: string;
 }
 
 class MotionsView extends React.Component<any, MotionsViewState> {
@@ -23,6 +27,18 @@ class MotionsView extends React.Component<any, MotionsViewState> {
                 startResult: 0,
                 endResult: 0,
                 results: []
+            },
+            selectedMotionId: ""
+        }
+    }
+
+    public onClickBubble(e: any, activeElements: any): void {
+        const { history, match } = this.props;
+        const results = this.state.motions.results;
+        if (history && activeElements.length && results && results.length) {
+            const id = results[activeElements[0]._datasetIndex].id;
+            if (id) {
+                history.push(`/motions/${match.params.party}/${id}`);
             }
         }
     }
@@ -34,7 +50,7 @@ class MotionsView extends React.Component<any, MotionsViewState> {
                 const id = match && match.params ? match.params.party : "";
                 const fromDate = `${this.props.fromYear}-01-01`;
                 const toDate = `${this.props.toYear}-12-31`;
-                const result = await this.motionsApi.getMotionsForParty({ id, fromDate, toDate });
+                const result = await this.motionsApi.getMotionsForParty(id, fromDate, toDate);
                 this.setState({ motions: result });
             } catch (error) {
                 console.error(error);
@@ -83,7 +99,6 @@ class MotionsView extends React.Component<any, MotionsViewState> {
             ? this.state.motions.results.map<chartjs.ChartDataSets>(this.layout)
             : [];
         const divStyle = {
-            position: "fixed",
             zIndex: -1000,
         } as React.CSSProperties;
 
@@ -109,16 +124,23 @@ class MotionsView extends React.Component<any, MotionsViewState> {
                     top: 50,
                     bottom: 50
                 }
-            }
+            },
+            onClick: this.onClickBubble.bind(this)
         }
+
+        const { match } = this.props;
+
         return (
-            <div style={divStyle}>
+            <div className={"motions-view"} style={divStyle}>
                 <Bubble
                     type='bubble'
                     data={{ datasets: layoutedMotions }}
                     options={options}
                     width={800}
                     height={800} />
+                <Route
+                    path={`${match.path}/:motionId`}
+                    render={(props) => <MotionInfo {...props} motionId={this.state.selectedMotionId} />}/>
             </div>
         );
     }

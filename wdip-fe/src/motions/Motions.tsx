@@ -9,13 +9,13 @@ import MotionsView from './MotionsView';
 import { Range } from 'rc-slider';
 import { Route, Switch } from "react-router-dom";
 import { TransitionGroup, CSSTransition } from "react-transition-group";
-import { MotionsApi, PartyApi } from "src/service/wdip-be";
+import { MotionsApi, MotionsByParty, PartyApi } from "src/service/wdip-be";
 import * as moment from "moment";
 
 interface MotionsState {
     fromDate: moment.Moment;
     toDate: moment.Moment;
-    motionsByParty?: any;
+    motionsByParty?: MotionsByParty;
     partyData?: any;
 };
 
@@ -39,10 +39,10 @@ class Motions extends React.Component<any, MotionsState> {
 
     async getMotionsByParty() {
         try {
-            const motions = await this.motionsApi.getMotionsByParty( {
-                fromDate: this.state.fromDate.format("YYYY-MM-DD"),
-                toDate: this.state.toDate.format("YYYY-MM-DD"),
-            });
+            const motions = await this.motionsApi.getMotionsByParty(
+                this.state.fromDate.format("YYYY-MM-DD"),
+                this.state.toDate.format("YYYY-MM-DD"),
+            );
             this.setState({ motionsByParty: motions });
         } catch (error) {
             console.error(error);
@@ -99,14 +99,14 @@ class Motions extends React.Component<any, MotionsState> {
                                         render={(props) =>
                                             <BubbleChart
                                                 {...props}
-                                                results={this.state.motionsByParty.results}
+                                                results={this.state.motionsByParty ? this.state.motionsByParty.results : null}
                                                 partyData={this.state.partyData}
                                             />
                                         }
                                     />
                                     <Route
                                         path={`${match.path}/:party`}
-                                        render={(props) => <MotionsView {...props} fromYear={fromYear} toYear={toYear} />}
+                                        render={(props) => <MotionsView {...props} results={this.state.motionsByParty ? this.state.motionsByParty.results : null} fromYear={fromYear} toYear={toYear} />}
                                     />
                                 </Switch>
                             </CSSTransition>

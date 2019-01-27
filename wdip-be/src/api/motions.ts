@@ -5,6 +5,7 @@ import dbClient from "../dbclient";
 import logger from "../logger";
 import { DocumentStatus } from "../models/DocumentStatus";
 import { DocumentType } from "../models/DocumentType";
+import { transformMotion } from "./apiUtil";
 
 export async function getMotionById(id: string) {
     logger.debug(`Will query for motion ${id}.`);
@@ -18,10 +19,10 @@ export async function getMotionById(id: string) {
     try {
         const doc = await dbClient.get(params);
         logger.debug("Got document.", doc);
-        return doc;
+        return transformMotion(doc);
     } catch (error) {
-        logger.error(`Failed to query table ${config.WDIP_MOTION_INDEX}.`, error);
-        return null;
+        logger.error(`Failed to query table ${config.WDIP_MOTION_INDEX}: ${JSON.stringify(error, null, 2)}`);
+        throw error;
     }
 }
 
@@ -40,6 +41,6 @@ export async function getPendingMotions() {
         return pendingIds;
     } catch (error) {
         logger.error("Failed to query pending motions.", error);
-        return null;
+        throw error;
     }
 }

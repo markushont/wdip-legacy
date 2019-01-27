@@ -90,6 +90,26 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Motions"
+  /motions/{id}:
+    get:
+      summary: Gets motion for the specified id
+      operationId: getMotion
+      tags:
+        - motions
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: Identifier for motion
+      responses:
+        '200':
+          description: Motion
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Motion"
   /charts/wordcloud:
     get:
       summary: Gets word cloud data, ie keywords and their frequency
@@ -220,12 +240,15 @@ components:
     Motion:
       required:
         - id
+        - title
         - documentStatus
         - documentType
         - proposals
         - stakeholders
       properties:
         id:
+          type: string
+        title:
           type: string
         documentStatus:
           type: string

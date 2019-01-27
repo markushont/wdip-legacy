@@ -2,32 +2,7 @@ import { SearchResponse } from "elasticsearch";
 import { Moment } from "moment";
 import config from "../config/config";
 import dbClient from "../dbclient";
-
-const transformMotion = (dbHit: any) => {
-    const {
-        id,
-        documentStatus,
-        documentType,
-        proposals,
-        stakeholders
-    } = dbHit._source;
-
-    const parsedStakeholders = stakeholders.map((stakeholder) => {
-        return {
-            id: stakeholder.id,
-            name: stakeholder.name,
-            party: stakeholder.party.id
-        };
-    });
-
-    return {
-        id,
-        documentStatus,
-        documentType,
-        proposals,
-        stakeholders: parsedStakeholders
-    };
-};
+import { transformMotion } from "./apiUtil";
 
 const RESULTS_SIZE = 50;
 
