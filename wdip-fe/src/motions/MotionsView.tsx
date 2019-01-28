@@ -1,9 +1,11 @@
 import * as React from 'react';
+import { connect } from 'react-redux';
+import { Dispatch } from "redux";
 import { Bubble } from 'react-chartjs-2';
 import { Route } from "react-router-dom";
 import * as chartjs from "chart.js";
 import { MotionsApi, Motions, Motion } from "../service/wdip-be";
-import { MotionInfo } from "./MotionInfo";
+import MotionInfo from "./MotionInfo";
 import "./MotionsView.css";
 
 const colorApproved = "#41B3A3";
@@ -15,7 +17,15 @@ interface MotionsViewState {
     selectedMotionId: string;
 }
 
-class MotionsView extends React.Component<any, MotionsViewState> {
+interface MotionsViewProps {
+    getMotionDataSuccess: (result: Motion) => any;
+    history: any;
+    match: any;
+    fromYear: string;
+    toYear: string;
+}
+
+class MotionsView extends React.Component<MotionsViewProps, MotionsViewState> {
 
     motionsApi: MotionsApi = new MotionsApi();
 
@@ -32,12 +42,23 @@ class MotionsView extends React.Component<any, MotionsViewState> {
         }
     }
 
+    private async getMotionData(id: string) {
+        try {
+            const result = await this.motionsApi.getMotion({ id });
+            // this.setState({ motion: result });
+            this.props.getMotionDataSuccess(result);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
     public onClickBubble(e: any, activeElements: any): void {
         const { history, match } = this.props;
         const results = this.state.motions.results;
         if (history && activeElements.length && results && results.length) {
             const id = results[activeElements[0]._datasetIndex].id;
             if (id) {
+                this.getMotionData(id);
                 history.push(`/motions/${match.params.party}/${id}`);
             }
         }
@@ -140,10 +161,19 @@ class MotionsView extends React.Component<any, MotionsViewState> {
                     height={800} />
                 <Route
                     path={`${match.path}/:motionId`}
-                    render={(props) => <MotionInfo {...props} motionId={this.state.selectedMotionId} />}/>
+                    render={(props) => <MotionInfo match={match} />}/>
             </div>
         );
     }
 }
 
-export default MotionsView;
+const mapDispatchToProps = (dispatch: Dispatch) => ({
+    getMotionDataSuccess: (result: Motion) => {
+        console.log('hej')
+        dispatch({type: 'GET_MOTION_DATA_SUCCESS', payload: [result]})
+    }
+})
+
+const mapStateToProps = () => ({})
+  
+export default connect(mapStateToProps, mapDispatchToProps)(MotionsView);

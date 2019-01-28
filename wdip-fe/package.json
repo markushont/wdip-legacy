@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@types/rc-slider": "^8.6.0",
+    "@types/react-redux": "^7.0.1",
     "@types/react-router-dom": "^4.3.1",
     "@types/react-transition-group": "^2.0.14",
     "@types/recharts": "^1.1.0",
@@ -21,9 +22,11 @@
     "react-date-picker": "^7.0.0",
     "react-dom": "^16.6.0",
     "react-foundation": "^0.9.6",
+    "react-redux": "^6.0.0",
     "react-router-dom": "^4.3.1",
     "react-scripts-ts": "^4.0.8",
-    "recharts": "^1.3.5"
+    "recharts": "^1.3.5",
+    "redux": "^4.0.1"
   },
   "scripts": {
     "start": "react-scripts-ts start",

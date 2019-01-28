@@ -1,40 +1,22 @@
 import * as React from "react";
+import { connect } from 'react-redux';
 import "./MotionInfo.css";
 import { match } from "react-router";
 import { MotionsApi, Motion, Proposal, Stakeholder } from "../service/wdip-be";
+import { AppState } from '../reducers/';
 
 export interface MotionInfoProps {
-    motionId: string;
-    match: match<any>;
+    currentMotion: Motion;
+    match?: match<any>;
 }
 
-export interface MotionInfoState {
-    motion: Motion;
-}
-
-export class MotionInfo extends React.Component<MotionInfoProps, any> {
+class MotionInfo extends React.Component<MotionInfoProps, any> {
 
     motionsApi: MotionsApi = new MotionsApi();
 
-    constructor(props: MotionInfoProps) {
-        super(props);
-        this.state = {
-            motion: null
-        }
-    }
-
     componentWillReceiveProps(nextProps: Readonly<MotionInfoProps>) {
         if (nextProps !== this.props) {
-            this.getMotionData(nextProps.match.params.motionId);
-        }
-    }
-
-    private async getMotionData(id: string) {
-        try {
-            const result = await this.motionsApi.getMotion({ id });
-            this.setState({ motion: result });
-        } catch (error) {
-            console.log(error);
+            // this.getMotionData(nextProps.match.params.motionId);
         }
     }
 
@@ -47,7 +29,8 @@ export class MotionInfo extends React.Component<MotionInfoProps, any> {
     }
 
     public render() {
-        const { motion } = this.state;
+        {console.log(this.props)}
+        const motion  = this.props.currentMotion;
         if (!motion) { return null };
         const statusClass = motion.documentStatus ? motion.documentStatus.toLowerCase() : "";
         return (
@@ -67,3 +50,14 @@ export class MotionInfo extends React.Component<MotionInfoProps, any> {
         );
     }
 }
+
+
+const mapDispatchToProps = () => ({
+
+})
+
+const mapStateToProps = (state: AppState) => ({
+    currentMotion: state.motions.currentMotion
+  })
+
+export default connect(mapStateToProps, mapDispatchToProps)(MotionInfo); 
