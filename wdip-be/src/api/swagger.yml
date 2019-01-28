@@ -25,17 +25,21 @@ paths:
           required: false
           schema:
             type: string
-            format: date
+            #format: date, see https://github.com/OpenAPITools/openapi-generator/issues/926
         - name: toDate
           in: query
           description: To which date (inclusive) data should be returned.
           required: false
           schema:
             type: string
-            format: date
+            #format: date
       responses:
         '200':
           description: A list of all motions by party
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
           content:
             application/json:    
               schema:
@@ -45,7 +49,67 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorModel"
+                $ref: "#/components/schemas/Partys"
+  /motions/byparty/{id}:
+    get:
+      summary: Gets motions for the specified party and time period
+      operationId: getMotionsForParty
+      tags:
+        - motions
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: Identifier for party
+        - in: query
+          name: fromDate
+          description: From which date (inclusive) data should be returned.
+          required: false
+          schema:
+            type: string
+            #format: date
+        - in: query
+          name: toDate
+          description: To which date (inclusive) data should be returned.
+          required: false
+          schema:
+            type: string
+            #format: date
+        - in: query
+          name: fromResultNo
+          description: Where to begin the batch of results (pagination) 
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: A list of motions
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Motions"
+  /motions/{id}:
+    get:
+      summary: Gets motion for the specified id
+      operationId: getMotion
+      tags:
+        - motions
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: Identifier for motion
+      responses:
+        '200':
+          description: Motion
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Motion"
   /charts/wordcloud:
     get:
       summary: Gets word cloud data, ie keywords and their frequency
@@ -59,14 +123,14 @@ paths:
           required: false
           schema:
             type: string
-            format: date
+            #format: date
         - name: toDate
           in: query
           description: To which date (inclusive) data should be returned.
           required: false
           schema:
             type: string
-            format: date
+            #format: date
       responses:
         '200':
           description: A list of words and their number of appearances
@@ -74,7 +138,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Words"
-  /partydata/allparties:
+  /parties:
     get:
       summary: Gets data for all the parties, i.e. GAL-TAN position and party color
       operationId: getAllParties
@@ -86,7 +150,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorModel"
+                $ref: "#/components/schemas/Partys"
 components:
   schemas:
     MotionsByParty:
@@ -97,10 +161,10 @@ components:
       properties:
         fromDate:
           type: string
-          format: date
+          #format: date
         toDate:
           type: string
-          format: date
+          #format: date
         results:
           type: array
           items:
@@ -127,6 +191,89 @@ components:
       type: array
       items:
         $ref: "#/components/schemas/Word"
+    Party:
+      required:
+        - id
+        - x
+        - y
+        - color
+        - name
+      properties:
+        id:
+          type: string
+        x:
+          type: integer
+        y:
+          type: integer
+        color:
+          type: string
+        name:
+          type: string
+    Partys:
+      type: array
+      items:
+        $ref: "#/components/schemas/Party"
+    Proposal:
+      required:
+        - wording
+        - committeeStatus
+        - chamberStatus
+      properties:
+        wording:
+          type: string
+        committeeStatus:
+          type: string
+        chamberStatus:
+          type: string
+    Stakeholder:
+      required:
+        - id
+        - name
+        - party
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        party:
+          type: string
+    Motion:
+      required:
+        - id
+        - title
+        - documentStatus
+        - documentType
+        - proposals
+        - stakeholders
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        documentStatus:
+          type: string
+        documentType:
+          type: string
+        proposals:
+          type: array
+          items:
+            $ref: "#/components/schemas/Proposal"
+        stakeholders:
+          type: array
+          items:
+            $ref: "#/components/schemas/Stakeholder"
+    Motions:
+      properties:
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/Motion"
+        total:
+          type: integer
+        startResult:
+          type: integer
+        endResult:
+          type: integer
     ErrorModel:
       required:
         - code

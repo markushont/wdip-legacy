@@ -1,0 +1,48 @@
+getPendingMotions:
+  handler: src/apiHandler.getPendingMotions
+  events:
+    - http:
+        path: motions/pending
+        method: get
+getMotionsByParty:
+  handler: src/apiHandler.getMotionsByParty
+  events:
+    - http:
+        path: motions/byparty
+        method: get
+getMotionsForParty:
+  handler: src/apiHandler.getMotionsForParty
+  events:
+    - http:
+        path: motions/byparty/{id}
+        method: get
+        requests:
+          parameters:
+            querystrings:
+              fromDate: false
+              toDate: false
+              fromResultNo: false
+            paths:
+              id: true
+getMotion:
+  handler: src/apiHandler.getMotionById
+  events:
+    - http:
+        path: motions/{id}
+        method: get
+        requests:
+          parameters:
+            paths:
+              id: true
+getWordCloud:
+  handler: src/apiHandler.getWordCloud
+  events:
+    - http:
+        path: charts/wordcloud
+        method: get
+getAllParties:
+  handler: src/apiHandler.getAllParties
+  events:
+    - http:
+        path: parties
+        method: get

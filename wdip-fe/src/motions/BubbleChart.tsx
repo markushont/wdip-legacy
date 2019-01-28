@@ -10,6 +10,20 @@ class BubbleChart extends React.Component<any, any> {
         super(props);
     }
 
+    public onClickBubble(e: any, activeElements: any): void {
+        const { history, results } = this.props;
+        if (history &&
+            activeElements.length &&
+            results &&
+            activeElements[0]._datasetIndex < results.length)
+        {
+            const id = results[activeElements[0]._datasetIndex].party;
+            if (id) {
+                history.push(`/motions/${id}`);
+            }
+        }
+    }
+
     public render() {
         let bubbles = {
             datasets: Array<any>()
@@ -80,10 +94,7 @@ class BubbleChart extends React.Component<any, any> {
             animation: {
                 duration: 2000
             },
-            onClick: (event: any, activeElements: any) =>
-            {
-                this.props.changePage();
-            }
+            onClick: this.onClickBubble.bind(this)
         }
 
         if (this.props.results) {
@@ -110,8 +121,11 @@ class BubbleChart extends React.Component<any, any> {
                 hoverRadius: 20
             }));
             
-            const partyData = this.props.partyData;
-            if(partyData){
+            if (this.props.partyData){
+                const partyData = {};
+                for (const data of this.props.partyData) {
+                    partyData[data.id] = data;
+                }
                 for (let bubble of bubbles.datasets) {
                     bubble.data[0].x = partyData[bubble.label].x;
                     bubble.data[0].y = partyData[bubble.label].y;
@@ -133,7 +147,7 @@ class BubbleChart extends React.Component<any, any> {
                     data={bubbles}
                     options={options}
                     width={800}
-                    height={800} 
+                    height={800}
                    />
             </div>
         );
