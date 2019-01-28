@@ -236,7 +236,7 @@ components:
         name:
           type: string
         party:
-            $ref: "#/components/schemas/Party"
+          type: string
     Motion:
       required:
         - id

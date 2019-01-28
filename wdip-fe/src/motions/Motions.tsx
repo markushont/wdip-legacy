@@ -39,10 +39,10 @@ class Motions extends React.Component<any, MotionsState> {
 
     async getMotionsByParty() {
         try {
-            const motions = await this.motionsApi.getMotionsByParty(
-                this.state.fromDate.format("YYYY-MM-DD"),
-                this.state.toDate.format("YYYY-MM-DD"),
-            );
+            const motions = await this.motionsApi.getMotionsByParty({
+                fromDate: this.state.fromDate.format("YYYY-MM-DD"),
+                toDate: this.state.toDate.format("YYYY-MM-DD"),
+            });
             this.setState({ motionsByParty: motions });
         } catch (error) {
             console.error(error);

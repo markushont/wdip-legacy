@@ -50,7 +50,7 @@ class MotionsView extends React.Component<any, MotionsViewState> {
                 const id = match && match.params ? match.params.party : "";
                 const fromDate = `${this.props.fromYear}-01-01`;
                 const toDate = `${this.props.toYear}-12-31`;
-                const result = await this.motionsApi.getMotionsForParty(id, fromDate, toDate);
+                const result = await this.motionsApi.getMotionsForParty({ id, fromDate, toDate });
                 this.setState({ motions: result });
             } catch (error) {
                 console.error(error);

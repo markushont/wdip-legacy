@@ -31,7 +31,7 @@ export class MotionInfo extends React.Component<MotionInfoProps, any> {
 
     private async getMotionData(id: string) {
         try {
-            const result = await this.motionsApi.getMotion(id);
+            const result = await this.motionsApi.getMotion({ id });
             this.setState({ motion: result });
         } catch (error) {
             console.log(error);
