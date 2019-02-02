@@ -21,8 +21,8 @@ interface MotionsState {
 
 class Motions extends React.Component<any, MotionsState> {
 
-    motionsApi: MotionsApi = new MotionsApi();
-    partyApi: PartyApi = new PartyApi();
+    motionsApi: MotionsApi = new MotionsApi(config.apiConfiguration);
+    partyApi: PartyApi = new PartyApi(config.apiConfiguration);
 
     constructor(props: any) {
         super(props);

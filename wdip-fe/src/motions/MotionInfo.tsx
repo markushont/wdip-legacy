@@ -1,6 +1,7 @@
 import * as React from "react";
 import "./MotionInfo.css";
 import { match } from "react-router";
+import { config } from "../config/config";
 import { MotionsApi, Motion, Proposal, Stakeholder } from "../service/wdip-be";
 
 export interface MotionInfoProps {
@@ -14,7 +15,7 @@ export interface MotionInfoState {
 
 export class MotionInfo extends React.Component<MotionInfoProps, any> {
 
-    motionsApi: MotionsApi = new MotionsApi();
+    motionsApi: MotionsApi = new MotionsApi(config.apiConfiguration);
 
     constructor(props: MotionInfoProps) {
         super(props);
