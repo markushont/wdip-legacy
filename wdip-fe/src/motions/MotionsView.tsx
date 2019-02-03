@@ -18,6 +18,7 @@ interface MotionsViewState {
 }
 
 interface MotionsViewProps {
+    motions: any;
     getMotionDataSuccess: (result: Motion) => any;
     history: any;
     match: any;
