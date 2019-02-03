@@ -15,8 +15,6 @@ import "foundation-sites/dist/js/foundation.min.js";
 const logger = createLogger();
 const store = createStore(rootReducer, applyMiddleware(logger));
 
-// const store = createStore(rootReducer, (window as any).__REDUX_DEVTOOLS_EXTENSION__ && (window as any).__REDUX_DEVTOOLS_EXTENSION__());
-
 ReactDOM.render(
   <Provider store={store}>
     <App />

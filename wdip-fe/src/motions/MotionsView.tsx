@@ -67,10 +67,6 @@ class MotionsView extends React.Component<MotionsViewProps, any> {
         this.getPartyData();
     }
 
-    componentWillReceiveProps() {
-        // this.getPartyData();
-    }
-
     private layout(motion: Motion, index: number, array: Motion[]): chartjs.ChartDataSets {
         const length = array.length;
         const columns = Math.floor(Math.sqrt(length));

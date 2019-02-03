@@ -8,7 +8,7 @@ import { config } from "../config/config";
 import BubbleChart from './BubbleChart';
 import MotionsView from './MotionsView';
 import { Range } from 'rc-slider';
-import { Route, Switch, match } from "react-router-dom";
+import { Route, Switch } from "react-router-dom";
 import { TransitionGroup, CSSTransition } from "react-transition-group";
 import { MotionsApi, MotionsByParty, PartyApi, Party } from "src/service/wdip-be";
 import * as moment from "moment";
@@ -30,10 +30,6 @@ class Motions extends React.Component<MotionsProps, any> {
 
     motionsApi: MotionsApi = new MotionsApi();
     partyApi: PartyApi = new PartyApi();
-
-    constructor(props: any) {
-        super(props);
-    }
 
     componentDidMount() {
         this.getMotionsByParty();
