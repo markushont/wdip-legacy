@@ -48,7 +48,6 @@ class MotionsView extends React.Component<MotionsViewProps, MotionsViewState> {
         try {
             const result = await this.motionsApi.getMotion({ id });
             // this.setState({ motion: result });
-            console.log('Get motion data successful: ', result)
             this.props.getMotionDataSuccess(result); // redux
         } catch (error) {
             console.log(error);
@@ -57,7 +56,6 @@ class MotionsView extends React.Component<MotionsViewProps, MotionsViewState> {
 
     public onClickBubble(e: any, activeElements: any): void {
         const { history, match } = this.props;
-        console.log('click bubble, this.props.motions.results: ', this.props.motions.results)
         const results = this.props.motions.results;
         if (history && activeElements.length && results && results.length) {
             const id = results[activeElements[0]._datasetIndex].id;
@@ -77,7 +75,6 @@ class MotionsView extends React.Component<MotionsViewProps, MotionsViewState> {
                 const toDate = `${this.props.toYear}-12-31`;
                 const result = await this.motionsApi.getMotionsForParty({ id, fromDate, toDate });
                 // this.setState({ motions: result });
-                console.log('Get party data successful: ', result)
                 this.props.getMotionsForPartySuccess(result); // redux
             } catch (error) {
                 console.error(error);
@@ -90,7 +87,7 @@ class MotionsView extends React.Component<MotionsViewProps, MotionsViewState> {
     }
 
     componentWillReceiveProps() {
-        this.getPartyData();
+        // this.getPartyData();
     }
 
     private layout(motion: Motion, index: number, array: Motion[]): chartjs.ChartDataSets {

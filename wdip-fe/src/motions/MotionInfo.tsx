@@ -23,7 +23,6 @@ class MotionInfo extends React.Component<MotionInfoProps, any> {
     }
 
     public render() {
-        {console.log(this.props)}
         const motion  = this.props.currentMotion;
         if (!motion) { return null };
         const statusClass = motion.documentStatus ? motion.documentStatus.toLowerCase() : "";

@@ -18,7 +18,7 @@ export const GET_MOTIONS_BY_PARTY_SUCCESS = 'GET_MOTIONS_BY_PARTY_SUCCESS'
 
 interface GetMotionSuccessAction {
   type: typeof GET_MOTION_DATA_SUCCESS
-  payload: Array<Motion>
+  payload: Motion
 }
 
 interface GetMotionsForPartySuccessAction {
@@ -34,8 +34,8 @@ interface GetMotionsByPartySuccessAction {
 export default function motions(state: MotionsState = initialState, action: GetMotionSuccessAction | GetMotionsForPartySuccessAction | GetMotionsByPartySuccessAction): MotionsState {
     switch (action.type) {
         case GET_MOTION_DATA_SUCCESS: 
-            console.log('action.payload: ', action.payload)
             return {
+                ...state,
                 currentMotion: action.payload[0],
                 motions: {
                     ...state.motions,
@@ -43,13 +43,11 @@ export default function motions(state: MotionsState = initialState, action: GetM
                 }
             }
         case GET_MOTIONS_FOR_PARTY_SUCCESS:
-            console.log('action.payload: ', action.payload)
             return {
                 ...state,
                 motionsForParty: action.payload
             }
         case GET_MOTIONS_BY_PARTY_SUCCESS:
-            console.log('GET_MOTIONS_BY_PARTY_SUCCESS action.payload: ', action.payload)
             return {
                 ...state,
                 motionsByParty: action.payload
