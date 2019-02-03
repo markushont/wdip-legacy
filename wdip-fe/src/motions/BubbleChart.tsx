@@ -27,7 +27,6 @@ class BubbleChart extends React.Component<any, any> {
     public render() {
         let bubbles = {
             datasets: Array<any>()
-
         }
 
         let options = {
@@ -147,8 +146,7 @@ class BubbleChart extends React.Component<any, any> {
                     data={bubbles}
                     options={options}
                     width={800}
-                    height={800}
-                   />
+                    height={800} />
             </div>
         );
     }

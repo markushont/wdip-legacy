@@ -45,12 +45,10 @@ class MotionInfo extends React.Component<MotionInfoProps, any> {
 }
 
 
-const mapDispatchToProps = () => ({
-
-})
+const mapDispatchToProps = () => ({})
 
 const mapStateToProps = (state: AppState) => ({
     currentMotion: state.motions.currentMotion
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(MotionInfo); 
+export default connect(mapStateToProps, mapDispatchToProps)(MotionInfo);

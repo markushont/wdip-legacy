@@ -13,10 +13,6 @@ const colorApproved = "#41B3A3";
 const colorPending  = "#FADA5E";
 const colorRejected = "#E27D60";
 
-interface MotionsViewState {
-    selectedMotionId: string;
-}
-
 interface MotionsViewProps {
     motions: Motions;
     getMotionDataSuccess: (result: Motion) => any;
@@ -27,28 +23,14 @@ interface MotionsViewProps {
     toYear: string;
 }
 
-class MotionsView extends React.Component<MotionsViewProps, MotionsViewState> {
+class MotionsView extends React.Component<MotionsViewProps, any> {
 
     motionsApi: MotionsApi = new MotionsApi();
-
-    constructor(props: any) {
-        super(props);
-        // this.state = {
-        //     motions: {
-        //         total: 0,
-        //         startResult: 0,
-        //         endResult: 0,
-        //         results: []
-        //     },
-        //     selectedMotionId: ""
-        // }
-    }
 
     private async getMotionData(id: string) {
         try {
             const result = await this.motionsApi.getMotion({ id });
-            // this.setState({ motion: result });
-            this.props.getMotionDataSuccess(result); // redux
+            this.props.getMotionDataSuccess(result);
         } catch (error) {
             console.log(error);
         }
@@ -74,8 +56,7 @@ class MotionsView extends React.Component<MotionsViewProps, MotionsViewState> {
                 const fromDate = `${this.props.fromYear}-01-01`;
                 const toDate = `${this.props.toYear}-12-31`;
                 const result = await this.motionsApi.getMotionsForParty({ id, fromDate, toDate });
-                // this.setState({ motions: result });
-                this.props.getMotionsForPartySuccess(result); // redux
+                this.props.getMotionsForPartySuccess(result);
             } catch (error) {
                 console.error(error);
             }
@@ -164,9 +145,9 @@ class MotionsView extends React.Component<MotionsViewProps, MotionsViewState> {
                     height={800} />
                 <Route
                     path={`${match.path}/:motionId`}
-                    render={(props) => <MotionInfo match={match} />}/>
-            </div>
-        );
+                    render={() => <MotionInfo match={match} />}/>
+            </div>    
+        )
     }
 }
 
