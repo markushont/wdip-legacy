@@ -2,7 +2,8 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import App from './App';
 import { Provider } from 'react-redux';
-import { createStore } from 'redux';
+import { applyMiddleware, createStore } from 'redux';
+import {createLogger} from 'redux-logger'
 import rootReducer from './reducers';
 import './index.css';
 import registerServiceWorker from './registerServiceWorker';
@@ -11,7 +12,10 @@ import "jquery/dist/jquery.min.js"
 import "foundation-sites/dist/css/foundation.min.css";
 import "foundation-sites/dist/js/foundation.min.js";
 
-const store = createStore(rootReducer, (window as any).__REDUX_DEVTOOLS_EXTENSION__ && (window as any).__REDUX_DEVTOOLS_EXTENSION__());
+const logger = createLogger();
+const store = createStore(rootReducer, applyMiddleware(logger));
+
+// const store = createStore(rootReducer, (window as any).__REDUX_DEVTOOLS_EXTENSION__ && (window as any).__REDUX_DEVTOOLS_EXTENSION__());
 
 ReactDOM.render(
   <Provider store={store}>

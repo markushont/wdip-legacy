@@ -14,12 +14,6 @@ class MotionInfo extends React.Component<MotionInfoProps, any> {
 
     motionsApi: MotionsApi = new MotionsApi();
 
-    componentWillReceiveProps(nextProps: Readonly<MotionInfoProps>) {
-        if (nextProps !== this.props) {
-            // this.getMotionData(nextProps.match.params.motionId);
-        }
-    }
-
     private layoutProposal(proposal: Proposal) {
         return <li>{proposal.wording}</li>;
     }
@@ -58,6 +52,6 @@ const mapDispatchToProps = () => ({
 
 const mapStateToProps = (state: AppState) => ({
     currentMotion: state.motions.currentMotion
-  })
+})
 
 export default connect(mapStateToProps, mapDispatchToProps)(MotionInfo); 

@@ -1,31 +1,40 @@
 
 import { Action } from 'redux'
-import { Motion } from 'src/service/wdip-be';
+import { Motion, Motions, MotionsByParty } from 'src/service/wdip-be';
 
 export interface MotionsState {
     currentMotion?: Motion;
     motions: any;
+    motionsByParty?: any;
+    motionsForParty?: any;
 }
 
 const initialState = {
     motions: {}
 }
 export const GET_MOTION_DATA_SUCCESS = 'GET_MOTION_DATA_SUCCESS'
-export const GET_MOTIONS_SUCCESS = 'GET_MOTIONS_SUCCESS'
+export const GET_MOTIONS_FOR_PARTY_SUCCESS = 'GET_MOTIONS_FOR_PARTY_SUCCESS'
+export const GET_MOTIONS_BY_PARTY_SUCCESS = 'GET_MOTIONS_BY_PARTY_SUCCESS'
 
 interface GetMotionSuccessAction {
   type: typeof GET_MOTION_DATA_SUCCESS
   payload: Array<Motion>
 }
 
-interface GetMotionsSuccessAction {
-    type: typeof GET_MOTIONS_SUCCESS
-    payload: Array<Motion>
-  }
+interface GetMotionsForPartySuccessAction {
+    type: typeof GET_MOTIONS_FOR_PARTY_SUCCESS
+    payload: Motions
+}
 
-export default function motions(state: MotionsState = initialState, action: GetMotionSuccessAction | GetMotionsSuccessAction): MotionsState {
+interface GetMotionsByPartySuccessAction {
+    type: typeof GET_MOTIONS_BY_PARTY_SUCCESS
+    payload: MotionsByParty
+}
+
+export default function motions(state: MotionsState = initialState, action: GetMotionSuccessAction | GetMotionsForPartySuccessAction | GetMotionsByPartySuccessAction): MotionsState {
     switch (action.type) {
         case GET_MOTION_DATA_SUCCESS: 
+            console.log('action.payload: ', action.payload)
             return {
                 currentMotion: action.payload[0],
                 motions: {
@@ -33,15 +42,19 @@ export default function motions(state: MotionsState = initialState, action: GetM
                     [action.payload[0].id]: action.payload
                 }
             }
-        // case GET_MOTIONS_SUCCESS: 
-        //     return {
-        //         currentMotion: action.payload[0],
-        //         motions: {
-        //             ...state.motions,
-        //             [action.payload[0].id]: action.payload
-        //         }
-        //     }
-      default:
-        return state
+        case GET_MOTIONS_FOR_PARTY_SUCCESS:
+            console.log('action.payload: ', action.payload)
+            return {
+                ...state,
+                motionsForParty: action.payload
+            }
+        case GET_MOTIONS_BY_PARTY_SUCCESS:
+            console.log('GET_MOTIONS_BY_PARTY_SUCCESS action.payload: ', action.payload)
+            return {
+                ...state,
+                motionsByParty: action.payload
+            }
+        default:
+            return state
     }
 }

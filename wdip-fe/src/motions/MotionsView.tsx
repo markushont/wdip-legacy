@@ -6,6 +6,7 @@ import { Route } from "react-router-dom";
 import * as chartjs from "chart.js";
 import { MotionsApi, Motions, Motion } from "../service/wdip-be";
 import MotionInfo from "./MotionInfo";
+import { AppState } from '../reducers/';
 import "./MotionsView.css";
 
 const colorApproved = "#41B3A3";
@@ -13,13 +14,13 @@ const colorPending  = "#FADA5E";
 const colorRejected = "#E27D60";
 
 interface MotionsViewState {
-    motions: Motions;
     selectedMotionId: string;
 }
 
 interface MotionsViewProps {
-    motions: any;
+    motions: Motions;
     getMotionDataSuccess: (result: Motion) => any;
+    getMotionsForPartySuccess: (result: Motions) => any;
     history: any;
     match: any;
     fromYear: string;
@@ -32,22 +33,23 @@ class MotionsView extends React.Component<MotionsViewProps, MotionsViewState> {
 
     constructor(props: any) {
         super(props);
-        this.state = {
-            motions: {
-                total: 0,
-                startResult: 0,
-                endResult: 0,
-                results: []
-            },
-            selectedMotionId: ""
-        }
+        // this.state = {
+        //     motions: {
+        //         total: 0,
+        //         startResult: 0,
+        //         endResult: 0,
+        //         results: []
+        //     },
+        //     selectedMotionId: ""
+        // }
     }
 
     private async getMotionData(id: string) {
         try {
             const result = await this.motionsApi.getMotion({ id });
             // this.setState({ motion: result });
-            this.props.getMotionDataSuccess(result);
+            console.log('Get motion data successful: ', result)
+            this.props.getMotionDataSuccess(result); // redux
         } catch (error) {
             console.log(error);
         }
@@ -55,7 +57,8 @@ class MotionsView extends React.Component<MotionsViewProps, MotionsViewState> {
 
     public onClickBubble(e: any, activeElements: any): void {
         const { history, match } = this.props;
-        const results = this.state.motions.results;
+        console.log('click bubble, this.props.motions.results: ', this.props.motions.results)
+        const results = this.props.motions.results;
         if (history && activeElements.length && results && results.length) {
             const id = results[activeElements[0]._datasetIndex].id;
             if (id) {
@@ -73,7 +76,9 @@ class MotionsView extends React.Component<MotionsViewProps, MotionsViewState> {
                 const fromDate = `${this.props.fromYear}-01-01`;
                 const toDate = `${this.props.toYear}-12-31`;
                 const result = await this.motionsApi.getMotionsForParty({ id, fromDate, toDate });
-                this.setState({ motions: result });
+                // this.setState({ motions: result });
+                console.log('Get party data successful: ', result)
+                this.props.getMotionsForPartySuccess(result); // redux
             } catch (error) {
                 console.error(error);
             }
@@ -117,8 +122,8 @@ class MotionsView extends React.Component<MotionsViewProps, MotionsViewState> {
     }
 
     public render() {
-        const layoutedMotions: chartjs.ChartDataSets[] = this.state.motions.results
-            ? this.state.motions.results.map<chartjs.ChartDataSets>(this.layout)
+        const layoutedMotions: chartjs.ChartDataSets[] = (this.props.motions && this.props.motions.results)
+            ? this.props.motions.results.map<chartjs.ChartDataSets>(this.layout)
             : [];
         const divStyle = {
             zIndex: -1000,
@@ -170,11 +175,15 @@ class MotionsView extends React.Component<MotionsViewProps, MotionsViewState> {
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({
     getMotionDataSuccess: (result: Motion) => {
-        console.log('hej')
         dispatch({type: 'GET_MOTION_DATA_SUCCESS', payload: [result]})
+    },
+    getMotionsForPartySuccess: (result: Motions) => {
+        dispatch({type: 'GET_MOTIONS_FOR_PARTY_SUCCESS', payload: result})
     }
 })
 
-const mapStateToProps = () => ({})
+const mapStateToProps = (state: AppState) => ({
+    motions: state.motions.motionsForParty
+})
   
 export default connect(mapStateToProps, mapDispatchToProps)(MotionsView);

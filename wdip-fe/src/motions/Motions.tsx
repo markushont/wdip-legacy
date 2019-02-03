@@ -2,24 +2,32 @@ import * as React from "react";
 import "./Motions.css";
 import "rc-slider/assets/index.css";
 
+import { Dispatch } from "redux";
 import { GridContainer, Grid, Cell } from 'react-foundation';
 import { config } from "../config/config";
 import BubbleChart from './BubbleChart';
 import MotionsView from './MotionsView';
 import { Range } from 'rc-slider';
-import { Route, Switch } from "react-router-dom";
+import { Route, Switch, match } from "react-router-dom";
 import { TransitionGroup, CSSTransition } from "react-transition-group";
 import { MotionsApi, MotionsByParty, PartyApi } from "src/service/wdip-be";
 import * as moment from "moment";
+import { AppState } from '../reducers/';
+import { connect } from 'react-redux';
 
 interface MotionsState {
     fromDate: moment.Moment;
     toDate: moment.Moment;
-    motionsByParty?: MotionsByParty;
     partyData?: any;
 };
 
-class Motions extends React.Component<any, MotionsState> {
+export interface MotionsProps {
+    getMotionByPartySuccess: (result: MotionsByParty) => any;
+    motionsByParty: MotionsByParty;
+    match: any;
+}
+
+class Motions extends React.Component<MotionsProps, MotionsState> {
 
     motionsApi: MotionsApi = new MotionsApi();
     partyApi: PartyApi = new PartyApi();
@@ -39,11 +47,12 @@ class Motions extends React.Component<any, MotionsState> {
 
     async getMotionsByParty() {
         try {
-            const motions = await this.motionsApi.getMotionsByParty({
+            const result = await this.motionsApi.getMotionsByParty({
                 fromDate: this.state.fromDate.format("YYYY-MM-DD"),
                 toDate: this.state.toDate.format("YYYY-MM-DD"),
             });
-            this.setState({ motionsByParty: motions });
+            this.props.getMotionByPartySuccess(result); // redux
+            // this.setState({ motionsByParty: motions });
         } catch (error) {
             console.error(error);
         }
@@ -69,7 +78,7 @@ class Motions extends React.Component<any, MotionsState> {
     }
 
     public render() {
-        if (!this.state.motionsByParty || !this.state.partyData) { return null; }
+        if (!this.props.motionsByParty || !this.state.partyData) { return null; }
 
         const { match } = this.props;
         const minYear = config.DEFAULT_FROM_DATE.year();
@@ -99,14 +108,14 @@ class Motions extends React.Component<any, MotionsState> {
                                         render={(props) =>
                                             <BubbleChart
                                                 {...props}
-                                                results={this.state.motionsByParty ? this.state.motionsByParty.results : null}
+                                                results={this.props.motionsByParty.results}
                                                 partyData={this.state.partyData}
                                             />
                                         }
                                     />
                                     <Route
                                         path={`${match.path}/:party`}
-                                        render={(props) => <MotionsView {...props} motions={this.state.motionsByParty ? this.state.motionsByParty.results : null} fromYear={fromYear+''} toYear={toYear+''} />}
+                                        render={(props) => <MotionsView {...props} fromYear={fromYear+''} toYear={toYear+''} />}
                                     />
                                 </Switch>
                             </CSSTransition>
@@ -119,4 +128,14 @@ class Motions extends React.Component<any, MotionsState> {
     }
 }
 
-export default Motions;
+const mapDispatchToProps = (dispatch: Dispatch) => ({
+    getMotionByPartySuccess: (result: MotionsByParty) => {
+        dispatch({type: 'GET_MOTIONS_BY_PARTY_SUCCESS', payload: result})
+    }
+})
+
+const mapStateToProps = (state: AppState) => ({
+    motionsByParty: state.motions.motionsByParty
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(Motions);
