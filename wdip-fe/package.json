@@ -27,9 +27,12 @@
   },
   "scripts": {
     "start": "react-scripts-ts start",
-    "build": "rm -rf build/ && react-scripts-ts build",
-    "deploy:test": "npm run build && serverless client deploy -s test",
-    "deploy:prod": "npm run build && serverless client deploy -s prod",
+    "clean": "rm -rf build/",
+    "build": "npm run clean && npm run start",
+    "build:test": "npm run clean && env-cmd .env.test react-scripts-ts build",
+    "build:prod": "npm run clean && env-cmd .env.production react-scripts-ts build",
+    "deploy:test": "npm run build:test && serverless client deploy -s test",
+    "deploy:prod": "npm run build:prod && serverless client deploy -s prod",
     "testOriginal": "react-scripts-ts test --env=jsdom",
     "test": "./node_modules/.bin/jest --watch",
     "eject": "react-scripts-ts eject"
@@ -41,6 +44,7 @@
     "@types/react": "^16.4.18",
     "@types/react-dom": "^16.0.9",
     "@types/react-foundation": "^0.9.3",
+    "env-cmd": "^8.0.2",
     "jest": "^23.6.0",
     "serverless-finch": "^2.3.2",
     "ts-jest": "^23.10.4",
