@@ -88,6 +88,7 @@ docker run --rm -v ${PWD}:/local openapitools/openapi-generator-cli generate -i 
 Using the [serverless](https://www.serverless.com) framework, run the following command to deploy a new version to AWS Lambda:
 
 ```bash
+cd wdip-be
 npm run deploy:[stage]
 ```
 
@@ -97,6 +98,7 @@ Specifying [stage] (can be e.g. 'test') will include the correct configuration (
 Also using the [serverless](https://www.serverless.com) framework, run the following command to deploy a new version to AWS S3:
 
 ```bash
+cd wdip-fe
 npm run deploy:[stage]
 ```
 
