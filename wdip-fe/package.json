@@ -20,6 +20,7 @@
     "react-chartjs-2": "^2.7.4",
     "react-d3-cloud": "^0.7.0",
     "react-date-picker": "^7.0.0",
+    "react-dev-utils": "^7.0.1",
     "react-dom": "^16.6.0",
     "react-foundation": "^0.9.6",
     "react-redux": "^6.0.0",

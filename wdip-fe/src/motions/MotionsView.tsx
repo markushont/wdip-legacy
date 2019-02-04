@@ -87,7 +87,7 @@ class MotionsView extends React.Component<MotionsViewProps, any> {
                 backgroundColor = colorRejected;
                 break;
         }
-
+        
         return {
             backgroundColor,
             data: [{ x, y, r }],
@@ -130,7 +130,6 @@ class MotionsView extends React.Component<MotionsViewProps, any> {
         }
 
         const { match } = this.props;
-
         return (
             <div className={"motions-view"} style={divStyle}>
                 <Bubble
@@ -143,7 +142,7 @@ class MotionsView extends React.Component<MotionsViewProps, any> {
                     path={`${match.path}/:motionId`}
                     render={() => <MotionInfo match={match} />}/>
             </div>    
-        )
+        );
     }
 }
 

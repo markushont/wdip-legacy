@@ -38,7 +38,6 @@ class Motions extends React.Component<MotionsProps, any> {
 
     async getMotionsByParty() {
         try {
-            console.log(this.props)
             const result = await this.motionsApi.getMotionsByParty({
                 fromDate: this.props.fromDate.format("YYYY-MM-DD"),
                 toDate: this.props.toDate.format("YYYY-MM-DD"),
@@ -89,13 +88,19 @@ class Motions extends React.Component<MotionsProps, any> {
                                 <Switch>
                                     <Route
                                         exact path={match.path} 
-                                        render={(props) =>
-                                            <BubbleChart
-                                                {...props}
-                                                results={(this.props.motionsByParty && this.props.motionsByParty.results ? this.props.motionsByParty.results : null)}
-                                                partyData={this.props.partyData}
-                                            />
-                                        }
+                                        render={(props) => {
+                                            if (this.props.motionsByParty && this.props.motionsByParty.results && this.props.partyData) {
+                                                return (
+                                                    <BubbleChart
+                                                        {...props}
+                                                        results={this.props.motionsByParty.results}
+                                                        partyData={this.props.partyData}
+                                                    />
+                                                )
+                                            } else {
+                                                return null;
+                                            }
+                                        }}
                                     />
                                     <Route
                                         path={`${match.path}/:party`}

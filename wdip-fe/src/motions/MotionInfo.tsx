@@ -14,33 +14,36 @@ class MotionInfo extends React.Component<MotionInfoProps, any> {
 
     motionsApi: MotionsApi = new MotionsApi();
 
-    private layoutProposal(proposal: Proposal) {
-        return <li>{proposal.wording}</li>;
+    private layoutProposal(proposal: Proposal, index: number) {
+        return <li key={index}>{proposal.wording}</li>;
     }
 
-    private layoutStakeholder(stakeholder: Stakeholder) {
-        return <li>{stakeholder.name} ({stakeholder.party})</li>;
+    private layoutStakeholder(stakeholder: Stakeholder, index: number) {
+        return <li key={index}>{stakeholder.name} ({stakeholder.party})</li>;
     }
 
     public render() {
         const motion  = this.props.currentMotion;
-        if (!motion) { return null };
-        const statusClass = motion.documentStatus ? motion.documentStatus.toLowerCase() : "";
-        return (
-            <div className={"motions-info"}>
-                <h1>{motion.title}</h1>
-                <p>{motion.id}</p>
-                <p>Status: <span className={`status-text ${statusClass}`}>{motion.documentStatus}</span></p>
-                <h2>Förslag:</h2>
-                <ul>
-                    {motion.proposals.map(this.layoutProposal)}
-                </ul>
-                <h2>Intressenter:</h2>
-                <ul>
-                    {motion.stakeholders.map(this.layoutStakeholder)}
-                </ul>
-            </div>
-        );
+        if (!motion) { 
+            return null;
+        } else {
+            const statusClass = motion.documentStatus ? motion.documentStatus.toLowerCase() : "";
+            return (
+                <div className={"motions-info"}>
+                    <h1>{motion.title}</h1>
+                    <p>{motion.id}</p>
+                    <p>Status: <span className={`status-text ${statusClass}`}>{motion.documentStatus}</span></p>
+                    <h2>Förslag:</h2>
+                    <ul>
+                        {motion.proposals.map((proposal, index) => {this.layoutProposal(proposal, index)})}
+                    </ul>
+                    <h2>Intressenter:</h2>
+                    <ul>
+                        {motion.stakeholders.map((stakeholder, index) => {this.layoutStakeholder(stakeholder, index)})}
+                    </ul>
+                </div>
+            );
+        }
     }
 }
 
