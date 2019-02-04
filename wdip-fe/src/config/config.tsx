@@ -15,6 +15,9 @@ class WDIPFrontendConfig {
     constructor() {
         const env = process.env;
 
+        /* react-scripts-ts requires env vars to be prefixed
+         * with 'REACT_APP_'
+         */
         this.API_URL = env.REACT_APP_API_URL || this.API_URL;
 
         if (env.DEFAULT_FROM_DATE) {

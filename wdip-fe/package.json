@@ -27,7 +27,9 @@
   },
   "scripts": {
     "start": "react-scripts-ts start",
-    "build": "react-scripts-ts build",
+    "build": "rm -rf build/ && react-scripts-ts build",
+    "deploy:test": "npm run build && serverless client deploy -s test",
+    "deploy:prod": "npm run build && serverless client deploy -s prod",
     "testOriginal": "react-scripts-ts test --env=jsdom",
     "test": "./node_modules/.bin/jest --watch",
     "eject": "react-scripts-ts eject"
