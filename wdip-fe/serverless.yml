@@ -1,0 +1,22 @@
+service: wdip-fe
+
+app: wdip-fe
+tenant: hejare
+
+plugins:
+  - serverless-finch
+
+provider:
+  name: aws
+  runtime: nodejs8.10
+  stage: test
+  profile: wdip-test
+  region: eu-west-1
+
+custom:
+  client:
+    bucketName: wdip-fe-${opt:stage, "test"}
+    distributionFolder: build
+    indexDocument: index.html
+    errorDocument: index.html
+

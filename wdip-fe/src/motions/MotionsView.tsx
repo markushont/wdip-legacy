@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Bubble } from 'react-chartjs-2';
 import { Route } from "react-router-dom";
 import * as chartjs from "chart.js";
+import { config } from "../config/config";
 import { MotionsApi, Motions, Motion } from "../service/wdip-be";
 import { MotionInfo } from "./MotionInfo";
 import "./MotionsView.css";
@@ -17,7 +18,7 @@ interface MotionsViewState {
 
 class MotionsView extends React.Component<any, MotionsViewState> {
 
-    motionsApi: MotionsApi = new MotionsApi();
+    motionsApi: MotionsApi = new MotionsApi(config.apiConfiguration);
 
     constructor(props: any) {
         super(props);
