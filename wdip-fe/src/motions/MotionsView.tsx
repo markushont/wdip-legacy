@@ -8,6 +8,7 @@ import { MotionsApi, Motions, Motion } from "../service/wdip-be";
 import MotionInfo from "./MotionInfo";
 import { AppState } from '../reducers/';
 import "./MotionsView.css";
+import { getMotionDataSuccess, getMotionsForPartySuccess } from 'src/actions';
 
 const colorApproved = "#41B3A3";
 const colorPending  = "#FADA5E";
@@ -148,10 +149,10 @@ class MotionsView extends React.Component<MotionsViewProps, any> {
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({
     getMotionDataSuccess: (result: Motion) => {
-        dispatch({type: 'GET_MOTION_DATA_SUCCESS', payload: [result]})
+        dispatch(getMotionDataSuccess(result))
     },
     getMotionsForPartySuccess: (result: Motions) => {
-        dispatch({type: 'GET_MOTIONS_FOR_PARTY_SUCCESS', payload: result})
+        dispatch(getMotionsForPartySuccess(result))
     }
 })
 

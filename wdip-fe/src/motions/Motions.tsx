@@ -14,6 +14,7 @@ import { MotionsApi, MotionsByParty, PartyApi, Party } from "src/service/wdip-be
 import * as moment from "moment";
 import { AppState } from '../reducers/';
 import { connect } from 'react-redux';
+import { getMotionByPartySuccess, getPartyDataSuccess, handleDateChange } from "src/actions";
 
 export interface MotionsProps {
     getMotionByPartySuccess: (result: MotionsByParty) => any;
@@ -54,7 +55,7 @@ class Motions extends React.Component<MotionsProps, any> {
         } catch (error) {
             console.error(error);
         }
-      }
+    }
 
     private onAfterChangeDate = (values: number[]) => {
         this.getMotionsByParty();
@@ -119,13 +120,13 @@ class Motions extends React.Component<MotionsProps, any> {
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({
     getMotionByPartySuccess: (result: MotionsByParty) => {
-        dispatch({type: 'GET_MOTIONS_BY_PARTY_SUCCESS', payload: result})
+        dispatch(getMotionByPartySuccess(result))
     },
     getPartyDataSuccess: (result: Party[]) => {
-        dispatch({type: 'GET_PARTY_DATA_SUCCESS', payload: result})
+        dispatch(getPartyDataSuccess(result))
     },
     handleDateChange: (values: number[]) => {
-        dispatch({type: 'HANDLE_DATE_CHANGE', payload: {fromDate: moment(`${values[0]}-01-01`), toDate: moment(`${values[0]}-01-01`)}})
+        dispatch(handleDateChange(values))
     }
 })
 

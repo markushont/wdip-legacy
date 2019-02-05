@@ -1,6 +1,5 @@
-
-import { Action } from 'redux'
 import { Motion, Motions, MotionsByParty } from 'src/service/wdip-be';
+import { GET_MOTIONS_BY_PARTY_SUCCESS, GET_MOTION_DATA_SUCCESS, GET_MOTIONS_FOR_PARTY_SUCCESS } from 'src/actions';
 
 export interface MotionsState {
     currentMotion?: Motion;
@@ -12,9 +11,6 @@ export interface MotionsState {
 const initialState = {
     motions: {}
 }
-export const GET_MOTION_DATA_SUCCESS = 'GET_MOTION_DATA_SUCCESS'
-export const GET_MOTIONS_FOR_PARTY_SUCCESS = 'GET_MOTIONS_FOR_PARTY_SUCCESS'
-export const GET_MOTIONS_BY_PARTY_SUCCESS = 'GET_MOTIONS_BY_PARTY_SUCCESS'
 
 interface GetMotionSuccessAction {
   type: typeof GET_MOTION_DATA_SUCCESS

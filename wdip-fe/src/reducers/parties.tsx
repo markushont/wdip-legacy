@@ -1,6 +1,5 @@
 import { Party } from 'src/service/wdip-be';
-
-export const GET_PARTY_DATA_SUCCESS = 'GET_PARTY_DATA_SUCCESS'
+import { GET_PARTY_DATA_SUCCESS } from 'src/actions';
 
 export interface PartiesState {
     partyData?: Party[];

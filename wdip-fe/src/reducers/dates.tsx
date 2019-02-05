@@ -1,7 +1,6 @@
 import { config } from "../config/config";
 import * as moment from "moment";
-
-export const HANDLE_DATE_CHANGE = 'HANDLE_DATE_CHANGE'
+import { HANDLE_DATE_CHANGE } from "src/actions";
 
 export interface DatesState {
     fromDate?: moment.Moment;

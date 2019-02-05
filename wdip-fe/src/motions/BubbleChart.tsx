@@ -17,7 +17,6 @@ class BubbleChart extends React.Component<any, any> {
             results &&
             activeElements[0]._datasetIndex < results.length)
         {
-            debugger;
             const id = results[activeElements[0]._datasetIndex].party;
             if (id) {
                 history.push(`/motions/${id}`);
