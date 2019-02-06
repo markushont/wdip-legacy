@@ -3,14 +3,11 @@ import { GET_MOTIONS_BY_PARTY_SUCCESS, GET_MOTION_DATA_SUCCESS, GET_MOTIONS_FOR_
 
 export interface MotionsState {
     currentMotion?: Motion;
-    motions: any;
     motionsByParty?: any;
     motionsForParty?: any;
 }
 
-const initialState = {
-    motions: {}
-}
+const initialState = {}
 
 interface GetMotionSuccessAction {
   type: typeof GET_MOTION_DATA_SUCCESS
@@ -32,11 +29,7 @@ export default function motions(state: MotionsState = initialState, action: GetM
         case GET_MOTION_DATA_SUCCESS: 
             return {
                 ...state,
-                currentMotion: action.payload[0],
-                motions: {
-                    ...state.motions,
-                    [action.payload[0].id]: action.payload
-                }
+                currentMotion: action.payload[0]
             }
         case GET_MOTIONS_FOR_PARTY_SUCCESS:
             return {

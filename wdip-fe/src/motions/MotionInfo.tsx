@@ -35,11 +35,11 @@ class MotionInfo extends React.Component<MotionInfoProps, any> {
                     <p>Status: <span className={`status-text ${statusClass}`}>{motion.documentStatus}</span></p>
                     <h2>Förslag:</h2>
                     <ul>
-                        {motion.proposals.map((proposal, index) => {this.layoutProposal(proposal, index)})}
+                        {motion.proposals.map((proposal, index) => {return this.layoutProposal(proposal, index)})}
                     </ul>
                     <h2>Intressenter:</h2>
                     <ul>
-                        {motion.stakeholders.map((stakeholder, index) => {this.layoutStakeholder(stakeholder, index)})}
+                        {motion.stakeholders.map((stakeholder, index) => {return this.layoutStakeholder(stakeholder, index)})}
                     </ul>
                 </div>
             );
