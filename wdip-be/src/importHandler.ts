@@ -26,8 +26,10 @@ export const routeAdminStartImport = async (event, context) => {
 
   const requestParams = { fromDate, toDate, documentType };
   try {
+    // InvocationType: Event <=> asynchronous execution of Lambda
     await lambdaClient.invoke({
       FunctionName: `${config.AWS_APPLICATION_NAME}-adminStartImport`,
+      InvocationType: "Event",
       Payload: JSON.stringify(requestParams, null, 2)
     }).promise();
     return httpResponses.success({}, 202);
@@ -64,8 +66,10 @@ export const routeStartUpdateImport = async (event, context) => {
 
   const requestParams = { fromDate, documentType };
   try {
+    // InvocationType: Event <=> asynchronous execution of Lambda
     await lambdaClient.invoke({
       FunctionName: `${config.AWS_APPLICATION_NAME}-adminStartUpdateImport`,
+      InvocationType: "Event",
       Payload: JSON.stringify(requestParams, null, 2)
     }).promise();
     return httpResponses.success({}, 202);
