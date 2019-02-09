@@ -1,6 +1,6 @@
 import { MotionsApi } from "src/service/wdip-be";
 import { call, put, takeEvery } from "redux-saga/effects"
-import { GET_MOTIONS_BY_PARTY_SUCCESS, GET_MOTIONS_BY_PARTY_FAILURE, GET_MOTIONS_BY_PARTY, GET_MOTION_DATA, GET_MOTION_DATA_SUCCESS, GET_MOTION_DATA_FAILURE, GET_MOTIONS_FOR_PARTY_SUCCESS, GET_MOTIONS_FOR_PARTY_FAILURE, GET_MOTIONS_FOR_PARTY } from ".";
+import { GET_MOTIONS_BY_PARTY_SUCCESS, GET_MOTIONS_BY_PARTY_FAILURE, GET_MOTIONS_BY_PARTY, GET_MOTION_DATA, GET_MOTION_DATA_SUCCESS, GET_MOTION_DATA_FAILURE, GET_MOTIONS_FOR_PARTY_SUCCESS, GET_MOTIONS_FOR_PARTY_FAILURE, GET_MOTIONS_FOR_PARTY, HANDLE_DATE_CHANGE } from ".";
 
 let motionsApi: MotionsApi = new MotionsApi();
 
@@ -41,7 +41,7 @@ function * getMotionData(body: any) {
 }
 
 export function * motionDataSaga() {
-    yield takeEvery(GET_MOTIONS_BY_PARTY, getMotionsByParty)
-    yield takeEvery(GET_MOTIONS_FOR_PARTY, getMotionsForParty)
+    yield takeEvery([GET_MOTIONS_BY_PARTY, HANDLE_DATE_CHANGE], getMotionsByParty)
+    yield takeEvery([GET_MOTIONS_FOR_PARTY, HANDLE_DATE_CHANGE], getMotionsForParty)
     yield takeEvery(GET_MOTION_DATA, getMotionData)
 }

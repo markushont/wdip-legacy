@@ -26,8 +26,9 @@ export function getPartyDataSuccess (result: Party[]) {
     return {type: GET_PARTY_DATA_SUCCESS, payload: result}
 }
 
-export function handleDateChange (values: number[]) {
-    return {type: HANDLE_DATE_CHANGE, payload: {fromDate: moment(`${values[0]}-01-01`), toDate: moment(`${values[1]}-01-01`)}}
+export function handleDateChange (values: number[], id?: string) {
+    console.log('id: ', id);
+    return {type: HANDLE_DATE_CHANGE, payload: {fromDate: moment(`${values[0]}-01-01`), toDate: moment(`${values[1]}-01-01`), id}}
 }
 
 export function getMotionDataSuccess (result: Motion) {

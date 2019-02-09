@@ -17,12 +17,13 @@ import { connect } from 'react-redux';
 import { handleDateChange } from "src/actions";
 
 export interface MotionsProps {
-    handleDateChange: (values: number[]) => {fromDate: moment.Moment, toDate: moment.Moment};
+    handleDateChange: (values: number[], id?: string) => any;
     motionsByParty: MotionsByParty;
     partyData: Party[];
     match: any;
     fromDate: moment.Moment;
     toDate: moment.Moment;
+    currentPartyId: string;
 }
 
 const Motions = ({
@@ -31,7 +32,8 @@ const Motions = ({
     partyData,
     match,
     fromDate,
-    toDate
+    toDate,
+    currentPartyId
 }: MotionsProps) => {
 
     if (!motionsByParty || !partyData) { return null; }
@@ -48,7 +50,9 @@ const Motions = ({
                     <Cell>
                         <Range
                             value={[fromYear, toYear]}
-                            onChange={(values) => handleDateChange([values[0], values[1]])}
+                            onChange={(values) => {
+                                handleDateChange([values[0], values[1]], currentPartyId)
+                            }}
                             min={minYear}
                             max={maxYear}
                         />
@@ -88,8 +92,8 @@ const Motions = ({
 }
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({
-    handleDateChange: (values: number[]) => {
-        dispatch(handleDateChange(values))
+    handleDateChange: (values: number[], id?: string) => {
+        dispatch(handleDateChange(values, id))
     }
 })
 
@@ -98,6 +102,7 @@ const mapStateToProps = (state: AppState, ownProps: any) => ({
     partyData: state.parties.partyData,
     fromDate: state.dates.fromDate,
     toDate: state.dates.toDate,
+    currentPartyId: state.parties.currentPartyId,
     match: ownProps.match
 })
 
