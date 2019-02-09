@@ -26,10 +26,10 @@ interface GetMotionsByPartySuccessAction {
 
 export default function motions(state: MotionsState = initialState, action: GetMotionSuccessAction | GetMotionsForPartySuccessAction | GetMotionsByPartySuccessAction): MotionsState {
     switch (action.type) {
-        case GET_MOTION_DATA_SUCCESS: 
+        case GET_MOTION_DATA_SUCCESS:
             return {
                 ...state,
-                currentMotion: action.payload[0]
+                currentMotion: action.payload
             }
         case GET_MOTIONS_FOR_PARTY_SUCCESS:
             return {

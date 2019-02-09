@@ -2,8 +2,22 @@ import * as React from 'react';
 import { Normalizer } from 'src/service/Normalizer';
 import { Bubble } from 'react-chartjs-2';
 import 'chartjs-plugin-annotation';
+import * as moment from 'moment';
+import { GET_MOTIONS_FOR_PARTY } from 'src/actions';
+import { Dispatch } from 'redux';
+import { AppState } from '../reducers/';
+import { config } from 'src/config/config';
+import { MotionsByPartyResults, Party } from 'src/service/wdip-be';
+import { connect } from 'react-redux';
 
-class BubbleChart extends React.Component<any, any> {
+interface BubbleChartProps {
+    getMotionsForParty: (id: string, fromDate: moment.Moment, toDate: moment.Moment) => any;
+    results: Array<MotionsByPartyResults>;
+    history: any;
+    partyData: Party[];
+}
+
+class BubbleChart extends React.Component<BubbleChartProps, any> {
     private normalizer: Normalizer;
 
     constructor(props: any) {
@@ -11,15 +25,15 @@ class BubbleChart extends React.Component<any, any> {
     }
 
     public onClickBubble(e: any, activeElements: any): void {
-        const { history, results } = this.props;
-        if (history &&
+        if (this.props.history &&
             activeElements.length &&
-            results &&
-            activeElements[0]._datasetIndex < results.length)
+            this.props.results &&
+            activeElements[0]._datasetIndex < this.props.results.length)
         {
-            const id = results[activeElements[0]._datasetIndex].party;
+            const id = this.props.results[activeElements[0]._datasetIndex].party;
             if (id) {
-                history.push(`/motions/${id}`);
+                this.props.getMotionsForParty(id, config.DEFAULT_FROM_DATE, config.DEFAULT_TO_DATE)
+                this.props.history.push(`/motions/${id}`);
             }
         }
     }
@@ -97,11 +111,11 @@ class BubbleChart extends React.Component<any, any> {
 
         if (this.props.results) {
 
-            const minSubmitted = this.props.results.reduce(function (prev: any, current: any) {
+            const minSubmitted: any = this.props.results.reduce(function (prev: any, current: any) {
                 return (prev.submitted < current.submitted) ? prev : current
             }).submitted;
 
-            const maxSubmitted = this.props.results.reduce(function (prev: any, current: any) {
+            const maxSubmitted: any = this.props.results.reduce(function (prev: any, current: any) {
                 return (prev.submitted > current.submitted) ? prev : current
             }).submitted;
 
@@ -151,4 +165,16 @@ class BubbleChart extends React.Component<any, any> {
     }
 }
 
-export default BubbleChart;
+const mapDispatchToProps = (dispatch: Dispatch) => ({
+    getMotionsForParty: (id: string, fromDate: moment.Moment, toDate: moment.Moment) => {
+        dispatch({type: GET_MOTIONS_FOR_PARTY, payload: { id, fromDate, toDate }})
+    }
+})
+
+const mapStateToProps = (state: AppState, ownProps: any) => ({
+    results: ownProps.results,
+    history: ownProps.history,
+    partyData: ownProps.partyData
+})
+  
+export default connect(mapStateToProps, mapDispatchToProps)(BubbleChart);

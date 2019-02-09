@@ -1,15 +1,12 @@
 import { MotionsApi } from "src/service/wdip-be";
 import { call, put, takeEvery } from "redux-saga/effects"
-import { GET_MOTIONS_BY_PARTY_SUCCESS, GET_MOTIONS_BY_PARTY_FAILURE, GET_MOTIONS_BY_PARTY } from ".";
-import * as moment from "moment";
+import { GET_MOTIONS_BY_PARTY_SUCCESS, GET_MOTIONS_BY_PARTY_FAILURE, GET_MOTIONS_BY_PARTY, GET_MOTION_DATA, GET_MOTION_DATA_SUCCESS, GET_MOTION_DATA_FAILURE, GET_MOTIONS_FOR_PARTY_SUCCESS, GET_MOTIONS_FOR_PARTY_FAILURE, GET_MOTIONS_FOR_PARTY } from ".";
 
 let motionsApi: MotionsApi = new MotionsApi();
 
 const getMotionsByPartySync = (payload: any) => {
-    console.log('body.payload: ', payload)
     return motionsApi.getMotionsByParty(payload);
 }
-
 function * getMotionsByParty(body: any) {
     try {
         const response = yield call(getMotionsByPartySync, body.payload)
@@ -19,7 +16,32 @@ function * getMotionsByParty(body: any) {
     }
 }
 
+const getMotionsForPartySync = (payload: any) => {
+    return motionsApi.getMotionsForParty(payload);
+}
+function * getMotionsForParty(body: any) {
+    try {
+        const response = yield call(getMotionsForPartySync, body.payload)
+        yield put({type: GET_MOTIONS_FOR_PARTY_SUCCESS, payload: response})
+    } catch (e) {
+        yield put({type: GET_MOTIONS_FOR_PARTY_FAILURE, error: e})
+    }
+}
+
+const getMotionDataSync = (payload: any) => {
+    return motionsApi.getMotion({ id: payload });
+}
+function * getMotionData(body: any) {
+    try {
+        const response = yield call(getMotionDataSync, body.payload)
+        yield put({type: GET_MOTION_DATA_SUCCESS, payload: response})
+    } catch (e) {
+        yield put({type: GET_MOTION_DATA_FAILURE, error: e})
+    }
+}
+
 export function * motionDataSaga() {
-    console.log('motionDataSaga!')
     yield takeEvery(GET_MOTIONS_BY_PARTY, getMotionsByParty)
+    yield takeEvery(GET_MOTIONS_FOR_PARTY, getMotionsForParty)
+    yield takeEvery(GET_MOTION_DATA, getMotionData)
 }

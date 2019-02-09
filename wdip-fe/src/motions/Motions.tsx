@@ -14,7 +14,7 @@ import { MotionsByParty, Party } from "src/service/wdip-be";
 import * as moment from "moment";
 import { AppState } from '../reducers/';
 import { connect } from 'react-redux';
-import { getMotionByPartySuccess, getPartyDataSuccess, handleDateChange } from "src/actions";
+import { handleDateChange } from "src/actions";
 
 export interface MotionsProps {
     handleDateChange: (values: number[]) => {fromDate: moment.Moment, toDate: moment.Moment};
@@ -48,7 +48,7 @@ const Motions = ({
                     <Cell>
                         <Range
                             value={[fromYear, toYear]}
-                            onChange={() => handleDateChange([fromYear, toYear])}
+                            onChange={(values) => handleDateChange([values[0], values[1]])}
                             min={minYear}
                             max={maxYear}
                         />
@@ -88,12 +88,6 @@ const Motions = ({
 }
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({
-    getMotionByPartySuccess: (result: MotionsByParty) => {
-        dispatch(getMotionByPartySuccess(result))
-    },
-    getPartyDataSuccess: (result: Party[]) => {
-        dispatch(getPartyDataSuccess(result))
-    },
     handleDateChange: (values: number[]) => {
         dispatch(handleDateChange(values))
     }
