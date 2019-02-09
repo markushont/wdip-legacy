@@ -47,7 +47,7 @@ export const adminStartImport = async (event, context) => {
 
   // Run import job
   try {
-    const ipsParliamentDateRange = new IPSParliamentDateRange(documentType, context);
+    const ipsParliamentDateRange = new IPSParliamentDateRange(documentType);
     await ipsParliamentDateRange.start(fromDate, toDate);
     return httpResponses.success({}, 202);
   } catch (error) {
@@ -85,7 +85,7 @@ export const startUpdateImport = async (event, context) => {
 
   // Run import job
   try {
-    const ipsParliamentUpdate = new IPSParliamentUpdate(docType, context);
+    const ipsParliamentUpdate = new IPSParliamentUpdate(docType);
     await ipsParliamentUpdate.start(fromDate);
     return httpResponses.success({}, 202);
   } catch (error) {
