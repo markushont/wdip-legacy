@@ -141,7 +141,7 @@ class MotionsView extends React.Component<MotionsViewProps, any> {
                     height={800} />
                 <Route
                     path={`${match.path}/:motionId`}
-                    render={() => <MotionInfo match={match} />}/>
+                    render={() => <MotionInfo />}/>
             </div>    
         );
     }
