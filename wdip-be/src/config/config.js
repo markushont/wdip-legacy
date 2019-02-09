@@ -1,4 +1,5 @@
 const defaultConfig = {
+    AWS_APPLICATION_NAME: "wdip-be-local",
     AWS_REGION: "eu-west-1",
     ES_SERVER: "elasticsearch:9200",
     SQS_URL: "http://sqs:9324/queue/wdip-import-local",

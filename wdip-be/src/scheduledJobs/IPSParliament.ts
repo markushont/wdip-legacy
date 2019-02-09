@@ -2,8 +2,9 @@ import axios from "axios";
 import { parseUrl, stringify } from "query-string";
 import config from "../config/config";
 import dbClient from "../dbclient";
+import lambda from "../lambdaClient";
 import logger from "../logger";
-import { DocumentType } from "../models/DocumentType";
+import { DocumentType, getDocumentTypeString } from "../models/DocumentType";
 import { ImportDocument, ImportDocumentType } from "./ImportDocument";
 import { ImportPublicationService } from "./ImportPublicationService";
 import { importQueue } from "./ImportQueue";
@@ -18,9 +19,19 @@ export abstract class IPSParliament extends ImportPublicationService {
 
     protected documentType: DocumentType = DocumentType.MOTION;
 
-    constructor(documentType: DocumentType) {
+    private context: any = null;
+    private allowContinue: boolean = true;
+
+    /**
+     * @param documentType the document type for the current execution
+     * @param context reference to lambda context (from handler)
+     * @param allowContinue set to true to allow invoking new lambdas before this one times out
+     */
+    constructor(documentType: DocumentType, context: any, allowContinue: boolean = true) {
         super();
         this.documentType = documentType;
+        this.context = context;
+        this.allowContinue = allowContinue;
     }
 
     /**

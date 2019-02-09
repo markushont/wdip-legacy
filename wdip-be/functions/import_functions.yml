@@ -1,5 +1,5 @@
-adminStartImport:
-  handler: src/importHandler.adminStartImport
+routeAdminStartImport:
+  handler: src/importHandler.routeAdminStartImport
   events:
     - http:
         path: admin/import
@@ -10,8 +10,23 @@ adminStartImport:
               documentType: false
               fromDate: false
               toDate: false
+adminStartImport:
+  handler: src/importHandler.adminStartImport
+  timeout: 900 # max 15 min timeout on AWS
+routeAdminStartUpdateImport:
+  handler: src/importHandler.routeAdminStartUpdateImport
+  events:
+    - http:
+        path: admin/import/update
+        method: post
+        requests:
+          parameters:
+            querystrings:
+              fromDate: false
+              documentType: false
 adminStartUpdateImport:
   handler: src/importHandler.startUpdateImport
+  timeout: 900 # max 15 min timeout on AWS
   events:
     - schedule:
         rate: rate(1 day)
@@ -23,14 +38,6 @@ adminStartUpdateImport:
         enabled: ${self:provider.enableScheduled}
         input:
           documentType: prop
-    - http:
-        path: admin/import/update
-        method: post
-        requests:
-          parameters:
-            querystrings:
-              fromDate: false
-              documentType: false
 adminHandleImportQueueEvent:
   handler: src/importHandler.handleImportQueueEvent
   events:
