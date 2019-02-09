@@ -80,9 +80,8 @@ The backend API is defined in an OpenAPI definition file (at wdip-be/api/swagger
 rm -rf wdip-fe/src/service/wdip-be
 
 # Generate the new API client
-docker run --rm -v ${PWD}:/local openapitools/openapi-generator-cli:v3.3.4 generate -i /local/wdip-be/src/api/swagger.yml -g typescript-fetch -o /local/wdip-fe/src/service/wdip-be
+docker run --rm -v ${PWD}:/local openapitools/openapi-generator-cli generate -i /local/wdip-be/src/api/swagger.yml -g typescript-fetch -o /local/wdip-fe/src/service/wdip-be
 ```
-3.3.4 is the latest stable release. The upcoming beta release of 4.0.0 is set to Janaury/February and contains breaking changes. 
 
 ## Deploying the backend (not necessary for local development)
 
@@ -90,10 +89,20 @@ Using the [serverless](https://www.serverless.com) framework, run the following 
 
 ```bash
 cd wdip-be
-serverless deploy -v -s [stage]
+npm run deploy:[stage]
 ```
 
 Specifying [stage] (can be e.g. 'test') will include the correct configuration (DB endpoints etc.) into the deployment package. Please ensure that the environment actually exists on AWS before deploying.
+
+## Deploying the frontend (not necessary for local development)
+Also using the [serverless](https://www.serverless.com) framework, run the following command to deploy a new version to AWS S3:
+
+```bash
+cd wdip-fe
+npm run deploy:[stage]
+```
+
+Again, please ensure that the staging environment actually exists as an S3 bucket before deploying.
 
 ## Fetching data locally
 

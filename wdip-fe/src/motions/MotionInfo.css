@@ -1,0 +1,28 @@
+.motions-info h1 {
+    font-size: 30px;
+    color: darkgrey;
+}
+
+.motions-info h2 {
+    font-size: 23px;
+}
+
+.motions-info li {
+    font-size: 13px;
+}
+
+.status-text {
+    font-weight: bold;
+}
+
+.status-text.approved {
+    color: #41B3A3;
+}
+
+.status-text.rejected {
+    color: #E27D60;
+}
+
+.status-text.pending {
+    color: #FADA5E;
+}

@@ -13,7 +13,7 @@ async function getMotions(outcome: string,
   parties.forEach((party) => {
     toAddDocs.push({
       index: config.WDIP_MOTION_INDEX,
-      type: "_doc",
+      type: "MOTION",
       size: "0"
     });
     toAddDocs.push(
@@ -22,14 +22,14 @@ async function getMotions(outcome: string,
           bool: {
             must: [
               {
-                term: { "intressent.partibet": party }
+                term: { "stakeholders.party.id": party }
               },
               {
-                term: { status: outcome }
+                term: { "documentStatus.keyword": outcome }
               },
               {
                 range: {
-                  dateStr: {
+                  published: {
                     gte: fromDateStrOverride,
                     lte: toDateStrOverride
                   }
