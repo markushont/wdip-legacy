@@ -14,11 +14,22 @@ import { MotionsByParty, Party } from "src/service/wdip-be";
 import * as moment from "moment";
 import { AppState } from '../reducers/';
 import { connect } from 'react-redux';
-import { handleDateChange, GET_MOTION_DATA } from "src/actions";
+import { handleDateChange, handleDirectEnterMotionsView } from "src/actions";
+
+//@ts-ignore
+import lifecycle from 'react-pure-lifecycle';
+
+const methods = {
+    componentDidMount(props: any) {
+        const url = props.history.location.pathname.split('/');
+        if(url.length > 2 && props.fromDate && props.toDate) {
+            props.handleEnterMotionsView(url[2], props.fromDate, props.toDate)
+        }
+    }
+};
 
 export interface MotionsProps {
     handleDateChange: (values: number[], id?: string) => any;
-    handleEnterMotionsView: (id: string) => any;
     motionsByParty: MotionsByParty;
     partyData: Party[];
     match: any;
@@ -29,7 +40,6 @@ export interface MotionsProps {
 
 const Motions = ({
     handleDateChange,
-    handleEnterMotionsView,
     motionsByParty,
     partyData,
     match,
@@ -64,23 +74,23 @@ const Motions = ({
                                     <Route
                                         exact path={match.path} 
                                         render={(props) => {
-                                            if (motionsByParty && motionsByParty.results && partyData) {
-                                                return (
-                                                    <BubbleChart
-                                                        {...props}
-                                                        results={motionsByParty.results}
-                                                        partyData={partyData}
-                                                    />
-                                                )
-                                            } else {
-                                                return null;
-                                            }
+                                            return (
+                                                <BubbleChart
+                                                    {...props}
+                                                    results={motionsByParty.results ? motionsByParty.results : null}
+                                                    partyData={partyData}
+                                                />
+                                            )
+                                            
                                         }}
                                     />
                                     <Route
                                         path={`${match.path}/:party`}
-                                        onEnter={() => handleEnterMotionsView(location.pathname.split('/')[2])}
-                                        render={(props) => <MotionsView {...props} fromYear={fromYear+''} toYear={toYear+''} />}
+                                        render={(props) => {
+                                            return (
+                                                <MotionsView {...props} fromYear={fromYear+''} toYear={toYear+''} />
+                                            )
+                                        }}
                                     />
                                 </Switch>
                             </CSSTransition>
@@ -96,8 +106,10 @@ const mapDispatchToProps = (dispatch: Dispatch) => ({
     handleDateChange: (values: number[], id?: string) => {
         dispatch(handleDateChange(values, id))
     },
-    handleEnterMotionsView: (id: string) => {
-        dispatch({type: GET_MOTION_DATA, payload: id})
+    handleEnterMotionsView: (id: string, fromDate: any, toDate: any) => {
+        handleDirectEnterMotionsView(id, fromDate, toDate).then(result => {
+            return dispatch(result)
+        })
     }
 })
 
@@ -110,4 +122,4 @@ const mapStateToProps = (state: AppState, ownProps: any) => ({
     match: ownProps.match
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(Motions);
+export default connect(mapStateToProps, mapDispatchToProps)(lifecycle(methods)(Motions));

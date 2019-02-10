@@ -18,6 +18,10 @@ export const GET_MOTIONS_FOR_PARTY = 'GET_MOTIONS_FOR_PARTY'
 export const GET_MOTIONS_FOR_PARTY_SUCCESS = 'GET_MOTIONS_FOR_PARTY_SUCCESS'
 export const GET_MOTIONS_FOR_PARTY_FAILURE = 'GET_MOTIONS_FOR_PARTY_FAILURE'
 
+import { MotionsApi } from "src/service/wdip-be";
+
+let motionsApi: MotionsApi = new MotionsApi();
+
 export function getMotionByPartySuccess (result: MotionsByParty) {
     return {type: GET_MOTIONS_BY_PARTY_SUCCESS, payload: result}
 }
@@ -28,6 +32,11 @@ export function getPartyDataSuccess (result: Party[]) {
 
 export function handleDateChange (values: number[], id?: string) {
     return {type: HANDLE_DATE_CHANGE, payload: {fromDate: moment(`${values[0]}-01-01`), toDate: moment(`${values[1]}-01-01`), id}}
+}
+
+export async function handleDirectEnterMotionsView (id: string, fromDate: any, toDate: any) {
+    const result =  await motionsApi.getMotionsForParty({id, fromDate, toDate})
+    return {type: GET_MOTIONS_FOR_PARTY_SUCCESS, payload: result}
 }
 
 export function getMotionDataSuccess (result: Motion) {
