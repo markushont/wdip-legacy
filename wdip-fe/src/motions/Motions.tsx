@@ -14,10 +14,11 @@ import { MotionsByParty, Party } from "src/service/wdip-be";
 import * as moment from "moment";
 import { AppState } from '../reducers/';
 import { connect } from 'react-redux';
-import { handleDateChange } from "src/actions";
+import { handleDateChange, GET_MOTION_DATA } from "src/actions";
 
 export interface MotionsProps {
     handleDateChange: (values: number[], id?: string) => any;
+    handleEnterMotionsView: (id: string) => any;
     motionsByParty: MotionsByParty;
     partyData: Party[];
     match: any;
@@ -28,6 +29,7 @@ export interface MotionsProps {
 
 const Motions = ({
     handleDateChange,
+    handleEnterMotionsView,
     motionsByParty,
     partyData,
     match,
@@ -37,12 +39,10 @@ const Motions = ({
 }: MotionsProps) => {
 
     if (!motionsByParty || !partyData) { return null; }
-
         const minYear = config.DEFAULT_FROM_DATE.year();
         const maxYear = config.DEFAULT_TO_DATE.year();
         const fromYear = fromDate.year();
         const toYear = toDate.year();
-
         return (
         <div className="motions">
             <GridContainer>
@@ -79,6 +79,7 @@ const Motions = ({
                                     />
                                     <Route
                                         path={`${match.path}/:party`}
+                                        onEnter={() => handleEnterMotionsView(location.pathname.split('/')[2])}
                                         render={(props) => <MotionsView {...props} fromYear={fromYear+''} toYear={toYear+''} />}
                                     />
                                 </Switch>
@@ -94,6 +95,9 @@ const Motions = ({
 const mapDispatchToProps = (dispatch: Dispatch) => ({
     handleDateChange: (values: number[], id?: string) => {
         dispatch(handleDateChange(values, id))
+    },
+    handleEnterMotionsView: (id: string) => {
+        dispatch({type: GET_MOTION_DATA, payload: id})
     }
 })
 

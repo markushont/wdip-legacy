@@ -2,7 +2,6 @@ import * as React from 'react';
 import './App.css';
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 
-
 import Motions from './motions/Motions';
 
 class App extends React.Component<any, any> {
