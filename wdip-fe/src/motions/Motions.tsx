@@ -2,6 +2,7 @@ import * as React from "react";
 import "./Motions.css";
 import "rc-slider/assets/index.css";
 
+import { Dispatch } from "redux";
 import { GridContainer, Grid, Cell } from 'react-foundation';
 import { config } from "../config/config";
 import BubbleChart from './BubbleChart';
@@ -9,74 +10,37 @@ import MotionsView from './MotionsView';
 import { Range } from 'rc-slider';
 import { Route, Switch } from "react-router-dom";
 import { TransitionGroup, CSSTransition } from "react-transition-group";
-import { MotionsApi, MotionsByParty, PartyApi } from "src/service/wdip-be";
+import { MotionsByParty, Party } from "src/service/wdip-be";
 import * as moment from "moment";
+import { AppState } from '../reducers/';
+import { connect } from 'react-redux';
+import { handleDateChange } from "src/actions";
 
-interface MotionsState {
+export interface MotionsProps {
+    handleDateChange: (values: number[], id?: string) => any;
+    motionsByParty: MotionsByParty;
+    partyData: Party[];
+    match: any;
     fromDate: moment.Moment;
     toDate: moment.Moment;
-    motionsByParty?: MotionsByParty;
-    partyData?: any;
-};
+    currentPartyId: string;
+}
 
-class Motions extends React.Component<any, MotionsState> {
+const Motions = ({
+    handleDateChange,
+    motionsByParty,
+    partyData,
+    match,
+    fromDate,
+    toDate,
+    currentPartyId
+}: MotionsProps) => {
 
-    motionsApi: MotionsApi = new MotionsApi(config.apiConfiguration);
-    partyApi: PartyApi = new PartyApi(config.apiConfiguration);
-
-    constructor(props: any) {
-        super(props);
-        this.state = {
-            fromDate: config.DEFAULT_FROM_DATE,
-            toDate: config.DEFAULT_TO_DATE,
-       };
-    }
-
-    componentDidMount() {
-        this.getMotionsByParty();
-        this.getPartyData();
-    }
-
-    async getMotionsByParty() {
-        try {
-            const motions = await this.motionsApi.getMotionsByParty({
-                fromDate: this.state.fromDate.format("YYYY-MM-DD"),
-                toDate: this.state.toDate.format("YYYY-MM-DD"),
-            });
-            this.setState({ motionsByParty: motions });
-        } catch (error) {
-            console.error(error);
-        }
-    }
-
-    async getPartyData() {
-        try {
-          this.setState({ partyData: await this.partyApi.getAllParties() });
-        } catch (error) {
-          console.error(error);
-        }
-      }
-
-    public onChangeDate = (values: number[]) => {
-        this.setState({
-            fromDate: moment(`${values[0]}-01-01`),
-            toDate: moment(`${values[1]}-01-01`)
-        });
-    }
-
-    public onAfterChangeDate = (values: number[]) => {
-        this.getMotionsByParty();
-    }
-
-    public render() {
-        if (!this.state.motionsByParty || !this.state.partyData) { return null; }
-
-        const { match } = this.props;
+    if (!motionsByParty || !partyData) { return null; }
         const minYear = config.DEFAULT_FROM_DATE.year();
         const maxYear = config.DEFAULT_TO_DATE.year();
-        const fromYear = this.state.fromDate.year();
-        const toYear = this.state.toDate.year();
-
+        const fromYear = fromDate.year();
+        const toYear = toDate.year();
         return (
         <div className="motions">
             <GridContainer>
@@ -84,8 +48,9 @@ class Motions extends React.Component<any, MotionsState> {
                     <Cell>
                         <Range
                             value={[fromYear, toYear]}
-                            onChange={this.onChangeDate.bind(this)}
-                            onAfterChange={this.onAfterChangeDate.bind(this)}
+                            onChange={(values) => {
+                                handleDateChange([values[0], values[1]], currentPartyId)
+                            }}
                             min={minYear}
                             max={maxYear}
                         />
@@ -96,17 +61,29 @@ class Motions extends React.Component<any, MotionsState> {
                                 <Switch>
                                     <Route
                                         exact path={match.path} 
-                                        render={(props) =>
-                                            <BubbleChart
-                                                {...props}
-                                                results={this.state.motionsByParty ? this.state.motionsByParty.results : null}
-                                                partyData={this.state.partyData}
-                                            />
-                                        }
+                                        render={(props) => {
+                                            return (
+                                                <BubbleChart
+                                                    {...props}
+                                                    results={motionsByParty.results ? motionsByParty.results : null}
+                                                    partyData={partyData}
+                                                />
+                                            )
+                                            
+                                        }}
                                     />
                                     <Route
                                         path={`${match.path}/:party`}
-                                        render={(props) => <MotionsView {...props} results={this.state.motionsByParty ? this.state.motionsByParty.results : null} fromYear={fromYear} toYear={toYear} />}
+                                        render={(props) => {
+                                            return (
+                                                <MotionsView 
+                                                    {...props} 
+                                                    fromDate={fromDate}
+                                                    toDate={toDate}
+                                                    fromYear={fromYear+''}
+                                                    toYear={toYear+''} />
+                                            )
+                                        }}
                                     />
                                 </Switch>
                             </CSSTransition>
@@ -116,7 +93,21 @@ class Motions extends React.Component<any, MotionsState> {
             </GridContainer>
         </div>
         );
-    }
 }
 
-export default Motions;
+const mapDispatchToProps = (dispatch: Dispatch) => ({
+    handleDateChange: (values: number[], id?: string) => {
+        dispatch(handleDateChange(values, id))
+    }
+})
+
+const mapStateToProps = (state: AppState, ownProps: any) => ({
+    motionsByParty: state.motions.motionsByParty,
+    partyData: state.parties.partyData,
+    fromDate: state.dates.fromDate,
+    toDate: state.dates.toDate,
+    currentPartyId: state.parties.currentPartyId,
+    match: ownProps.match
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(Motions);

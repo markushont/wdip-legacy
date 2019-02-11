@@ -1,70 +1,68 @@
 import * as React from "react";
+import { connect } from 'react-redux';
 import "./MotionInfo.css";
-import { match } from "react-router";
-import { config } from "../config/config";
-import { MotionsApi, Motion, Proposal, Stakeholder } from "../service/wdip-be";
+import { Motion, Proposal, Stakeholder } from "../service/wdip-be";
+import { AppState } from '../reducers/';
+//@ts-ignore
+import lifecycle from 'react-pure-lifecycle';
+import { GET_MOTION_DATA } from "src/actions";
+import { Dispatch } from "redux";
 
 export interface MotionInfoProps {
-    motionId: string;
-    match: match<any>;
+    currentMotion: Motion;
 }
 
-export interface MotionInfoState {
-    motion: Motion;
+const methods = {
+    componentDidMount(props: any) {
+        const url = props.location.pathname.split('/');
+        if(url.length > 3) {
+            props.handleDirectEnterMotionsInfo(url[3]);
+        }
+    }
+};
+
+const layoutProposal = (proposal: Proposal, index: number) => {
+    return <li key={index}>{proposal.wording}</li>;
 }
 
-export class MotionInfo extends React.Component<MotionInfoProps, any> {
+const layoutStakeholder = (stakeholder: Stakeholder, index: number) => {
+    return <li key={index}>{stakeholder.name} ({stakeholder.party})</li>;
+}
 
-    motionsApi: MotionsApi = new MotionsApi(config.apiConfiguration);
-
-    constructor(props: MotionInfoProps) {
-        super(props);
-        this.state = {
-            motion: null
-        }
-    }
-
-    componentWillReceiveProps(nextProps: Readonly<MotionInfoProps>) {
-        if (nextProps !== this.props) {
-            this.getMotionData(nextProps.match.params.motionId);
-        }
-    }
-
-    private async getMotionData(id: string) {
-        try {
-            const result = await this.motionsApi.getMotion({ id });
-            this.setState({ motion: result });
-        } catch (error) {
-            console.log(error);
-        }
-    }
-
-    private layoutProposal(proposal: Proposal) {
-        return <li>{proposal.wording}</li>;
-    }
-
-    private layoutStakeholder(stakeholder: Stakeholder) {
-        return <li>{stakeholder.name} ({stakeholder.party})</li>;
-    }
-
-    public render() {
-        const { motion } = this.state;
-        if (!motion) { return null };
-        const statusClass = motion.documentStatus ? motion.documentStatus.toLowerCase() : "";
+const MotionInfo = ({
+    currentMotion
+}: MotionInfoProps) => {
+    const statusClass = (currentMotion && currentMotion.documentStatus) ? currentMotion.documentStatus.toLowerCase() : "";
+    if (currentMotion) {
         return (
             <div className={"motions-info"}>
-                <h1>{motion.title}</h1>
-                <p>{motion.id}</p>
-                <p>Status: <span className={`status-text ${statusClass}`}>{motion.documentStatus}</span></p>
+                <h1>{currentMotion.title}</h1>
+                <p>{currentMotion.id}</p>
+                <p>Status: <span className={`status-text ${statusClass}`}>{currentMotion.documentStatus}</span></p>
                 <h2>Förslag:</h2>
                 <ul>
-                    {motion.proposals.map(this.layoutProposal)}
+                    {currentMotion.proposals.map((proposal, index) => {return layoutProposal(proposal, index)})}
                 </ul>
                 <h2>Intressenter:</h2>
                 <ul>
-                    {motion.stakeholders.map(this.layoutStakeholder)}
+                    {currentMotion.stakeholders.map((stakeholder, index) => {return layoutStakeholder(stakeholder, index)})}
                 </ul>
             </div>
-        );
+        )
+    } else {
+        return null;
     }
 }
+
+const mapDispatchToProps = (dispatch: Dispatch) => ({
+    handleDirectEnterMotionsInfo: (id: string) => {
+        dispatch({type: GET_MOTION_DATA, payload: id})
+    }
+})
+
+const mapStateToProps = (state: AppState, ownProps: any) => ({
+    currentMotion: state.motions.currentMotion,
+    history: ownProps.history
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(lifecycle(methods)(MotionInfo));
