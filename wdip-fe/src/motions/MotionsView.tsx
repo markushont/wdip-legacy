@@ -17,7 +17,6 @@ import lifecycle from 'react-pure-lifecycle';
 
 const methods = {
     componentDidMount(props: any) {
-        console.log(props)
         const url = props.location.pathname.split('/')
         if(url.length > 2 && props.fromDate && props.toDate) {
             props.handleEnterMotionsView(url[2], props.fromDate, props.toDate)

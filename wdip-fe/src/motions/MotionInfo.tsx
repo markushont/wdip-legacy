@@ -34,7 +34,6 @@ const MotionInfo = ({
     currentMotion
 }: MotionInfoProps) => {
     const statusClass = (currentMotion && currentMotion.documentStatus) ? currentMotion.documentStatus.toLowerCase() : "";
-
     if (currentMotion) {
         return (
             <div className={"motions-info"}>
