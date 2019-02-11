@@ -1,8 +1,9 @@
 import { MotionsApi } from "src/service/wdip-be";
 import { call, put, takeEvery } from "redux-saga/effects"
 import { GET_MOTIONS_BY_PARTY_SUCCESS, GET_MOTIONS_BY_PARTY_FAILURE, GET_MOTIONS_BY_PARTY, GET_MOTION_DATA, GET_MOTION_DATA_SUCCESS, GET_MOTION_DATA_FAILURE, GET_MOTIONS_FOR_PARTY_SUCCESS, GET_MOTIONS_FOR_PARTY_FAILURE, GET_MOTIONS_FOR_PARTY, HANDLE_DATE_CHANGE } from ".";
+import { config } from "src/config/config";
 
-let motionsApi: MotionsApi = new MotionsApi();
+let motionsApi: MotionsApi = new MotionsApi(config.apiConfiguration);
 
 const getMotionsByPartySync = (payload: any) => {
     return motionsApi.getMotionsByParty(payload);

@@ -27,13 +27,15 @@ provider:
         - sqs:DeleteMessage
         - sqs:GetQueueAttributes
         - sqs:SendMessage
+        - lambda:InvokeFunction
       Resource:
         - arn:aws:es:${self:provider.region}:843375259671:domain/wdip-${opt:stage, "local"}
         - arn:aws:sqs:${self:provider.region}:843375259671:wdip-import-${opt:stage, "local"}
+        - arn:aws:lambda:${self:provider.region}:843375259671:*
 
 functions:
-    - ${file(./functions/web_apis.yml)}
-    - ${file(./functions/import_functions.yml)}
+  - ${file(./functions/web_apis.yml)}
+  - ${file(./functions/import_functions.yml)}
 
 custom:
   serverless-offline-sqs:

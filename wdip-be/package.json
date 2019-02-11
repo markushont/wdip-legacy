@@ -10,8 +10,10 @@
   },
   "scripts": {
     "clean": "rm -rf .build",
-    "build": "npm run build-ts && npm run tslint",
+    "build": "npm run clean && npm run build-ts && npm run tslint",
     "build-ts": "./node_modules/.bin/tsc",
+    "deploy:test": "npm run build && serverless deploy -s test",
+    "deploy:prod": "npm run build && serverless deploy -s prod",
     "tslint": "./node_modules/.bin/tslint -c tslint.json -p tsconfig.json",
     "debug": "npm run clean && npm run tslint && node --inspect=0.0.0.0:9229 ./node_modules/.bin/serverless offline start --host 0.0.0.0 --port 3001 --stage local",
     "test": "npm run tslint && jest",

@@ -3,7 +3,6 @@ import { connect } from 'react-redux';
 import "./MotionInfo.css";
 import { Motion, Proposal, Stakeholder } from "../service/wdip-be";
 import { AppState } from '../reducers/';
-
 //@ts-ignore
 import lifecycle from 'react-pure-lifecycle';
 import { GET_MOTION_DATA } from "src/actions";

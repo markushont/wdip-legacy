@@ -19,8 +19,9 @@ export const GET_MOTIONS_FOR_PARTY_SUCCESS = 'GET_MOTIONS_FOR_PARTY_SUCCESS'
 export const GET_MOTIONS_FOR_PARTY_FAILURE = 'GET_MOTIONS_FOR_PARTY_FAILURE'
 
 import { MotionsApi } from "src/service/wdip-be";
+import { config } from "src/config/config";
 
-let motionsApi: MotionsApi = new MotionsApi();
+let motionsApi: MotionsApi = new MotionsApi(config.apiConfiguration);
 
 export function getMotionByPartySuccess (result: MotionsByParty) {
     return {type: GET_MOTIONS_BY_PARTY_SUCCESS, payload: result}

@@ -18,6 +18,9 @@ export abstract class IPSParliament extends ImportPublicationService {
 
     protected documentType: DocumentType = DocumentType.MOTION;
 
+    /**
+     * @param documentType the document type for the current execution
+     */
     constructor(documentType: DocumentType) {
         super();
         this.documentType = documentType;

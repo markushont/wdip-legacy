@@ -89,10 +89,20 @@ Using the [serverless](https://www.serverless.com) framework, run the following 
 
 ```bash
 cd wdip-be
-serverless deploy -v -s [stage]
+npm run deploy:[stage]
 ```
 
 Specifying [stage] (can be e.g. 'test') will include the correct configuration (DB endpoints etc.) into the deployment package. Please ensure that the environment actually exists on AWS before deploying.
+
+## Deploying the frontend (not necessary for local development)
+Also using the [serverless](https://www.serverless.com) framework, run the following command to deploy a new version to AWS S3:
+
+```bash
+cd wdip-fe
+npm run deploy:[stage]
+```
+
+Again, please ensure that the staging environment actually exists as an S3 bucket before deploying.
 
 ## Fetching data locally
 
