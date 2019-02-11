@@ -14,19 +14,7 @@ import { MotionsByParty, Party } from "src/service/wdip-be";
 import * as moment from "moment";
 import { AppState } from '../reducers/';
 import { connect } from 'react-redux';
-import { handleDateChange, handleDirectEnterMotionsView } from "src/actions";
-
-//@ts-ignore
-import lifecycle from 'react-pure-lifecycle';
-
-const methods = {
-    componentDidMount(props: any) {
-        const url = props.history.location.pathname.split('/');
-        if(url.length > 2 && props.fromDate && props.toDate) {
-            props.handleEnterMotionsView(url[2], props.fromDate, props.toDate)
-        }
-    }
-};
+import { handleDateChange } from "src/actions";
 
 export interface MotionsProps {
     handleDateChange: (values: number[], id?: string) => any;
@@ -88,7 +76,12 @@ const Motions = ({
                                         path={`${match.path}/:party`}
                                         render={(props) => {
                                             return (
-                                                <MotionsView {...props} fromYear={fromYear+''} toYear={toYear+''} />
+                                                <MotionsView 
+                                                    {...props} 
+                                                    fromDate={fromDate}
+                                                    toDate={toDate}
+                                                    fromYear={fromYear+''}
+                                                    toYear={toYear+''} />
                                             )
                                         }}
                                     />
@@ -105,11 +98,6 @@ const Motions = ({
 const mapDispatchToProps = (dispatch: Dispatch) => ({
     handleDateChange: (values: number[], id?: string) => {
         dispatch(handleDateChange(values, id))
-    },
-    handleEnterMotionsView: (id: string, fromDate: any, toDate: any) => {
-        handleDirectEnterMotionsView(id, fromDate, toDate).then(result => {
-            return dispatch(result)
-        })
     }
 })
 
@@ -122,4 +110,4 @@ const mapStateToProps = (state: AppState, ownProps: any) => ({
     match: ownProps.match
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(lifecycle(methods)(Motions));
+export default connect(mapStateToProps, mapDispatchToProps)(Motions);

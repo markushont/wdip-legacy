@@ -10,6 +10,21 @@ import { AppState } from '../reducers/';
 import "./MotionsView.css";
 import { GET_MOTION_DATA } from 'src/actions';
 
+import { handleDirectEnterMotionsView } from "src/actions";
+
+//@ts-ignore
+import lifecycle from 'react-pure-lifecycle';
+
+const methods = {
+    componentDidMount(props: any) {
+        console.log(props)
+        const url = props.location.pathname.split('/')
+        if(url.length > 2 && props.fromDate && props.toDate) {
+            props.handleEnterMotionsView(url[2], props.fromDate, props.toDate)
+        }
+    }
+};
+
 const colorApproved = "#41B3A3";
 const colorPending  = "#FADA5E";
 const colorRejected = "#E27D60";
@@ -29,9 +44,6 @@ const MotionsView = ({
     match,
     history,
 }: MotionsViewProps) => {
-    // componentWillMount() {
-    //     this.getPartyData();
-    // }
 
     function layout(motion: Motion, index: number, array?: Motion[]): chartjs.ChartDataSets {
         const length = array ? array.length : 0;
@@ -117,7 +129,7 @@ const MotionsView = ({
                 height={800} />
             <Route
                 path={`${match.path}/:motionId`}
-                render={() => <MotionInfo />}/>
+                render={(props) => <MotionInfo {...props}/>}/>
         </div>    
     );
 }
@@ -125,6 +137,11 @@ const MotionsView = ({
 const mapDispatchToProps = (dispatch: Dispatch) => ({
     getMotionData: (id: string) => {
         dispatch({type: GET_MOTION_DATA, payload: id})
+    },
+    handleEnterMotionsView: (id: string, fromDate: any, toDate: any) => {
+        handleDirectEnterMotionsView(id, fromDate, toDate).then(result => {
+            return dispatch(result)
+        })
     }
 })
 
@@ -134,4 +151,4 @@ const mapStateToProps = (state: AppState, ownProps: any) => ({
     history: ownProps.history
 })
   
-export default connect(mapStateToProps, mapDispatchToProps)(MotionsView);
+export default connect(mapStateToProps, mapDispatchToProps)(lifecycle(methods)(MotionsView));

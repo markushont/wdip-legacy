@@ -1,13 +1,26 @@
 import * as React from "react";
 import { connect } from 'react-redux';
 import "./MotionInfo.css";
-import { match } from "react-router";
 import { Motion, Proposal, Stakeholder } from "../service/wdip-be";
 import { AppState } from '../reducers/';
+
+//@ts-ignore
+import lifecycle from 'react-pure-lifecycle';
+import { GET_MOTION_DATA } from "src/actions";
+import { Dispatch } from "redux";
 
 export interface MotionInfoProps {
     currentMotion: Motion;
 }
+
+const methods = {
+    componentDidMount(props: any) {
+        const url = props.location.pathname.split('/');
+        if(url.length > 3) {
+            props.handleDirectEnterMotionsInfo(url[3]);
+        }
+    }
+};
 
 const layoutProposal = (proposal: Proposal, index: number) => {
     return <li key={index}>{proposal.wording}</li>;
@@ -43,10 +56,15 @@ const MotionInfo = ({
     }
 }
 
-const mapDispatchToProps = () => ({})
-
-const mapStateToProps = (state: AppState) => ({
-    currentMotion: state.motions.currentMotion
+const mapDispatchToProps = (dispatch: Dispatch) => ({
+    handleDirectEnterMotionsInfo: (id: string) => {
+        dispatch({type: GET_MOTION_DATA, payload: id})
+    }
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(MotionInfo);
+const mapStateToProps = (state: AppState, ownProps: any) => ({
+    currentMotion: state.motions.currentMotion,
+    history: ownProps.history
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(lifecycle(methods)(MotionInfo));
