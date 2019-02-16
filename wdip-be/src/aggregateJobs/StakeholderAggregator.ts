@@ -72,7 +72,7 @@ export default class StakeholderAggregator extends Aggregator {
         // Go through documents and parse stakeholders
         for (const parliamentDocument of documents) {
             const stakeholders = parliamentDocument.stakeholders;
-            if (!stakeholders.length || stakeholders.length < 2) { continue; }
+            if (!stakeholders.length) { continue; }
 
             // Get existing stakeholder docs
             const existingStakeholders = {};
@@ -101,29 +101,32 @@ export default class StakeholderAggregator extends Aggregator {
                         _id: stakeholder.id
                     }
                 };
-                // Body
-                const existingStakeholderIds = existingStakeholders[stakeholder.id] ?
-                    existingStakeholders[stakeholder.id].relatedStakeholders :
-                    [];
-                const newRelatedStakeholderIds = stakeholders
-                    .filter((item) => item.id !== stakeholder.id)
-                    .map((doc) => doc.id);
-                const uniqueRelatedStakeholderIds =
-                    [...new Set(existingStakeholderIds.concat(newRelatedStakeholderIds))];
 
-                // doc_as_upsert: create document if it doesn't exist, otherwise update
-                const bodyObj = {
-                    doc: {
-                        stakeholder,
-                        relatedStakeholders: uniqueRelatedStakeholderIds,
-                        meta: {
-                            updated: moment().utc()
-                        }
-                    },
-                    doc_as_upsert: true
-                };
-                bulkDocs.push(indexObj);
-                bulkDocs.push(bodyObj);
+                // Build index Body
+                const existingStakeholderIds = existingStakeholders[stakeholder.id] ?
+                    existingStakeholders[stakeholder.id].relatedStakeholders : [];
+                // No need to parse if only 1 stakeholder that already exists in DB
+                if (stakeholders.length > 1 || !existingStakeholders[stakeholder.id]) {
+                    const newRelatedStakeholderIds = stakeholders
+                        .filter((item) => item.id !== stakeholder.id)
+                        .map((doc) => doc.id);
+                    const uniqueRelatedStakeholderIds =
+                        [...new Set(existingStakeholderIds.concat(newRelatedStakeholderIds))];
+
+                    // doc_as_upsert: create document if it doesn't exist, otherwise update
+                    const bodyObj = {
+                        doc: {
+                            stakeholder,
+                            relatedStakeholders: uniqueRelatedStakeholderIds,
+                            meta: {
+                                updated: moment().utc()
+                            }
+                        },
+                        doc_as_upsert: true
+                    };
+                    bulkDocs.push(indexObj);
+                    bulkDocs.push(bodyObj);
+                }
             }
             try {
                 logger.debug(`Pushing ${bulkDocs.length ? bulkDocs.length / 2 : 0} documents`);
