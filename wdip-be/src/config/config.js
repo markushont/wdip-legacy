@@ -8,7 +8,8 @@ const defaultConfig = {
     STATUS_INTERVAL_IPS_MS: 1000,
     WDIP_DEFAULT_PARTIES: ["s", "m", "l", "kd", "v", "sd", "c", "mp"],
     WDIP_IS_LOCAL_ENV: false,
-    WDIP_MOTION_INDEX: "motions"
+    WDIP_MOTION_INDEX: "motions",
+    WDIP_STAKEHOLDERS_INDEX: "stakeholders"
 };
 
 const config = {};

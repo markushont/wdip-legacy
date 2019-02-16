@@ -34,6 +34,7 @@ provider:
         - arn:aws:lambda:${self:provider.region}:843375259671:*
 
 functions:
+  - ${file(./functions/aggregate_functions.yml)}
   - ${file(./functions/web_apis.yml)}
   - ${file(./functions/import_functions.yml)}
 
