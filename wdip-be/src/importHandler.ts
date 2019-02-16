@@ -1,12 +1,12 @@
 import moment from "moment";
 import config from "./config/config";
 import httpResponses from "./httpResponses";
+import { importQueueStatus } from "./importJobs/ImportQueueStatus";
+import { importSubscriptionServiceParliament } from "./importJobs/ImportSubscriptionServiceParliament";
+import { IPSParliamentDateRange } from "./importJobs/IPSParliamentDateRange";
+import { IPSParliamentUpdate } from "./importJobs/IPSParliamentUpdate";
 import lambdaClient from "./lambdaClient";
 import { transformDocumentType } from "./models/DocumentType";
-import { importQueueStatus } from "./scheduledJobs/ImportQueueStatus";
-import { importSubscriptionServiceParliament } from "./scheduledJobs/ImportSubscriptionServiceParliament";
-import { IPSParliamentDateRange } from "./scheduledJobs/IPSParliamentDateRange";
-import { IPSParliamentUpdate } from "./scheduledJobs/IPSParliamentUpdate";
 
 function hasParameter(event, parameter) {
   return event && event.queryStringParameters && event.queryStringParameters[parameter];
