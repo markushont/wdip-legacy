@@ -1,8 +1,8 @@
 import { SearchParams, SearchResponse } from "elasticsearch";
-import moment = require("moment");
+import moment, { Moment } from "moment";
 import config from "../config/config";
 import dbClient from "../dbclient";
-import logger = require("../logger");
+import logger from "../logger";
 import { ParliamentDocument } from "../models/ParliamentDocument";
 import Aggregator from "./Aggregator";
 
@@ -18,20 +18,22 @@ export default class StakeholderAggregator extends Aggregator {
     private toDate: string;
     private scrollId: string;
 
+    private readonly DATE_FORMAT: string = "YYYY-MM-DD";
+
     /**
      * @param fromDate beginning of date range (for the 'published' field)
      * @param toDate end of date range (for the 'published' field)
      * @param scrollId pagination cursor for previous search
      */
-    constructor(fromDate: string, toDate: string, scrollId?: string) {
+    constructor(fromDate: Moment, toDate: Moment, scrollId?: string) {
         super();
-        this.fromDate = fromDate;
-        this.toDate = toDate;
+        this.fromDate = fromDate.format(this.DATE_FORMAT);
+        this.toDate = toDate.format(this.DATE_FORMAT);
         this.scrollId = scrollId || null;
     }
 
-    public setFromDate(fromDate: string) { this.fromDate = fromDate; }
-    public setToDate(toDate: string) { this.toDate = toDate; }
+    public setFromDate(fromDate: Moment) { this.fromDate = fromDate.format(this.DATE_FORMAT); }
+    public setToDate(toDate: Moment) { this.toDate = toDate.format(this.DATE_FORMAT); }
     public setScrollId(scrollId: string) { this.scrollId = scrollId; }
 
     public async start() {
@@ -129,11 +131,13 @@ export default class StakeholderAggregator extends Aggregator {
                     bulkDocs.push(bodyObj);
                 }
             }
-            try {
-                logger.debug(`Pushing ${bulkDocs.length ? bulkDocs.length / 2 : 0} documents`);
-                await dbClient.bulk({ body: bulkDocs });
-            } catch (error) {
-                throw error;
+            if (bulkDocs.length) {
+                try {
+                    logger.debug(`Pushing ${bulkDocs.length / 2} documents`);
+                    await dbClient.bulk({ body: bulkDocs });
+                } catch (error) {
+                    throw error;
+                }
             }
         }
     }

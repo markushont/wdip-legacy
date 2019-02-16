@@ -1,7 +1,6 @@
 import moment from "moment";
 import StakeholderAggregator from "./aggregateJobs/StakeholderAggregator";
 import httpResponses from "./httpResponses";
-import logger = require("./logger");
 
 function isValidDateString(inStr?: string): boolean {
     if (!inStr) { return false; }
@@ -16,10 +15,11 @@ function isValidDateString(inStr?: string): boolean {
 export const aggregateStakeholders = async (event, context: any) => {
     const scrollId = event.scrollId;
     const fromDate = isValidDateString(event.fromDate) ?
-        event.fromDate : moment().subtract(1, "day").format("YYYY-MM-DD");
+        moment(event.fromDate, "YYYY-MM-DD") : moment().subtract(1, "day");
     const toDate = isValidDateString(event.toDate) ?
-        event.toDate : moment().format("YYYY-MM-DD");
+        moment(event.toDate, "YYYY-MM-DD") : moment();
 
+    console.log(`Parameters: ${fromDate}, ${toDate}, ${scrollId}`);
     const aggregator = new StakeholderAggregator(fromDate, toDate, scrollId);
 
     try {
