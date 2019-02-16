@@ -49,6 +49,7 @@ export default class StakeholderAggregator extends Aggregator {
         }
 
         try {
+            // TODO: split this into two classes that inherits from Aggregator
             if (!this.scrollId) {
                 const scrollId = await this.scrollStakeholders(this.fromDate, this.toDate);
                 return scrollId;
