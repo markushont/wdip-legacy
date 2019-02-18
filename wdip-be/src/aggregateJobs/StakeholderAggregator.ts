@@ -1,9 +1,17 @@
 import { SearchParams, SearchResponse } from "elasticsearch";
-import moment, { Moment } from "moment";
+import { Moment } from "moment";
 import config from "../config/config";
 import dbClient from "../dbclient";
 import logger from "../logger";
+import { DocumentReferenceType } from "../models/DocumentReference";
 import { ParliamentDocument } from "../models/ParliamentDocument";
+import { Stakeholder } from "../models/Stakeholder";
+import {
+    StakeholderDocument,
+    StakeholderDocumentSet,
+    transformStakeholderDocument
+} from "../models/StakeholderDocument";
+import { hasCollaboration } from "../models/StakeholderDocumentCollection";
 import Aggregator from "./Aggregator";
 
 /**
@@ -53,14 +61,34 @@ export default class StakeholderAggregator extends Aggregator {
         try {
             // TODO: split this into two classes that inherits from Aggregator
             if (!this.scrollId) {
-                const scrollId = await this.scrollStakeholders(this.fromDate, this.toDate);
-                return scrollId;
+                return await this.scrollStakeholders(this.fromDate, this.toDate);
             } else {
-                const scrollId = await this.continueScrollStakeholders(this.scrollId);
-                return scrollId;
+                return await this.continueScrollStakeholders(this.scrollId);
             }
         } catch (error) {
             throw error;
+        }
+    }
+
+    /**
+     * Get stakeholder documents from DB
+     * @param stakeholders array of stakeholders (e.g. from a ParliamentDocument)
+     */
+    private async getExistingStakeholderDocs(stakeholders: Stakeholder[]): Promise<StakeholderDocumentSet> {
+        const existingStakeholders = {};
+        try {
+            const ids = stakeholders.map((stakeholder) => stakeholder.id);
+            const response = await dbClient.mget<StakeholderDocument>({
+                index: config.WDIP_STAKEHOLDERS_INDEX,
+                type: "STAKEHOLDER",
+                body: { ids }
+            });
+            for (const doc of response.docs) {
+                existingStakeholders[doc._id] = doc._source;
+            }
+            return existingStakeholders;
+        } catch (error) {
+            logger.error(error);
         }
     }
 
@@ -72,31 +100,19 @@ export default class StakeholderAggregator extends Aggregator {
     private async parseStakeholders(documents: ParliamentDocument[]) {
         if (!documents || !documents.length) { return; }
 
+        logger.debug(`Parsing ${documents.length} ParliamentDocuments`);
+
         // Go through documents and parse stakeholders
         for (const parliamentDocument of documents) {
             const stakeholders = parliamentDocument.stakeholders;
-            if (!stakeholders.length) { continue; }
+            if (!stakeholders || !stakeholders.length) { continue; }
 
-            // Get existing stakeholder docs
-            const existingStakeholders = {};
-            try {
-                const ids = stakeholders.map((stakeholder) => stakeholder.id);
-                const response = await dbClient.mget({
-                    index: config.WDIP_STAKEHOLDERS_INDEX,
-                    type: "STAKEHOLDER",
-                    body: { ids }
-                });
-                for (const doc of response.docs) {
-                    existingStakeholders[doc._id] = doc._source;
-                }
-            } catch (error) {
-                logger.error(error);
-            }
+            const existingStakeholders = await this.getExistingStakeholderDocs(stakeholders);
 
-            // Update array of related stakeholders for each stakeholder
+            // For each stakeholder, add the other stakeholders as collaborators
             const bulkDocs = [];
             for (const stakeholder of stakeholders) {
-                // Index operation info
+                // Index operation info (instruction for ElasticSearch)
                 const indexObj = {
                     update: {
                         _index: config.WDIP_STAKEHOLDERS_INDEX,
@@ -105,32 +121,50 @@ export default class StakeholderAggregator extends Aggregator {
                     }
                 };
 
-                // Build index Body
-                const existingStakeholderIds = existingStakeholders[stakeholder.id] ?
-                    existingStakeholders[stakeholder.id].relatedStakeholders : [];
-                // No need to parse if only 1 stakeholder that already exists in DB
-                if (stakeholders.length > 1 || !existingStakeholders[stakeholder.id]) {
-                    const newRelatedStakeholderIds = stakeholders
-                        .filter((item) => item.id !== stakeholder.id)
-                        .map((doc) => doc.id);
-                    const uniqueRelatedStakeholderIds =
-                        [...new Set(existingStakeholderIds.concat(newRelatedStakeholderIds))];
+                // Build StakeholderDocument from Stakeholder in ParliamentDocument
+                const newStakeholderDoc = transformStakeholderDocument(parliamentDocument, stakeholder);
 
-                    // doc_as_upsert: create document if it doesn't exist, otherwise update
-                    const bodyObj = {
-                        doc: {
-                            stakeholder,
-                            relatedStakeholders: uniqueRelatedStakeholderIds,
-                            meta: {
-                                updated: moment().utc()
+                // Append existing data from DB to newStakeholderDoc
+                const existingStakeholder = existingStakeholders[stakeholder.id];
+                if (existingStakeholder) {
+                    newStakeholderDoc.meta.created = existingStakeholder.meta.created;
+                    newStakeholderDoc.published = newStakeholderDoc.published.concat(existingStakeholder.published);
+
+                    for (const collaborator of existingStakeholder.collaborations) {
+                        // If stakeholders already collaborated, update, else create new
+                        if (hasCollaboration(newStakeholderDoc.collaborations, collaborator)) {
+                            // If collaboration already exists, check if they collaborated in _this_ ParliamentDocument
+                            let hasCollaborated = false;
+                            for (const reference of collaborator.references) {
+                                hasCollaborated = reference.id === parliamentDocument.id;
                             }
-                        },
-                        doc_as_upsert: true
-                    };
-                    bulkDocs.push(indexObj);
-                    bulkDocs.push(bodyObj);
+                            if (!hasCollaborated) {
+                                collaborator.references.push({
+                                    id: parliamentDocument.id,
+                                    type: DocumentReferenceType.BASE_DOCUMENT
+                                });
+                            }
+                        } else {
+                            collaborator.references = [{
+                                id: parliamentDocument.id,
+                                type: DocumentReferenceType.BASE_DOCUMENT
+                            }];
+                        }
+                    }
                 }
+
+                // Build index body
+                // doc_as_upsert: create document if it doesn't exist, otherwise update
+                const bodyObj = {
+                    doc: newStakeholderDoc,
+                    doc_as_upsert: true
+                };
+
+                // Push Index operation and Body ready to push to DB
+                bulkDocs.push(indexObj);
+                bulkDocs.push(bodyObj);
             }
+
             if (bulkDocs.length) {
                 try {
                     logger.debug(`Pushing ${bulkDocs.length / 2} documents`);
@@ -153,7 +187,7 @@ export default class StakeholderAggregator extends Aggregator {
             index: config.WDIP_MOTION_INDEX,
             scroll: "20h",
             body: {
-                _source: ["stakeholders"],
+                _source: ["stakeholders", "id"],
                 query: {
                     range: {
                         published: {

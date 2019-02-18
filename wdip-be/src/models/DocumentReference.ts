@@ -1,4 +1,5 @@
 export enum DocumentReferenceType {
+    BASE_DOCUMENT = "BASE_DOCUMENT", // Base document native to WDIP
     CONSEQUENT_MOTION = "CONSEQUENT_MOTION", // Följdmotion
     REPORT = "REPORT", // Betänkande
     UNKNOWN = "UNKNOWN"

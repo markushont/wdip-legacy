@@ -19,7 +19,6 @@ export const aggregateStakeholders = async (event, context: any) => {
     const toDate = isValidDateString(event.toDate) ?
         moment(event.toDate, "YYYY-MM-DD") : moment();
 
-    console.log(`Parameters: ${fromDate}, ${toDate}, ${scrollId}`);
     const aggregator = new StakeholderAggregator(fromDate, toDate, scrollId);
 
     try {
