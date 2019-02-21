@@ -1,0 +1,112 @@
+{
+  "_index": "motions",
+  "_type": "MOTION",
+  "_id": "MOTION:H6023009",
+  "_version": 5,
+  "_score": null,
+  "_source": {
+    "id": "MOTION:H6023009",
+    "originalId": "H6023009",
+    "title": "med anledning av skr. 2018/19:25 Riksrevisionens rapport om skyddet av värdefull skog",
+    "subTitle": "av Kristina Yngwe m.fl. (C)",
+    "fullText": "fullText",
+    "summary": null,
+    "documentType": "MOTION",
+    "documentSubtype": "Enskild motion",
+    "stakeholders": [
+      {
+        "id": "0884738092723",
+        "name": "Kristina Yngwe",
+        "party": {
+          "id": "c",
+          "name": "Centerpartiet",
+          "abbreviation": "C"
+        },
+        "role": "undertecknare"
+      },
+      {
+        "id": "0836001490919",
+        "name": "Ulrika Heie",
+        "party": {
+          "id": "c",
+          "name": "Centerpartiet",
+          "abbreviation": "C"
+        },
+        "role": "undertecknare"
+      },
+      {
+        "id": "0132818093422",
+        "name": "Rickard Nordin",
+        "party": {
+          "id": "c",
+          "name": "Centerpartiet",
+          "abbreviation": "C"
+        },
+        "role": "undertecknare"
+      },
+      {
+        "id": "057993099726",
+        "name": "Magnus Ek",
+        "party": {
+          "id": "c",
+          "name": "Centerpartiet",
+          "abbreviation": "C"
+        },
+        "role": "undertecknare"
+      }
+    ],
+    "proposals": [
+      {
+        "wording": "fooBar",
+        "committeeStatus": "UNKNOWN",
+        "chamberStatus": "UNKNOWN"
+      },
+      {
+        "wording": "fooBar",
+        "committeeStatus": "UNKNOWN",
+        "chamberStatus": "UNKNOWN"
+      },
+      {
+        "wording": "fooBar",
+        "committeeStatus": "UNKNOWN",
+        "chamberStatus": "UNKNOWN"
+      },
+      {
+        "wording": "fooBar",
+        "committeeStatus": "UNKNOWN",
+        "chamberStatus": "UNKNOWN"
+      },
+      {
+        "wording": "fooBar",
+        "committeeStatus": "UNKNOWN",
+        "chamberStatus": "UNKNOWN"
+      }
+    ],
+    "published": "2019-01-18T00:00:00.000Z",
+    "documentStatus": "PENDING",
+    "documentReferences": [
+      {
+        "type": "REPORT",
+        "id": "H601MJU8"
+      }
+    ],
+    "meta": {
+      "created": "2019-02-09T15:28:47.371Z",
+      "updated": "2019-02-09T15:28:47.371Z"
+    }
+  },
+  "fields": {
+    "meta.created": [
+      "2019-02-09T15:28:47.371Z"
+    ],
+    "meta.updated": [
+      "2019-02-09T15:28:47.371Z"
+    ],
+    "published": [
+      "2019-01-18T00:00:00.000Z"
+    ]
+  },
+  "sort": [
+    1549726127371
+  ]
+}

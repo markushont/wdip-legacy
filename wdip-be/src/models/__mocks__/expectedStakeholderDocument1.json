@@ -1,0 +1,73 @@
+{
+    "id": "0884738092723",
+    "stakeholder": {
+        "id": "0884738092723",
+        "name": "Kristina Yngwe",
+        "party": {
+            "id": "c",
+            "name": "Centerpartiet",
+            "abbreviation": "C"
+        },
+        "role": "undertecknare"
+    },
+    "collaborations": [
+        {
+            "id": "0836001490919",
+            "name": "Ulrika Heie",
+            "party": {
+                "id": "c",
+                "name": "Centerpartiet",
+                "abbreviation": "C"
+            },
+            "role": "undertecknare",
+            "references": [
+                {
+                    "id": "MOTION:H6023009",
+                    "type": "BASE_DOCUMENT"
+                }
+            ]
+        },
+        {
+            "id": "0132818093422",
+            "name": "Rickard Nordin",
+            "party": {
+                "id": "c",
+                "name": "Centerpartiet",
+                "abbreviation": "C"
+            },
+            "role": "undertecknare",
+            "references": [
+                {
+                    "id": "MOTION:H6023009",
+                    "type": "BASE_DOCUMENT"
+                }
+            ]
+        },
+        {
+            "id": "057993099726",
+            "name": "Magnus Ek",
+            "party": {
+                "id": "c",
+                "name": "Centerpartiet",
+                "abbreviation": "C"
+            },
+            "role": "undertecknare",
+            "references": [
+                {
+                    "id": "MOTION:H6023009",
+                    "type": "BASE_DOCUMENT"
+                }
+            ]
+        }
+    ],
+    "published": [
+        {
+            "id": "MOTION:H6023009",
+            "type": "BASE_DOCUMENT"
+        }
+    ],
+    "meta": {
+        "created": "2019-02-18T21:49:42.894Z",
+        "updated": "2019-02-18T21:50:31.655Z"
+    }
+}
