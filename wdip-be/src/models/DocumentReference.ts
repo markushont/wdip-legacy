@@ -19,7 +19,8 @@ export function transformDocumentReferences(source: any): DocumentReference[] {
         .filter((referens) => referens != null);
     }
 
-    return [transformDocumentReference(source.referens)];
+    const docReference: DocumentReference = transformDocumentReference(source.referens);
+    return docReference ? [transformDocumentReference(source.referens)] : [];
 }
 
 function transformDocumentReference(referens: any): DocumentReference {

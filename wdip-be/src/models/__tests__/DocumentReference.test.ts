@@ -77,6 +77,12 @@ describe("DocumentReference tests", () => {
             toEqual([]);
     });
 
+    test("Missing data", () => {
+        expect(transformDocumentReferences({})).toEqual([]);
+        expect(transformDocumentReferences({ referens: null })).toEqual([]);
+        expect(transformDocumentReferences({ referens: { referenstyp: { ref_dok_id: null }}})).toEqual([]);
+    });
+
     test("Single proposal", () => {
         expect(transformDocumentReferences({referens: sourceReference1})).
             toEqual([expectedReference1]);
