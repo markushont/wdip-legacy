@@ -42,10 +42,7 @@ export function transformStakeholderDocument(
         return {
             id: sourceSH.id,
             stakeholder: sourceSH,
-            published: [{
-                id: sourcePD.originalId,
-                type: DocumentReferenceType.BASE_DOCUMENT
-            }],
+            published: [],
             meta: { created: moment(), updated: moment() }
         };
     }
