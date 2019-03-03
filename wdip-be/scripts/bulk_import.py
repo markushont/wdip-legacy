@@ -1,8 +1,14 @@
 ## Runs wdip-be-{stage}-adminStartImport for a given date range
 ## and sub-interval length.
-## Args (in order): startDate (YYYY-MM-DD), endDate (YYYY-MM-DD), dateInterval (int), [opt] stage (test|prod)
-## Output: List of successful import invocations   (stderr)
-##         List of unsuccessful import invocations (stdout)
+## Args (in order):
+##     startDate (YYYY-MM-DD)
+##     endDate (YYYY-MM-DD)
+##     dateInterval (int)
+##     documentType (mot|prop)
+##     [opt] stage (test|prod)
+## Output:
+##     List of successful import invocations   (stderr)
+##     List of unsuccessful import invocations (stdout)
 
 from boto3 import Session as boto_session
 from datetime import date, timedelta
