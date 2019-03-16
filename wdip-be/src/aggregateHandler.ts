@@ -1,6 +1,7 @@
+import logger from "./logger";
 import moment from "moment";
-import StakeholderAggregator from "./aggregateJobs/StakeholderAggregator";
-import httpResponses from "./httpResponses";
+import StakeholderContinueAggregator from "./aggregateJobs/StakeholderContinueAggregator";
+import StakeholderEntrypointAggregator from "./aggregateJobs/StakeholderEntrypointAggregator";
 
 function isValidDateString(inStr?: string): boolean {
     if (!inStr) { return false; }
@@ -13,18 +14,29 @@ function isValidDateString(inStr?: string): boolean {
  * based on documents where they are listed together
  */
 export const aggregateStakeholders = async (event, context: any) => {
-    const scrollId = event.scrollId;
+    // First check if we're continuing an ongoing aggregation
+    if (event.scrollId) {
+        logger.debug(`Invoking with param scrollId: ${event.scrollId}`);
+        try {
+            const continueAgg = new StakeholderContinueAggregator(event.scrollId);
+            const continueAggResp = await continueAgg.start();
+            return { statusCode: 200, body: continueAggResp };
+        } catch (error) {
+            return { statusCode: 500, body: { error } };
+        }
+    }
+
     const fromDate = isValidDateString(event.fromDate) ?
         moment(event.fromDate, "YYYY-MM-DD") : moment().subtract(1, "day");
     const toDate = isValidDateString(event.toDate) ?
         moment(event.toDate, "YYYY-MM-DD") : moment();
 
-    const aggregator = new StakeholderAggregator(fromDate, toDate, scrollId);
-
+    logger.debug(`Invoking with params fromDate: ${fromDate}, toDate: ${toDate}`);
     try {
-        const continueId = await aggregator.start();
-        return httpResponses.success({ data: continueId });
+        const entrypointAgg = new StakeholderEntrypointAggregator(fromDate, toDate);
+        const entrypointAggResp = await entrypointAgg.start();
+        return { statusCode: 200, body: entrypointAggResp };
     } catch (error) {
-        return httpResponses.error(error);
+        return { statusCode: 500, body: error };
     }
 };
