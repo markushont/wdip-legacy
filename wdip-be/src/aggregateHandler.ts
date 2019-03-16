@@ -1,7 +1,7 @@
-import logger from "./logger";
 import moment from "moment";
 import StakeholderContinueAggregator from "./aggregateJobs/StakeholderContinueAggregator";
 import StakeholderEntrypointAggregator from "./aggregateJobs/StakeholderEntrypointAggregator";
+import logger from "./logger";
 
 function isValidDateString(inStr?: string): boolean {
     if (!inStr) { return false; }
