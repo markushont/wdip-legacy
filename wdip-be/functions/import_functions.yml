@@ -30,12 +30,12 @@ adminStartUpdateImport:
   events:
     - schedule:
         rate: rate(1 day)
-        enabled: ${self:provider.enableScheduled}
+        enabled: ${self:provider.enableScheduledImports}
         input:
           documentType: mot
     - schedule:
         rate: rate(1 day)
-        enabled: ${self:provider.enableScheduled}
+        enabled: ${self:provider.enableScheduledImports}
         input:
           documentType: prop
 adminHandleImportQueueEvent:
@@ -49,4 +49,4 @@ adminLogQueueStatus:
   events:
     - schedule:
         rate: rate(1 minute)
-        enabled: ${self:provider.enableScheduled}
+        enabled: false

@@ -15,7 +15,8 @@ provider:
   profile: wdip-test
   region: eu-west-1
   environment: ${file(./environment_${opt:stage, "local"}.yml)}
-  enableScheduled: false
+  enableScheduledImports: true
+  enableScheduledAggregations: false
   iamRoleStatements:
     - Effect: Allow
       Action:
