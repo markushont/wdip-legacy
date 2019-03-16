@@ -66,5 +66,11 @@ typings/
 !.vscode/launch.json
 !.vscode/extensions.json
 
+# python
+__pycache__/
+
 # local stuff
 local/
+
+# script outputs
+wdip-be/scripts/*.json
