@@ -104,6 +104,9 @@ export default abstract class StakeholderAggregator extends Aggregator {
                             }];
                         }
                     }
+                    // Concatenate new document with existing
+                    newStakeholderDoc.collaborations =
+                        newStakeholderDoc.collaborations.concat(existingStakeholder.collaborations);
                 }
 
                 // Build index body
