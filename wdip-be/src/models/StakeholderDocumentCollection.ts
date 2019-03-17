@@ -17,9 +17,9 @@ export interface StakeholderDocumentCollection extends Stakeholder {
 export function hasCollaboration(
     source: StakeholderDocumentCollection[],
     target: StakeholderDocumentCollection
-): boolean {
+): StakeholderDocumentCollection {
     for (const sdc of source) {
-        if (sdc.id === target.id) { return true; }
+        if (sdc.id === target.id) { return sdc; }
     }
-    return false;
+    return null;
 }

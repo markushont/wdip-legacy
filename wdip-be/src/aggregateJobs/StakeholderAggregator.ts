@@ -77,36 +77,35 @@ export default abstract class StakeholderAggregator extends Aggregator {
                 // Build StakeholderDocument from Stakeholder in ParliamentDocument
                 const newStakeholderDoc = transformStakeholderDocument(parliamentDocument, stakeholder);
 
-                // Append existing data from DB to newStakeholderDoc
+                // Merge with existing data in DB if it exists
                 const existingStakeholder = existingStakeholders[stakeholder.id];
                 if (existingStakeholder) {
                     newStakeholderDoc.meta.created = existingStakeholder.meta.created;
-                    newStakeholderDoc.published = newStakeholderDoc.published.concat(existingStakeholder.published);
 
-                    for (const collaborator of existingStakeholder.collaborations) {
-                        // If stakeholders already collaborated, update, else create new
-                        if (hasCollaboration(newStakeholderDoc.collaborations, collaborator)) {
-                            // If collaboration already exists, check if they collaborated in _this_ ParliamentDocument
-                            let hasCollaborated = false;
-                            for (const reference of collaborator.references) {
-                                hasCollaborated = reference.id === parliamentDocument.id;
-                            }
-                            if (!hasCollaborated) {
-                                collaborator.references.push({
+                    // Prevent from adding duplicate publish references
+                    newStakeholderDoc.published = newStakeholderDoc.published.concat(
+                        existingStakeholder.published.filter((doc) => doc.id !== parliamentDocument.id)
+                    );
+
+                    // Add collaborators from newStakeholderDoc to existingStakeholder
+                    for (const newCollaborator of newStakeholderDoc.collaborations) {
+                        const existingCollaboration =
+                            hasCollaboration(existingStakeholder.collaborations, newCollaborator);
+                        if (existingCollaboration) {
+                            // Append only if stakeholders have no recorded collabs in _this_ parliament doc
+                            if (!existingCollaboration.references.find((ref) => ref.id === parliamentDocument.id)) {
+                                existingCollaboration.references.push({
                                     id: parliamentDocument.id,
                                     type: DocumentReferenceType.BASE_DOCUMENT
                                 });
                             }
                         } else {
-                            collaborator.references = [{
-                                id: parliamentDocument.id,
-                                type: DocumentReferenceType.BASE_DOCUMENT
-                            }];
+                            // Collaborator is new, just push
+                            existingStakeholder.collaborations.push(newCollaborator);
                         }
                     }
-                    // Concatenate new document with existing
-                    newStakeholderDoc.collaborations =
-                        newStakeholderDoc.collaborations.concat(existingStakeholder.collaborations);
+                    // Overwrite newStakeholderDoc to include existing collaborations
+                    newStakeholderDoc.collaborations = existingStakeholder.collaborations;
                 }
 
                 // Build index body
