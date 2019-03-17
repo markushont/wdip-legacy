@@ -171,3 +171,5 @@ If you want to update the default Kibana configuration, do the following:
 1. Test your changes by running `docker-compose up runtime-config`.
 1. Commit your changes.
 1. At next start of the runtime config service, the new settings will be applied. Note that this will be pushed to other developers as well, overwriting the Kibana objects if they already exist, so be mindful of your changes.
+
+Nu kör vi!!!
