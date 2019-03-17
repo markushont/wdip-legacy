@@ -58,6 +58,11 @@ export abstract class IPSParliament extends ImportPublicationService {
             logger.debug("Fetching data.", { url });
             const response = await axios.get(url);
 
+            if (parseInt(response.data.dokumentlista["@traffar"], 10) === 0) {
+                logger.info("No results to parse, exiting.");
+                return;
+            }
+
             this.processDocuments(response.data.dokumentlista.dokument);
 
             // Recursively fetch the next page of documents. Note that the last page does not
