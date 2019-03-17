@@ -16,7 +16,7 @@ provider:
   region: eu-west-1
   environment: ${file(./environment_${opt:stage, "local"}.yml)}
   enableScheduledImports: true
-  enableScheduledAggregations: false
+  enableScheduledAggregations: true
   iamRoleStatements:
     - Effect: Allow
       Action:

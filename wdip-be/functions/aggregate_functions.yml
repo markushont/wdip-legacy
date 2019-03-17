@@ -5,3 +5,5 @@ aggregateStakeholders:
     - schedule:
         rate: cron(0 2 * * ? *)
         enabled: ${self:provider.enableScheduledAggregations}
+        input:
+          continueScroll: true

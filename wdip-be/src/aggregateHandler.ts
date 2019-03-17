@@ -34,7 +34,11 @@ export const aggregateStakeholders = async (event, context: any) => {
     logger.debug(`Invoking with params fromDate: ${fromDate}, toDate: ${toDate}`);
     try {
         const entrypointAgg = new StakeholderEntrypointAggregator(fromDate, toDate);
-        const entrypointAggResp = await entrypointAgg.start();
+        let entrypointAggResp = await entrypointAgg.start();
+        if (entrypointAggResp.scrollId && event.continueScroll && entrypointAgg.remainingExecutionTime > 30) {
+            const continueEntryAgg = new StakeholderContinueAggregator(entrypointAggResp.scrollId);
+            entrypointAggResp = await continueEntryAgg.start();
+        }
         return { statusCode: 200, body: entrypointAggResp };
     } catch (error) {
         return { statusCode: 500, body: error };

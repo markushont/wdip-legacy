@@ -27,6 +27,8 @@ export default class StakeholderEntrypointAggregator extends StakeholderAggregat
     public setFromDate(fromDate: Moment) { this.fromDate = fromDate.format(this.DATE_FORMAT); }
     public setToDate(toDate: Moment) { this.toDate = toDate.format(this.DATE_FORMAT); }
 
+    public get remainingExecutionTime() { return this.MAX_EXECUTION_TIME_S - this.executionTime; }
+
     protected async startInternal() {
         return await this.scrollStakeholders(this.fromDate, this.toDate);
     }
